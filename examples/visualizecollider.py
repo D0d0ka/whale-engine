@@ -1,6 +1,7 @@
 from WhaleEngine import *
 
 app = WhaleEngine(title="Mesh collider show")
+renderer = Renderer2D(app)
 
 shapes = LoadShapes()
 

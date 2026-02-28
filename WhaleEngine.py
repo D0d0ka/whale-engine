@@ -694,6 +694,18 @@ class ConversationRenderer(Renderer2D):
     def add_message(self,text):
         self.text = str(text)
 
+# plugins
+class Plugin:
+    def __init__(self,app=0,name="Plugin"):
+        if type(app) == int:
+            app = current_apps[app]
+        self.app = app
+        self.name = name
+        self.app.plugins[name] = self
+        print(f"{name} loaded.")
+    def update(self,dt):
+        pass
+
 # engine
 class WhaleEngine:
     def __init__(self, width=800, height=600, title="Whale Engine"):
@@ -701,14 +713,15 @@ class WhaleEngine:
         self.width = width
         self.height = height
         self.window = Window(width, height, title)
+        self.renderers = []
         self.input = Input(self.window)
         self.mouse = Mouse(self.window)
-        self.renderers = []
         self.collision_system = CollisionSystem(self)
         current_apps.append(self)
         self.update = None
+        self.plugins = {}
         self.last_render = perf_counter()
-        self.parentchildrelationships = []
+        self.parenting = ParentingPlugin(self)
         print("Whale engine loaded.")
     def make_entity(self, entity, renderer=0):
         self.renderers[renderer].add(entity)
@@ -729,9 +742,10 @@ class WhaleEngine:
             self.window.clear()
             if self.update != None:
                 self.update(dt)
-            for i in self.parentchildrelationships:
-                i.update()
+            self.parenting.update(dt)
             self.collision_system.update()
+            for i in self.plugins:
+                self.plugins[i].update(dt)
             for i in self.renderers:
                 i.update(dt)
                 i.update_entitys(dt)
@@ -743,6 +757,14 @@ class WhaleEngine:
 current_apps = []
 
 #parenting
+class ParentingPlugin(Plugin):
+    def __init__(self,app):
+        super().__init__(app,name="Parenting")
+        self.parentchildrelationships = []
+    def update(self, dt):
+        for i in self.parentchildrelationships:
+            i.update()
+
 class ParentIn:
     def __init__(self, parent, child, attributes={"x": "set", "y": "set"}, app=0):
         self.parent = parent
@@ -757,7 +779,7 @@ class ParentIn:
         for attr, mode in attributes.items():
             value = getattr(self.parent, attr)
             self.attrs[attr] = {"last": value,"mode": mode}
-        self.app.parentchildrelationships.append(self)
+        self.app.parenting.parentchildrelationships.append(self)
     def update(self):
         try:
             for attr, data in self.attrs.items():
@@ -774,7 +796,7 @@ class ParentIn:
                         )
                     data["last"] = parent_value
         except:
-            current_apps[self.app].parentchildrelationships.remove(self)
+            current_apps[self.app].parenting.parentchildrelationships.remove(self)
             self.child.parentings.remove(self)
             self.parent.parentings.remove(self)
 

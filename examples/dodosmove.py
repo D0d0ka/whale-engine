@@ -1,6 +1,7 @@
 from WhaleEngine import * 
 
 app = WhaleEngine(title="Dodos moving demo")
+renderer = Renderer2D(app)
 app.window.set_color(Color.white)
 shapes = LoadShapes()
 

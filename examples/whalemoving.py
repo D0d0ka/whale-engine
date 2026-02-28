@@ -1,6 +1,7 @@
 from WhaleEngine import *
 
 app = WhaleEngine(title="Whale moving demo")
+renderer = Renderer2D(app)
 app.window.set_color(Color.cyan)
 
 shapes = LoadShapes()
