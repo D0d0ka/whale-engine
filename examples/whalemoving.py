@@ -1,0 +1,47 @@
+from WhaleEngine import *
+
+app = WhaleEngine(title="Whale moving demo")
+app.window.set_color(Color.cyan)
+
+shapes = LoadShapes()
+
+dodo = Entity2D(texture=shapes.dodo)
+player = Entity2D(texture=shapes.whale)
+player.collider = CircleCollider2D(100,visualize=True,visualition_color=Color.red)
+ParentIn(player,player.collider)
+dodo.collider = CircleCollider2D(200,visualize=True,visualition_color=Color.red)#MeshCollider2D(shapes.dodo,visualize=True,visualition_color=Color.red)#CircleCollider2D(200,visualize=True,visualition_color=Color.red)
+
+speed = 200
+way = "u"
+
+def update(dt):
+    global speed, way
+    if player.collider.colliding:
+        print(f"Player is colliding! Pos: ({player.collider.x:.1f},{player.collider.y:.1f})")
+    if app.input.key(glfw.KEY_W) or app.input.key(glfw.KEY_UP):
+        way = "u"
+    elif app.input.key(glfw.KEY_S) or app.input.key(glfw.KEY_DOWN):
+        way = "d"
+    if app.input.key(glfw.KEY_D) or app.input.key(glfw.KEY_RIGHT):
+        way = "r"
+    if app.input.key(glfw.KEY_A) or app.input.key(glfw.KEY_LEFT):
+        way = "l"
+    if way == "u":
+        player.y += speed*dt
+        player.rotation = 270
+    elif way == "d":
+        player.y -= speed*dt
+        player.rotation = 90
+    elif way == "r":
+        player.x += speed*dt
+        player.rotation = 180
+    elif way == "l":
+        player.x -= speed*dt
+        player.rotation = 0
+    if app.input.key(glfw.KEY_ESCAPE):
+        sys.exit()
+    if app.input.key_pressed(glfw.KEY_E):
+        destroy(dodo)
+app.update = update
+
+app.run()
