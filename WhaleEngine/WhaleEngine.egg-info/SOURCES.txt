@@ -1,7 +1,0 @@
-README.md
-pyproject.toml
-WhaleEngine.egg-info/PKG-INFO
-WhaleEngine.egg-info/SOURCES.txt
-WhaleEngine.egg-info/dependency_links.txt
-WhaleEngine.egg-info/top_level.txt
-whaleengine/__init__.py

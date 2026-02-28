@@ -1,9 +1,0 @@
-[build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
-
-[project]
-name = "WhaleEngine"
-version = "0.0.1"
-description = "Currently under development"
-authors = [{ name="Dodo rubiks cube" }]
