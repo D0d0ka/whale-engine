@@ -4,7 +4,7 @@ app = WhaleEngine(title="Whale moving demo")
 
 app.input = InputSystem()
 ParentingSystem()
-CircleCollisionSystem()
+CircleCollisionSystem2D()
 
 renderer = Renderer2D()
 app.window.set_color(Color.cyan)

@@ -6,7 +6,7 @@ shapes = LoadShapes()
 app.input = InputSystem()
 MouseSystem()
 ParentingSystem()
-CircleCollisionSystem()
+CircleCollisionSystem2D()
 
 
 def button1onclick():

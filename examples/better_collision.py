@@ -6,7 +6,7 @@ app = WhaleEngine(title="Better Collision System")
 render = Renderer2D()
 shapes = LoadShapes()
 ParentingSystem()
-BetterCollisionSystem()
+BetterCollisionSystem2D()
 MouseSystem()
 
 base_quad = QuadCollider2D(

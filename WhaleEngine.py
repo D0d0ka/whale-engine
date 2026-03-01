@@ -6,24 +6,6 @@ from time import perf_counter
 import colorsys
 import math
 
-presset = """from WhaleEngine import *
-
-app = WhaleEngine(title="Whale engine app")
-render = Renderer2D()
-#app.input = InputSystem()
-shapes = LoadShapes()
-
-#entity = Entity2D(texture=shapes.square)
-
-def update(dt):
-    #if app.input.key(glfw.KEY_SPACE):
-    #    entity.rotation += 90 * dt
-    #    entity.x += 100 * dt
-    pass
-app.update = update
-
-app.run()"""
-
 # other stuff
 class rarity:
     def __init__(self,one_out_of):
@@ -100,6 +82,30 @@ class Color:
     yellow  = None
     magenta = None
     cyan    = None
+    orange  = None
+    purple  = None
+    pink    = None
+    gray    = None
+    light_gray = None
+    dark_gray  = None
+    brown   = None
+    lime    = None
+    navy    = None
+    sky     = None
+    teal    = None
+    olive   = None
+    maroon  = None
+    silver  = None
+    gold    = None
+    indigo  = None
+    violet  = None
+    coral   = None
+    salmon  = None
+    turquoise = None
+    beige   = None
+    mint    = None
+    lavender = None
+    crimson = None
 
 Color.white   = Color(1,1,1,1)
 Color.black   = Color(0,0,0,1)
@@ -109,6 +115,30 @@ Color.blue    = Color(0,0,1,1)
 Color.yellow  = Color(1,1,0,1)
 Color.magenta = Color(1,0,1,1)
 Color.cyan    = Color(0,1,1,1)
+Color.orange  = Color.rgb(255,165,0)
+Color.purple  = Color.rgb(128,0,128)
+Color.pink    = Color.rgb(255,105,180)
+Color.gray    = Color.rgb(128,128,128)
+Color.light_gray = Color.rgb(211,211,211)
+Color.dark_gray  = Color.rgb(64,64,64)
+Color.brown   = Color.rgb(139,69,19)
+Color.lime    = Color.rgb(50,205,50)
+Color.navy    = Color.rgb(0,0,128)
+Color.sky     = Color.rgb(135,206,235)
+Color.teal    = Color.rgb(0,128,128)
+Color.olive   = Color.rgb(128,128,0)
+Color.maroon  = Color.rgb(128,0,0)
+Color.silver  = Color.rgb(192,192,192)
+Color.gold    = Color.rgb(255,215,0)
+Color.indigo  = Color.rgb(75,0,130)
+Color.violet  = Color.rgb(238,130,238)
+Color.coral   = Color.rgb(255,127,80)
+Color.salmon  = Color.rgb(250,128,114)
+Color.turquoise = Color.rgb(64,224,208)
+Color.beige   = Color.rgb(245,245,220)
+Color.mint    = Color.rgb(152,255,152)
+Color.lavender = Color.rgb(230,230,250)
+Color.crimson = Color.rgb(220,20,60)
 
 # window
 class Window:
@@ -219,6 +249,12 @@ class Texture:
             GL_RGBA, GL_UNSIGNED_BYTE, data
         )
 
+# model
+class Model:
+    def __init__(self, path):
+        self.path = path
+        # model loading code would go here
+
 # input
 class InputSystem(Plugin):
     def __init__(self):
@@ -302,7 +338,12 @@ class LoadShapes:
         self.dot = Texture("assets/shapes/dot.png")
         print("Shapes loaded.")
 
-# entitys
+class LoadModels:
+    def __init__(self):
+        self.cube = Model("assets/models/cube.obj")
+        print("Models loaded.")
+
+# entitys 2D
 class Entity2D:
     def __init__(self, *,texture,color=Color.white,position=(0, 0),scale=(1, 1),rotation=0.0,update=False,renderer=0):
         global current_app
@@ -398,6 +439,12 @@ class Text2D(Entity2D):
         self.font_size = max(1, int(new_font_size))
         self.set_text(self.text)
 
+# entitys 3d
+class Entity3D:
+    def __init__(self, *,model,texture,color=Color.white,position=(0, 0, 0),scale=(1, 1, 1),rotation=(0, 0, 0),update=False,renderer=0):
+        pass
+
+# destroying entitys and colliders
 def destroy(entity):
     if entity.entity_type == "Entity":
         if entity in entity.renderer.entities:
@@ -409,8 +456,8 @@ def destroy(entity):
             destroy(entity.visualition)
         for i in list(entity.parentings):
             destroy(i)
-        if entity in current_app.CircleCollisionSystem.circle_colliders:
-            current_app.CircleCollisionSystem.circle_colliders.remove(entity)
+        if entity in current_app.CircleCollisionSystem2D.circle_colliders:
+            current_app.CircleCollisionSystem2D.circle_colliders.remove(entity)
     elif entity.entity_type == "Parenting":
         if entity in current_app.ParentingSystem.parentchildrelationships:
             current_app.ParentingSystem.parentchildrelationships.remove(entity)
@@ -420,17 +467,17 @@ def destroy(entity):
                 destroy(dot)
         for i in list(entity.parentings):
             destroy(i)
-        if hasattr(current_app, "CircleCollisionSystem") and entity in current_app.CircleCollisionSystem.mesh_colliders:
-            current_app.CircleCollisionSystem.mesh_colliders.remove(entity)
-        if hasattr(current_app, "BetterCollisionSystem") and entity in current_app.BetterCollisionSystem.colliders:
-            current_app.BetterCollisionSystem.colliders.remove(entity)
+        if hasattr(current_app, "CircleCollisionSystem2D") and entity in current_app.CircleCollisionSystem2D.mesh_colliders:
+            current_app.CircleCollisionSystem2D.mesh_colliders.remove(entity)
+        if hasattr(current_app, "BetterCollisionSystem2D") and entity in current_app.BetterCollisionSystem2D.colliders:
+            current_app.BetterCollisionSystem2D.colliders.remove(entity)
     elif entity.entity_type == "Quad Collider":
         if entity.visualize:
             destroy(entity.visualition)
         for i in list(entity.parentings):
             destroy(i)
-        if hasattr(current_app, "BetterCollisionSystem") and entity in current_app.BetterCollisionSystem.colliders:
-            current_app.BetterCollisionSystem.colliders.remove(entity)
+        if hasattr(current_app, "BetterCollisionSystem") and entity in current_app.BetterCollisionSystem2D.colliders:
+            current_app.BetterCollisionSystem2D.colliders.remove(entity)
 
 # Circle collider
 class CircleCollider2D:
@@ -452,7 +499,7 @@ class CircleCollider2D:
         if visualize == True:
             self.visualition = Entity2D(texture=LoadShapes().circle,scale=(size/100,size/100),color=visualition_color,renderer=visualition_renderer)
             ParentIn(self,self.visualition)
-        current_app.CircleCollisionSystem.add_circle(self)
+        current_app.CircleCollisionSystem2D.add_circle(self)
     def visualize(self):
         if not self.visualized:
             self.visualition = Entity2D(texture=LoadShapes().circle,scale=(self.size/50,self.size/50),color=self.visualition_color,renderer=self.visualition_renderer)
@@ -520,7 +567,7 @@ class MeshCircleCollider2D:
                 if loaded >= load_once:
                     glfw.poll_events()
                     loaded = 0
-            current_app.CircleCollisionSystem.add_mesh(self)
+            current_app.CircleCollisionSystem2D.add_mesh(self)
     def get_position(self):
         return (self.x, self.y)
     def ignore(self, collider):
@@ -529,7 +576,7 @@ class MeshCircleCollider2D:
 def layers_match(a, b):
     return bool(set(a.layers) & set(b.layers))
 
-class CircleCollisionSystem(Plugin):
+class CircleCollisionSystem2D(Plugin):
     def __init__(self):
         super().__init__()
         self.circle_colliders = []
@@ -586,7 +633,7 @@ class QuadCollider2D:
         if visualize:
             self.visualition = Entity2D(texture=LoadShapes().square, scale=(w/100, h/100), rotation=rotation, color=visualition_color, renderer=visualition_renderer)
             ParentIn(self, self.visualition, attributes={"x": "set", "y": "set", "rotation": "set"})
-        current_app.BetterCollisionSystem.add_quad(self)
+        current_app.BetterCollisionSystem2D.add_quad(self)
     def get_position(self):
         return (self.x, self.y)
     def ignore(self, collider):
@@ -649,7 +696,7 @@ class MeshCollider2D:
             )
             ParentIn(self, self.visualition, attributes={"x": "set", "y": "set", "rotation": "set"})
 
-        current_app.BetterCollisionSystem.add_mesh(self)
+        current_app.BetterCollisionSystem2D.add_mesh(self)
 
     def get_position(self):
         return (self.x, self.y)
@@ -657,7 +704,7 @@ class MeshCollider2D:
     def ignore(self, collider):
         self.ignores.append(collider)
 
-class BetterCollisionSystem(Plugin):
+class BetterCollisionSystem2D(Plugin):
     def __init__(self):
         super().__init__()
         self.colliders = []

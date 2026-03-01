@@ -4,7 +4,7 @@ app = WhaleEngine(title="Mesh collider show")
 renderer = Renderer2D()
 app.input = InputSystem()
 ParentingSystem()
-CircleCollisionSystem()
+CircleCollisionSystem2D()
 
 
 shapes = LoadShapes()
