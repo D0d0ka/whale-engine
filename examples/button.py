@@ -3,6 +3,11 @@ from WhaleEngine import *
 app = WhaleEngine(title="button")
 renderer = Renderer2D()
 shapes = LoadShapes()
+app.input = InputSystem()
+MouseSystem()
+ParentingSystem()
+CircleCollisionSystem()
+
 
 def button1onclick():
     print("click")

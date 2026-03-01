@@ -44,11 +44,15 @@ def none(d=None):
 
 # plugins
 class Plugin:
-    def __init__(self,name="Plugin"):
+    def __init__(self):
         global current_app
-        self.name = name
-        current_app.plugins[name] = self
-        print(f"{name} loaded.")
+        self.name = self.__class__.__name__
+        current_app.plugins[self.name] = self
+        if not hasattr(current_app, "attrs"):
+            current_app.attrs = {}
+        current_app.attrs[self.name] = self
+        setattr(current_app, self.__class__.__name__, self)
+        print(f"{self.name} loaded.")
     def update(self,dt):
         pass
 
@@ -211,36 +215,40 @@ class Texture:
         )
 
 # input
-class Input:
-    def __init__(self, window):
-        self.window = window
+class InputSystem(Plugin):
+    def __init__(self):
+        super().__init__()
+        self.window = current_app.window
         self.keys = {}
         self.mouse = {}
-
-        glfw.set_key_callback(window.handle, self._key)
-        glfw.set_mouse_button_callback(window.handle, self._mouse)
-        print("Input loaded.")
+        self.prev_keys = {}
+        self.pressed_keys = {}
+        glfw.set_key_callback(self.window.handle, self._key)
     def _key(self, win, key, scancode, action, mods):
-        self.keys[key] = action != glfw.RELEASE
-
-    def _mouse(self, win, button, action, mods):
-        self.mouse[button] = action != glfw.RELEASE
+        if action == glfw.PRESS:
+            self.keys[key] = True
+        elif action == glfw.REPEAT:
+            self.keys[key] = True
+        elif action == glfw.RELEASE:
+            self.keys[key] = False
 
     def key(self, k):
         return self.keys.get(k, False)
-
-    def mouse_button(self, b):
-        return self.mouse.get(b, False)
     
     def key_pressed(self, k):
-        return self.keys.get(k) and not self.prev_keys.get(k)
+        return self.pressed_keys.get(k, False)
     
-    def update(self):
+    def update(self,dt):
+        self.pressed_keys = {}
+        for key, is_down in self.keys.items():
+            if is_down and not self.prev_keys.get(key, False):
+                self.pressed_keys[key] = True
         self.prev_keys = self.keys.copy()
 
-class Mouse:
-    def __init__(self, window):
-        self.window = window
+class MouseSystem(Plugin):
+    def __init__(self):
+        super().__init__()
+        self.window = current_app.window
         self.x = 0
         self.y = 0
         self.wx = 0
@@ -249,8 +257,7 @@ class Mouse:
         self.right_down = False
         self.prev_left = False
         self.prev_right = False
-        print("Mouse loaded.")
-    def update(self):
+    def update(self,dt):
         win = self.window.handle
         mx, my = glfw.get_cursor_pos(win)
         self.x = mx
@@ -313,9 +320,9 @@ class Button2D(Entity2D):
         self.onpress = onpress
     def update(self, dt):
         global current_app
-        if self.collider.colliding and current_app.mouse.left_pressed():
+        if self.collider.colliding and current_app.MouseSystem.left_pressed():
             self.onclick()
-        if self.collider.colliding and current_app.mouse.left_down:
+        if self.collider.colliding and current_app.MouseSystem.left_down:
             self.onpress()
 
 class Text2D(Entity2D):
@@ -388,16 +395,16 @@ def destroy(entity):
             destroy(entity.visualition)
         for i in entity.parentings:
             destroy(i)
-        current_app.collision_system.circle_colliders.remove(entity)
+        current_app.CircleCollisionSystem.circle_colliders.remove(entity)
     elif entity.entity_type == "Parenting":
-        if entity in current_app.parenting.parentchildrelationships:
-            current_app.parenting.parentchildrelationships.remove(entity)
+        if entity in current_app.ParentingSystem.parentchildrelationships:
+            current_app.ParentingSystem.parentchildrelationships.remove(entity)
     elif entity.entity_type == "Mesh Collider":
         for dot in entity.dots:
             destroy(dot)
         for i in entity.parentings:
             destroy(i)
-        current_app.collision_system.mesh_colliders.remove(entity)
+        current_app.CircleCollisionSystem.mesh_colliders.remove(entity)
 
 # Circle collider
 class CircleCollider2D:
@@ -419,7 +426,7 @@ class CircleCollider2D:
         if visualize == True:
             self.visualition = Entity2D(texture=LoadShapes().circle,scale=(size/100,size/100),color=visualition_color,renderer=visualition_renderer)
             ParentIn(self,self.visualition)
-        current_app.collision_system.add_circle(self)
+        current_app.CircleCollisionSystem.add_circle(self)
     def visualize(self):
         if not self.visualized:
             self.visualition = Entity2D(texture=LoadShapes().circle,scale=(self.size/50,self.size/50),color=self.visualition_color,renderer=self.visualition_renderer)
@@ -487,7 +494,7 @@ class MeshCircleCollider2D:
                 if loaded >= load_once:
                     glfw.poll_events()
                     loaded = 0
-            current_app.collision_system.add_mesh(self)
+            current_app.CircleCollisionSystem.add_mesh(self)
     def get_position(self):
         return (self.x, self.y)
     def ignore(self, collider):
@@ -498,10 +505,9 @@ def layers_match(a, b):
 
 class CircleCollisionSystem(Plugin):
     def __init__(self):
-        super().__init__(name="Circle Collision System")
+        super().__init__()
         self.circle_colliders = []
         self.mesh_colliders = []
-        print("Collision system loaded.")
     def add_circle(self, collider): 
         self.circle_colliders.append(collider)
     def add_mesh(self, collider): 
@@ -515,7 +521,7 @@ class CircleCollisionSystem(Plugin):
         for first in self.circle_colliders:
             for second in self.circle_colliders:
                 if "mouse" in first.layers:
-                    if distance2D(first,current_app.mouse) < first.size:
+                    if distance2D(first,current_app.MouseSystem) < first.size:
                         first.colliding = True
                         break
                 if first == second:
@@ -709,12 +715,9 @@ class WhaleEngine:
         self.window = Window(width, height, title)
         self.renderers = []
         self.plugins = {}
-        self.input = Input(self.window)
-        self.mouse = Mouse(self.window)
-        self.collision_system = CircleCollisionSystem()
+        self.attrs = {}
         self.update = None
         self.last_render = perf_counter()
-        self.parenting = ParentingSystem()
         print("Whale engine started.")
     def make_entity(self, entity, renderer=0):
         self.renderers[renderer].add(entity)
@@ -729,8 +732,6 @@ class WhaleEngine:
         while not self.window.should_close():
             this_update = perf_counter()
             dt = this_update-self.last_render
-            self.input.update()
-            self.mouse.update()
             self.window.poll()
             self.window.clear()
             for i in self.plugins:
@@ -744,13 +745,16 @@ class WhaleEngine:
             self.window.swap()
             self.last_render = this_update
         self.window.terminate()
+    def close_app(self):
+        self.window.terminate()
 
+# app
 current_app = None
 
 #parenting
 class ParentingSystem(Plugin):
     def __init__(self):
-        super().__init__(name="Parenting")
+        super().__init__()
         self.parentchildrelationships = []
     def update(self, dt):
         for i in self.parentchildrelationships:
@@ -768,7 +772,7 @@ class ParentIn:
         for attr, mode in attributes.items():
             value = getattr(self.parent, attr)
             self.attrs[attr] = {"last": value,"mode": mode}
-        current_app.parenting.parentchildrelationships.append(self)
+        current_app.ParentingSystem.parentchildrelationships.append(self)
     def update(self):
         try:
             for attr, data in self.attrs.items():
@@ -785,7 +789,7 @@ class ParentIn:
                         )
                     data["last"] = parent_value
         except:
-            current_app.parenting.parentchildrelationships.remove(self)
+            current_app.ParentingSystem.parentchildrelationships.remove(self)
             self.child.parentings.remove(self)
             self.parent.parentings.remove(self)
 

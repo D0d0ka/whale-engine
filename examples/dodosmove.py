@@ -4,6 +4,7 @@ app = WhaleEngine(title="Dodos moving demo")
 renderer = Renderer2D()
 app.window.set_color(Color.white)
 shapes = LoadShapes()
+app.input = InputSystem()
 
 class dodoentity(Entity2D):
     def __init__(self, position=(0,0),range=100,speed=100,player=False):
@@ -35,7 +36,7 @@ def update(dt):
     FPS_counter(dt,0.05)
     if app.input.key_pressed(glfw.KEY_ESCAPE):
         summarize_FPS()
-        sys.exit()
+        app.close_app()
 app.update = update
 
 app.run()

@@ -2,6 +2,7 @@ from WhaleEngine import *
 
 app = WhaleEngine(title="Whale engine app")
 render = Renderer2D()
+#app.input = InputSystem()
 shapes = LoadShapes()
 
 #entity = Entity2D(texture=shapes.square)

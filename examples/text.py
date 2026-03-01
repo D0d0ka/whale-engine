@@ -2,6 +2,7 @@ from WhaleEngine import *
 
 app = WhaleEngine(title="text")
 renderer = Renderer2D()
+app.input = InputSystem()
 shapes = LoadShapes()
 
 text = Text2D("dodo")

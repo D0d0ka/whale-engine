@@ -1,6 +1,11 @@
 from WhaleEngine import *
 
 app = WhaleEngine(title="Whale moving demo")
+
+app.input = InputSystem()
+ParentingSystem()
+CircleCollisionSystem()
+
 renderer = Renderer2D()
 app.window.set_color(Color.cyan)
 

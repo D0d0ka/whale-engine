@@ -3,6 +3,7 @@ from WhaleEngine import *
 app = WhaleEngine(title="Conversation")
 conversation = ConversationRenderer()
 conversation.add_message("Hello, how are you?")
+app.input = InputSystem()
 
 shapes = LoadShapes()
 

@@ -11,6 +11,7 @@ directions = {"up": (0, -1),"down": (0, 1),"left": (-1, 0),"right": (1, 0)}
 
 app = WhaleEngine(title="Boom",width=round(window_size_multiplier*800),height=round(window_size_multiplier*600))
 main_renderer = Renderer2D()
+app.input = InputSystem()
 
 openpath = load_texture("open.png")
 closedpath = load_texture("closed.png")
@@ -77,7 +78,6 @@ maps = [
         "spawn position":(0,3),
         "spawn way":"up"
     },
-
 ]
 
 class Map:
@@ -155,7 +155,7 @@ class Player:
         if app.input.key_pressed(glfw.KEY_ESCAPE):
             exit()
 
-current_map_data = maps[2]
+current_map_data = maps[1]
 current_map_name = maps[0]["name"]
 current_map = Map(current_map_data)
 current_map_spawn_position = current_map_data["spawn position"] 
