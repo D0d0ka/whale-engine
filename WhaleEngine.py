@@ -347,6 +347,8 @@ class LoadModels:
 class Entity2D:
     def __init__(self, *,texture,color=Color.white,position=(0, 0),scale=(1, 1),rotation=0.0,update=False,renderer=0):
         global current_app
+        if type(texture) == str:
+            texture = Texture(texture)
         self.texture = texture
         self.x, self.y = position
         self.w, self.h = texture.w, texture.h
@@ -442,6 +444,21 @@ class Text2D(Entity2D):
 # entitys 3d
 class Entity3D:
     def __init__(self, *,model,texture,color=Color.white,position=(0, 0, 0),scale=(1, 1, 1),rotation=(0, 0, 0),update=False,renderer=0):
+        if type(renderer) == int:
+            renderer = current_app.renderers[renderer]
+        self.renderer = renderer
+        if type(model) == str:
+            model = Model(model)
+        self.model = model
+        if type(texture) == str:
+            texture = Texture(texture)
+        self.texture = texture
+        self.color = color
+        self.x, self.y, self.z = position
+        self.scale_x, self.scale_y, self.scale_z = scale
+        self.rot_x, self.rot_y, self.rot_z = rotation
+        self.do_update = update
+    def update(self,dt):
         pass
 
 # destroying entitys and colliders
