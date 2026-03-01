@@ -9,7 +9,7 @@ import math
 presset = """from WhaleEngine import *
 
 app = WhaleEngine(title="Whale engine app")
-render = Renderer2D(app)
+render = Renderer2D()
 shapes = LoadShapes()
 
 def update(dt):
@@ -41,6 +41,16 @@ def Or(first,second):
 
 def none(d=None):
     return None
+
+# plugins
+class Plugin:
+    def __init__(self,name="Plugin"):
+        global current_app
+        self.name = name
+        current_app.plugins[name] = self
+        print(f"{name} loaded.")
+    def update(self,dt):
+        pass
 
 # color
 class Color:
@@ -274,7 +284,8 @@ class LoadShapes:
 
 # entitys
 class Entity2D:
-    def __init__(self, *,texture,color=Color.white,position=(0, 0),scale=(1, 1),rotation=0.0,update=False,app=0,renderer=0):
+    def __init__(self, *,texture,color=Color.white,position=(0, 0),scale=(1, 1),rotation=0.0,update=False,renderer=0):
+        global current_app
         self.texture = texture
         self.x, self.y = position
         self.w, self.h = texture.w, texture.h
@@ -282,11 +293,8 @@ class Entity2D:
         self.rotation = rotation
         self.do_update = update
         self.color = color
-        if type(app) == int:
-            app = current_apps[app]
-        self.app = app
         if type(renderer) == int:
-            renderer = self.app.renderers[renderer]
+            renderer = current_app.renderers[renderer]
         self.renderer = renderer
         self.entity_type = "Entity"
         self.parentings = []
@@ -297,21 +305,21 @@ class Entity2D:
         pass
 
 class Button2D(Entity2D):
-    def __init__(self, onclick=none,onpress=none, *,density=8,size=20, texture, color=Color.white, position=(0, 0), app=0, renderer=0):
-        super().__init__(texture=texture, color=color, position=position, update=True, app=app, renderer=renderer)
-        self.collider = MeshCollider2D(texture,size=size,density=density,layers=["mouse"],app=app)
-        ParentIn(self,self.collider,app=app)
+    def __init__(self, onclick=none,onpress=none, *,density=8,size=20, texture, color=Color.white, position=(0, 0), renderer=0):
+        super().__init__(texture=texture, color=color, position=position, update=True, renderer=renderer)
+        self.collider = MeshCircleCollider2D(texture,size=size,density=density,layers=["mouse"])
+        ParentIn(self,self.collider)
         self.onclick = onclick
         self.onpress = onpress
-        self.app = current_apps[app]
     def update(self, dt):
-        if self.collider.colliding and self.app.mouse.left_pressed():
+        global current_app
+        if self.collider.colliding and current_app.mouse.left_pressed():
             self.onclick()
-        if self.collider.colliding and self.app.mouse.left_down:
+        if self.collider.colliding and current_app.mouse.left_down:
             self.onpress()
 
 class Text2D(Entity2D):
-    def __init__(self, text, font_path="arial.ttf", font_size=32, color=Color.white, position=(0,0), app=0, renderer=0):
+    def __init__(self, text, font_path="arial.ttf", font_size=32, color=Color.white, position=(0,0), renderer=0):
         self.text = text
         self.font_path = font_path
         self.font_size = font_size
@@ -320,7 +328,7 @@ class Text2D(Entity2D):
 
         # Create texture from text
         self.texture = self.create_text_texture(text, font_path, font_size, color)
-        super().__init__(texture=self.texture, color=color, position=position, update=False, app=app, renderer=renderer)
+        super().__init__(texture=self.texture, color=color, position=position, update=False, renderer=renderer)
 
     def create_text_texture(self, text, font_path, font_size, color):
         # Load font
@@ -380,26 +388,24 @@ def destroy(entity):
             destroy(entity.visualition)
         for i in entity.parentings:
             destroy(i)
-        current_apps[entity.app].collision_system.circle_colliders.remove(entity)
+        current_app.collision_system.circle_colliders.remove(entity)
     elif entity.entity_type == "Parenting":
-        if entity in current_apps[entity.app].parentchildrelationships:
-            current_apps[entity.app].parentchildrelationships.remove(entity)
+        if entity in current_app.parenting.parentchildrelationships:
+            current_app.parenting.parentchildrelationships.remove(entity)
     elif entity.entity_type == "Mesh Collider":
         for dot in entity.dots:
             destroy(dot)
         for i in entity.parentings:
             destroy(i)
-        current_apps[entity.app].collision_system.mesh_colliders.remove(entity)
+        current_app.collision_system.mesh_colliders.remove(entity)
 
-# collider
+# Circle collider
 class CircleCollider2D:
-    def __init__(self,size,*,layers=[0],position=(0,0),app=0,visualize=False,visualition_color=Color.cyan,visualition_renderer=0):
+    def __init__(self,size,*,layers=[0],position=(0,0),visualize=False,visualition_color=Color.cyan,visualition_renderer=0):
+        global current_app
         self.x, self.y = position
         self.size = size/2
         self.layers = layers
-        if type(app) == int:
-            app = current_apps[app]
-        self.app = app
         self.colliding = False
         self.parentings = []
         self.ignores = []
@@ -413,7 +419,7 @@ class CircleCollider2D:
         if visualize == True:
             self.visualition = Entity2D(texture=LoadShapes().circle,scale=(size/100,size/100),color=visualition_color,renderer=visualition_renderer)
             ParentIn(self,self.visualition)
-        self.app.collision_system.add_circle(self)
+        current_app.collision_system.add_circle(self)
     def visualize(self):
         if not self.visualized:
             self.visualition = Entity2D(texture=LoadShapes().circle,scale=(self.size/50,self.size/50),color=self.visualition_color,renderer=self.visualition_renderer)
@@ -431,17 +437,15 @@ class CircleCollider2D:
 def pixel_is_solid(r, g, b, a, alpha_threshold=10):
     return a > alpha_threshold
 
-class MeshCollider2D:
-    def __init__(self,shape='Texture("Path to your texture") without string',density=8,size=8,offset_x=50,offset_y=60,*,layers=[0],position=(0,0),visualize=False,visualition_color=Color.cyan,app=0,visualition_renderer=0,load_once=10):
+class MeshCircleCollider2D:
+    def __init__(self,shape='Texture("Path to your texture") without string',density=8,size=8,offset_x=50,offset_y=60,*,layers=[0],position=(0,0),visualize=False,visualition_color=Color.cyan,visualition_renderer=0,load_once=10):
+        global current_app
         self.x, self.y = position
         self.shape = shape
         if shape == 'Texture("Path to your texture") without string':
             self.shape = LoadShapes().square
         self.density = density
         self.layers = layers
-        if type(app) == int:
-            app = current_apps[app]
-        self.app = app
         self.colliding = False
         self.parentings = []
         self.ignores = []
@@ -471,12 +475,11 @@ class MeshCollider2D:
                 dot = CircleCollider2D(
                     size=size,
                     layers=self.layers,
-                    app=self.app,
                     visualize=self.visualize,
                     visualition_color=visualition_color,
                     visualition_renderer=visualition_renderer
                 )
-                ParentIn(self, dot, attributes={"x": "add", "y": "add"}, app=self.app)
+                ParentIn(self, dot, attributes={"x": "add", "y": "add"})
                 dot.x = self.x + local_x
                 dot.y = self.y + local_y
                 dot.owner = self
@@ -484,7 +487,7 @@ class MeshCollider2D:
                 if loaded >= load_once:
                     glfw.poll_events()
                     loaded = 0
-        self.app.collision_system.add_mesh(self)
+            current_app.collision_system.add_mesh(self)
     def get_position(self):
         return (self.x, self.y)
     def ignore(self, collider):
@@ -493,9 +496,9 @@ class MeshCollider2D:
 def layers_match(a, b):
     return bool(set(a.layers) & set(b.layers))
 
-class CollisionSystem: 
-    def __init__(self,app):
-        self.app = app
+class CircleCollisionSystem(Plugin):
+    def __init__(self):
+        super().__init__(name="Circle Collision System")
         self.circle_colliders = []
         self.mesh_colliders = []
         print("Collision system loaded.")
@@ -503,7 +506,8 @@ class CollisionSystem:
         self.circle_colliders.append(collider)
     def add_mesh(self, collider): 
         self.mesh_colliders.append(collider)
-    def update(self):
+    def update(self,dt):
+        global current_app
         for c in self.circle_colliders:
             c.colliding = False
         for c in self.mesh_colliders:
@@ -511,7 +515,7 @@ class CollisionSystem:
         for first in self.circle_colliders:
             for second in self.circle_colliders:
                 if "mouse" in first.layers:
-                    if distance2D(first,self.app.mouse) < first.size:
+                    if distance2D(first,current_app.mouse) < first.size:
                         first.colliding = True
                         break
                 if first == second:
@@ -533,11 +537,9 @@ class CollisionSystem:
 
 # renderers
 class Renderer2D:
-    def __init__(self,app=0):
-        if type(app) == int:
-            app = current_apps[app]
-        self.app = app
-        self.app.renderers.append(self)
+    def __init__(self):
+        global current_app
+        current_app.renderers.append(self)
         self.entities = []
         print("Renderer 2d loaded.")
     def start(self):
@@ -576,8 +578,8 @@ class Renderer2D:
         glDisable(GL_TEXTURE_2D)
 
 class ConversationRenderer(Renderer2D):
-    def __init__(self,app,text_color=Color.white,backround_color=Color.black,font_path="arial.ttf"):
-        super().__init__(app)
+    def __init__(self,text_color=Color.white,backround_color=Color.black,font_path="arial.ttf"):
+        super().__init__()
         self.text_color = text_color
         self.backround_color = backround_color
         self.font_path = font_path
@@ -669,14 +671,16 @@ class ConversationRenderer(Renderer2D):
         return selected_text, selected_size
 
     def start(self): 
+        global current_app
         self.backround = Entity2D(texture=LoadShapes().dot,renderer=self)
-        self.text_entity = Text2D(text=self.text,font_path=self.font_path,color=self.text_color,position=(0,-self.app.window.height/2 + self.backround.scale_y),renderer=self)
+        self.text_entity = Text2D(text=self.text,font_path=self.font_path,color=self.text_color,position=(0,-current_app.window.height/2 + self.backround.scale_y),renderer=self)
     def update(self,dt):
-        self.backround.scale_x = self.app.window.width
-        self.backround.scale_y = self.app.window.height/3
+        global current_app
+        self.backround.scale_x = current_app.window.width
+        self.backround.scale_y = current_app.window.height/3
         self.backround.color = self.backround_color
         self.backround.x = 0
-        self.backround.y = -self.app.window.height/2 + self.backround.scale_y/2
+        self.backround.y = -current_app.window.height/2 + self.backround.scale_y/2
 
         max_text_width = max(1, self.backround.scale_x - self.padding_x * 2)
         max_text_height = max(1, self.backround.scale_y - self.padding_y * 2)
@@ -694,42 +698,31 @@ class ConversationRenderer(Renderer2D):
     def add_message(self,text):
         self.text = str(text)
 
-# plugins
-class Plugin:
-    def __init__(self,app=0,name="Plugin"):
-        if type(app) == int:
-            app = current_apps[app]
-        self.app = app
-        self.name = name
-        self.app.plugins[name] = self
-        print(f"{name} loaded.")
-    def update(self,dt):
-        pass
-
 # engine
 class WhaleEngine:
     def __init__(self, width=800, height=600, title="Whale Engine"):
         print("Whale engine starting.")
+        global current_app
+        current_app = self
         self.width = width
         self.height = height
         self.window = Window(width, height, title)
         self.renderers = []
+        self.plugins = {}
         self.input = Input(self.window)
         self.mouse = Mouse(self.window)
-        self.collision_system = CollisionSystem(self)
-        current_apps.append(self)
+        self.collision_system = CircleCollisionSystem()
         self.update = None
-        self.plugins = {}
         self.last_render = perf_counter()
-        self.parenting = ParentingPlugin(self)
-        print("Whale engine loaded.")
+        self.parenting = ParentingSystem()
+        print("Whale engine started.")
     def make_entity(self, entity, renderer=0):
         self.renderers[renderer].add(entity)
     def run(self):
         print("Whale engine starting.")
-        global current_apps
+        global current_app
         if len(self.renderers) == 0:
-            self.renderers.append(Renderer2D(self))
+            self.renderers.append(Renderer2D())
         for i in self.renderers:
             i.start()
         print("Whale engine started")
@@ -740,12 +733,10 @@ class WhaleEngine:
             self.mouse.update()
             self.window.poll()
             self.window.clear()
-            if self.update != None:
-                self.update(dt)
-            self.parenting.update(dt)
-            self.collision_system.update()
             for i in self.plugins:
                 self.plugins[i].update(dt)
+            if self.update != None:
+                self.update(dt)
             for i in self.renderers:
                 i.update(dt)
                 i.update_entitys(dt)
@@ -754,24 +745,22 @@ class WhaleEngine:
             self.last_render = this_update
         self.window.terminate()
 
-current_apps = []
+current_app = None
 
 #parenting
-class ParentingPlugin(Plugin):
-    def __init__(self,app):
-        super().__init__(app,name="Parenting")
+class ParentingSystem(Plugin):
+    def __init__(self):
+        super().__init__(name="Parenting")
         self.parentchildrelationships = []
     def update(self, dt):
         for i in self.parentchildrelationships:
             i.update()
 
 class ParentIn:
-    def __init__(self, parent, child, attributes={"x": "set", "y": "set"}, app=0):
+    def __init__(self, parent, child, attributes={"x": "set", "y": "set"}):
+        global current_app
         self.parent = parent
         self.child = child
-        if type(app) == int:
-            app = current_apps[app]
-        self.app = app
         self.attrs = {}
         self.entity_type = "Parenting"
         self.parent.parentings.append(self)
@@ -779,7 +768,7 @@ class ParentIn:
         for attr, mode in attributes.items():
             value = getattr(self.parent, attr)
             self.attrs[attr] = {"last": value,"mode": mode}
-        self.app.parenting.parentchildrelationships.append(self)
+        current_app.parenting.parentchildrelationships.append(self)
     def update(self):
         try:
             for attr, data in self.attrs.items():
@@ -796,7 +785,7 @@ class ParentIn:
                         )
                     data["last"] = parent_value
         except:
-            current_apps[self.app].parenting.parentchildrelationships.remove(self)
+            current_app.parenting.parentchildrelationships.remove(self)
             self.child.parentings.remove(self)
             self.parent.parentings.remove(self)
 

@@ -1,7 +1,7 @@
 from WhaleEngine import *
 
 app = WhaleEngine(title="button")
-renderer = Renderer2D(app)
+renderer = Renderer2D()
 shapes = LoadShapes()
 
 def button1onclick():

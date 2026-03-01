@@ -10,14 +10,14 @@ def load_texture(name):
 directions = {"up": (0, -1),"down": (0, 1),"left": (-1, 0),"right": (1, 0)}
 
 app = WhaleEngine(title="Boom",width=round(window_size_multiplier*800),height=round(window_size_multiplier*600))
-main_renderer = Renderer2D(app)
+main_renderer = Renderer2D()
 
 openpath = load_texture("open.png")
 closedpath = load_texture("closed.png")
 
 class mainentity(Entity2D):
     def __init__(self, *, texture, color=Color.white, position=(0,0), scale=(1,1), rotation=0,update=True):
-        super().__init__(texture=texture, color=color, position=position, scale=(scale[0]*window_size_multiplier,scale[1]*window_size_multiplier), rotation=rotation, update=update, app=0, renderer=main_renderer)
+        super().__init__(texture=texture, color=color, position=position, scale=(scale[0]*window_size_multiplier,scale[1]*window_size_multiplier), rotation=rotation, update=update, renderer=main_renderer)
 
 class path(mainentity):
     def __init__(self,open=True,color=Color.white,distance=1):

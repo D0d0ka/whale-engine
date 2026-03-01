@@ -1,16 +1,16 @@
 from WhaleEngine import *
 
 app = WhaleEngine(title="Whale moving demo")
-renderer = Renderer2D(app)
+renderer = Renderer2D()
 app.window.set_color(Color.cyan)
 
 shapes = LoadShapes()
 
 dodo = Entity2D(texture=shapes.dodo)
 player = Entity2D(texture=shapes.whale)
-player.collider = CircleCollider2D(100,visualize=True,visualition_color=Color.red)
+player.collider = CircleCollider2D(100,visualize=False,visualition_color=Color.red)
 ParentIn(player,player.collider)
-dodo.collider = CircleCollider2D(200,visualize=True,visualition_color=Color.red)#MeshCollider2D(shapes.dodo,visualize=True,visualition_color=Color.red)#CircleCollider2D(200,visualize=True,visualition_color=Color.red)
+dodo.collider = CircleCollider2D(200,visualize=False,visualition_color=Color.red)#MeshCollider2D(shapes.dodo,visualize=True,visualition_color=Color.red)#CircleCollider2D(200,visualize=True,visualition_color=Color.red)
 
 speed = 200
 way = "u"

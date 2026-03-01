@@ -12,7 +12,7 @@ dodo = Entity2D(
     position=(0, 0)
 )
 
-collider = MeshCollider2D(
+collider = MeshCircleCollider2D(
     shape=shape,
     density=6,
     size=80,

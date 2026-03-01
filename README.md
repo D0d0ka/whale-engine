@@ -38,13 +38,13 @@ Minimal app (`AppBase.py`):
 from WhaleEngine import *
 
 app = WhaleEngine(title="Whale engine app")
-render = Renderer2D(app)
-shapes = LoadShapes()
+render = Renderer2D()
+shapes = LoadShapes() #if you wan't to use built in textures
 
 def update(dt):
     pass
-
 app.update = update
+
 app.run()
 ```
 
