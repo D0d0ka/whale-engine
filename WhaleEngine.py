@@ -441,6 +441,166 @@ class Text2D(Entity2D):
         self.font_size = max(1, int(new_font_size))
         self.set_text(self.text)
 
+class Line2D():
+    def __init__(self, start=(0, 0), end=(0, 0), scale=1, color=Color.white, step=1, renderer=0):
+        self.start_pos = start
+        self.end_pos = end
+        self.color = color
+        self.scale = scale
+        self.step = step
+        self.entity_type = "Line"
+        self.parts = []
+        if type(renderer) == int:
+            renderer = current_app.renderers[renderer]
+        self.renderer = renderer
+        self.last_start = start
+        self.last_end = end
+        self.start = Entity2D(texture=Texture("assets/shapes/dot.png"), color=color, position=start, scale=(scale, scale), update=False, renderer=renderer)
+        self.end = Entity2D(texture=Texture("assets/shapes/dot.png"), color=color, position=end, scale=(scale, scale), update=False, renderer=renderer)
+        self.generate_parts()
+    def generate_parts(self):
+        for part in self.parts:
+            destroy(part)
+        self.parts = []
+        start_x, start_y = self.start.get_position()
+        end_x, end_y = self.end.get_position()
+        dist = distance2D_points((start_x, start_y), (end_x, end_y))
+        if dist <= 0:
+            return
+        step_size = max(0.0001, float(self.step))
+        dir_x = (end_x - start_x) / dist
+        dir_y = (end_y - start_y) / dist
+        moved = step_size
+        while moved < dist:
+            pos_x = start_x + dir_x * moved
+            pos_y = start_y + dir_y * moved
+            part = Entity2D(texture=Texture("assets/shapes/dot.png"), color=self.color, position=(pos_x, pos_y), scale=(self.scale, self.scale), update=False, renderer=self.renderer)
+            self.parts.append(part)
+            moved += step_size
+    def update(self):
+        if self.start_pos != self.last_start or self.end_pos != self.last_end:
+            self.start.x, self.start.y = self.start_pos
+            self.end.x, self.end.y = self.end_pos
+            self.generate_parts()
+            self.last_start = self.start_pos
+            self.last_end = self.end_pos
+
+def _segment_segment_intersection(x1, y1, x2, y2, x3, y3, x4, y4):
+    dx1 = x2 - x1
+    dy1 = y2 - y1
+    dx2 = x4 - x3
+    dy2 = y4 - y3
+    denominator = dx1 * dy2 - dy1 * dx2
+    if abs(denominator) < 1e-9:
+        return None
+    diff_x = x3 - x1
+    diff_y = y3 - y1
+    t = (diff_x * dy2 - diff_y * dx2) / denominator
+    u = (diff_x * dy1 - diff_y * dx1) / denominator
+    if 0 <= t <= 1 and 0 <= u <= 1:
+        return (t, x1 + t * dx1, y1 + t * dy1)
+    return None
+
+def _segment_circle_intersection(x1, y1, x2, y2, cx, cy, radius):
+    dx = x2 - x1
+    dy = y2 - y1
+    a = dx * dx + dy * dy
+    if a <= 1e-12:
+        dist = math.sqrt((x1 - cx) ** 2 + (y1 - cy) ** 2)
+        if dist <= radius:
+            return (0, x1, y1)
+        return None
+    fx = x1 - cx
+    fy = y1 - cy
+    c = fx * fx + fy * fy - radius * radius
+    if c <= 0:
+        return (0, x1, y1)
+    b = 2 * (fx * dx + fy * dy)
+    disc = b * b - 4 * a * c
+    if disc < 0:
+        return None
+    sqrt_disc = math.sqrt(disc)
+    t1 = (-b - sqrt_disc) / (2 * a)
+    t2 = (-b + sqrt_disc) / (2 * a)
+    valid = []
+    if 0 <= t1 <= 1:
+        valid.append(t1)
+    if 0 <= t2 <= 1:
+        valid.append(t2)
+    if len(valid) == 0:
+        return None
+    t = min(valid)
+    return (t, x1 + t * dx, y1 + t * dy)
+
+def _point_in_polygon(point_x, point_y, polygon):
+    if len(polygon) < 3:
+        return False
+    inside = False
+    j = len(polygon) - 1
+    for i in range(len(polygon)):
+        xi, yi = polygon[i]
+        xj, yj = polygon[j]
+        intersects = ((yi > point_y) != (yj > point_y)) and (point_x < (xj - xi) * (point_y - yi) / ((yj - yi) + 1e-9) + xi)
+        if intersects:
+            inside = not inside
+        j = i
+    return inside
+
+def raycast(start=(0, 0), end=(0, 0), layers=None):
+    global current_app
+    if current_app is None:
+        return None
+
+    x1, y1 = start
+    x2, y2 = end
+    if x1 == x2 and y1 == y2:
+        return start
+
+    closest_t = None
+    hit_point = None
+
+    def layers_match_filter(collider):
+        if layers is None:
+            return True
+        return bool(set(getattr(collider, "layers", [])) & set(layers))
+
+    def register_hit(hit):
+        nonlocal closest_t, hit_point
+        if hit is None:
+            return
+        t, hx, hy = hit
+        if closest_t is None or t < closest_t:
+            closest_t = t
+            hit_point = (hx, hy)
+
+    if hasattr(current_app, "CircleCollisionSystem2D"):
+        for collider in current_app.CircleCollisionSystem2D.circle_colliders:
+            target = collider.owner if getattr(collider, "owner", None) is not None else collider
+            if not layers_match_filter(target):
+                continue
+            hit = _segment_circle_intersection(x1, y1, x2, y2, collider.x, collider.y, collider.size)
+            register_hit(hit)
+
+    if hasattr(current_app, "BetterCollisionSystem2D"):
+        for collider in current_app.BetterCollisionSystem2D.colliders:
+            if not layers_match_filter(collider):
+                continue
+            polygon = current_app.BetterCollisionSystem2D._get_polygon(collider)
+            if len(polygon) < 2:
+                continue
+            if _point_in_polygon(x1, y1, polygon):
+                register_hit((0, x1, y1))
+                continue
+            for i in range(len(polygon)):
+                j = (i + 1) % len(polygon)
+                edge_hit = _segment_segment_intersection(
+                    x1, y1, x2, y2,
+                    polygon[i][0], polygon[i][1],
+                    polygon[j][0], polygon[j][1]
+                )
+                register_hit(edge_hit)
+    return hit_point
+
 # entitys 3d
 class Entity3D:
     def __init__(self, *,model,texture,color=Color.white,position=(0, 0, 0),scale=(1, 1, 1),rotation=(0, 0, 0),update=False,renderer=0):
@@ -495,6 +655,13 @@ def destroy(entity):
             destroy(i)
         if hasattr(current_app, "BetterCollisionSystem") and entity in current_app.BetterCollisionSystem2D.colliders:
             current_app.BetterCollisionSystem2D.colliders.remove(entity)
+    elif entity.entity_type == "Line":
+        for part in entity.parts:
+            destroy(part)
+        destroy(entity.start)
+        destroy(entity.end)
+    else:
+        raise ValueError(f"Unknown entity type: {entity.entity_type}")
 
 # Circle collider
 class CircleCollider2D:
@@ -1017,6 +1184,14 @@ class Renderer3D:
         self.entities = []
         print("Renderer 3d loaded.")
         print("Renderer 3d if work in progress, expect bugs and missing features.")
+    def start(self):
+        pass
+    def update_entitys(self,dt):
+        for i in self.entities:
+            if i.do_update:
+                i.update(dt)
+    def render(self):
+        print("3D rendering is not implemented yet.")
 
 # engine
 class WhaleEngine:
@@ -1033,8 +1208,6 @@ class WhaleEngine:
         self.update = None
         self.last_render = perf_counter()
         print("Whale engine started.")
-    def make_entity(self, entity, renderer=0):
-        self.renderers[renderer].add(entity)
     def run(self):
         print("Whale engine starting.")
         global current_app
@@ -1107,11 +1280,29 @@ class ParentIn:
             self.child.parentings.remove(self)
             self.parent.parentings.remove(self)
 
-# distance
+# helpers 2D
 def distance2D(Entity1,Entity2):
     dx = Entity2.get_position()[0] - Entity1.get_position()[0]
     dy = Entity2.get_position()[1] - Entity1.get_position()[1]
     return math.sqrt(dx**2 + dy**2)
+
+def distance2D_points(pos1,pos2):
+    dx = pos2[0] - pos1[0]
+    dy = pos2[1] - pos1[1]
+    return math.sqrt(dx**2 + dy**2)
+
+def angle_to2D(pos1, pos2):
+    dx = pos2[0] - pos1[0]
+    dy = pos2[1] - pos1[1]
+    return math.degrees(math.atan2(dy, dx))
+
+def forwardPos2D(pos,angle,distance):
+    rad = math.radians(angle)
+    return (pos[0] + math.cos(rad) * distance, pos[1] + math.sin(rad) * distance)
+
+def forwardMove2D(angle, distance):
+    rad = math.radians(angle)
+    return (math.cos(rad) * distance, math.sin(rad) * distance)
 
 # FPS counter
 min_fps = float("inf")
