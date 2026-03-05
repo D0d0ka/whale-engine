@@ -767,7 +767,7 @@ class CircleCollisionSystem2D(Plugin):
         self.mesh_colliders = []
     def add_circle(self, collider): 
         self.circle_colliders.append(collider)
-    def add_mesh(self, collider): 
+    def add_mesh(self, collider):
         self.mesh_colliders.append(collider)
     def update(self,dt):
         global current_app

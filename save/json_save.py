@@ -3,6 +3,8 @@ import os
 
 class json_save:
     def __init__(self, file,*,backup_content={}):
+        if not file.endswith(".json"):
+            raise ValueError("File must be a .json file")
         self.file = file
         if not os.path.exists(file):
             with open(file,"w") as f:
