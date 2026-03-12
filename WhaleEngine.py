@@ -618,6 +618,7 @@ class Entity3D:
         self.scale_x, self.scale_y, self.scale_z = scale
         self.rot_x, self.rot_y, self.rot_z = rotation
         self.do_update = update
+        raise NotImplementedError("3d is not implemented yet.")
     def update(self,dt):
         pass
 
@@ -1184,6 +1185,7 @@ class Renderer3D:
         self.entities = []
         print("Renderer 3d loaded.")
         print("Renderer 3d if work in progress, expect bugs and missing features.")
+        raise NotImplementedError("3d is not implemented yet.")
     def start(self):
         pass
     def update_entitys(self,dt):
@@ -1191,7 +1193,7 @@ class Renderer3D:
             if i.do_update:
                 i.update(dt)
     def render(self):
-        print("3D rendering is not implemented yet.")
+        pass
 
 # engine
 class WhaleEngine:
