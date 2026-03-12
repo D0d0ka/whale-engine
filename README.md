@@ -1,6 +1,9 @@
 # whale-engine
 A game engine developed by dodo_rubics_cube.
 
+# This readme is deprecated!!!
+It's in development and this readme is made from older version of whale engine. Take note.
+
 ## Status
 
 Project is in development.
@@ -170,7 +173,9 @@ Important args:
 - `onclick` – called once on left mouse press.
 - `onpress` – called while left mouse is held down.
 - `texture` (required)
-- `density`, `size` for collider quality.
+- `density` for collider quality.
+
+Requires `BetterCollisionSystem2D()`.
 
 #### `destroy(entity)`
 
