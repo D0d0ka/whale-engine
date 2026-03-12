@@ -1,5 +1,7 @@
 from WhaleEngine import *
 
+set_logging_file("boom.log")
+
 window_size_multiplier = 1.5
 
 assets_folder = "boomassets/"

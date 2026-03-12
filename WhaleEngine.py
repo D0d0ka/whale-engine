@@ -44,7 +44,7 @@ class Plugin:
             current_app.attrs = {}
         current_app.attrs[self.name] = self
         setattr(current_app, self.__class__.__name__, self)
-        print(f"{self.name} loaded.")
+        logLn(f"{self.name} loaded.")
     def update(self,dt):
         pass
 
@@ -111,38 +111,52 @@ class Color:
     lavender = None
     crimson = None
 
-Color.white   = Color(1,1,1,1)
-Color.black   = Color(0,0,0,1)
-Color.red     = Color(1,0,0,1)
-Color.green   = Color(0,1,0,1)
-Color.blue    = Color(0,0,1,1)
-Color.yellow  = Color(1,1,0,1)
+Color.white = Color(1,1,1,1)
+Color.black = Color(0,0,0,1)
+Color.red = Color(1,0,0,1)
+Color.green = Color(0,1,0,1)
+Color.blue = Color(0,0,1,1)
+Color.yellow = Color(1,1,0,1)
 Color.magenta = Color(1,0,1,1)
-Color.cyan    = Color(0,1,1,1)
-Color.orange  = Color.rgb(255,165,0)
-Color.purple  = Color.rgb(128,0,128)
-Color.pink    = Color.rgb(255,105,180)
-Color.gray    = Color.rgb(128,128,128)
+Color.cyan = Color(0,1,1,1)
+Color.orange = Color.rgb(255,165,0)
+Color.purple = Color.rgb(128,0,128)
+Color.pink = Color.rgb(255,105,180)
+Color.gray = Color.rgb(128,128,128)
 Color.light_gray = Color.rgb(211,211,211)
-Color.dark_gray  = Color.rgb(64,64,64)
-Color.brown   = Color.rgb(139,69,19)
-Color.lime    = Color.rgb(50,205,50)
-Color.navy    = Color.rgb(0,0,128)
-Color.sky     = Color.rgb(135,206,235)
-Color.teal    = Color.rgb(0,128,128)
-Color.olive   = Color.rgb(128,128,0)
-Color.maroon  = Color.rgb(128,0,0)
-Color.silver  = Color.rgb(192,192,192)
-Color.gold    = Color.rgb(255,215,0)
-Color.indigo  = Color.rgb(75,0,130)
-Color.violet  = Color.rgb(238,130,238)
-Color.coral   = Color.rgb(255,127,80)
-Color.salmon  = Color.rgb(250,128,114)
+Color.dark_gray = Color.rgb(64,64,64)
+Color.brown = Color.rgb(139,69,19)
+Color.lime = Color.rgb(50,205,50)
+Color.navy = Color.rgb(0,0,128)
+Color.sky = Color.rgb(135,206,235)
+Color.teal = Color.rgb(0,128,128)
+Color.olive = Color.rgb(128,128,0)
+Color.maroon = Color.rgb(128,0,0)
+Color.silver = Color.rgb(192,192,192)
+Color.gold = Color.rgb(255,215,0)
+Color.indigo = Color.rgb(75,0,130)
+Color.violet = Color.rgb(238,130,238)
+Color.coral = Color.rgb(255,127,80)
+Color.salmon = Color.rgb(250,128,114)
 Color.turquoise = Color.rgb(64,224,208)
-Color.beige   = Color.rgb(245,245,220)
-Color.mint    = Color.rgb(152,255,152)
+Color.beige = Color.rgb(245,245,220)
+Color.mint = Color.rgb(152,255,152)
 Color.lavender = Color.rgb(230,230,250)
 Color.crimson = Color.rgb(220,20,60)
+
+# logging
+logging_file = None
+
+def set_logging_file(path):
+    global logging_file
+    logging_file = path
+
+def logLn(message, by="WhaleEngine"):
+    print(f"<{by}> {message}")
+    if not logging_file:
+        return
+    with open(logging_file, "a") as f:
+        f.write(f"[{by}] {message}\n")
 
 # window
 class Window:
@@ -173,7 +187,7 @@ class Window:
         self.keys = {}
         self.setup_2d()
 
-        print("Window loaded.")
+        logLn("Window loaded.")
 
     def set_size(self, width, height):
         self.width = width
@@ -223,7 +237,7 @@ class Window:
         return glfw.window_should_close(self.handle)
 
     def terminate(self):
-        print("App closed.")
+        logLn("App closed.")
         glfw.terminate()
         sys.exit()
 
@@ -340,12 +354,12 @@ class LoadShapes:
         self.triangle = Texture("assets/shapes/triangle.png")
         self.grid = Texture("assets/textures/grid.png")
         self.dot = Texture("assets/shapes/dot.png")
-        print("Shapes loaded.")
+        logLn("Shapes loaded.")
 
 class LoadModels:
     def __init__(self):
         self.cube = Model("assets/models/cube.obj")
-        print("Models loaded.")
+        logLn("Models loaded.")
 
 # entitys 2D
 class Entity2D:
@@ -1203,7 +1217,7 @@ class Renderer2D:
         global current_app
         current_app.renderers.append(self)
         self.entities = []
-        print("Renderer 2d loaded.")
+        logLn("Renderer 2d loaded.")
     def start(self):
         pass
     def update(self,dt):
@@ -1252,7 +1266,7 @@ class ConversationRenderer(Renderer2D):
         self.min_font_size = 12
         self._last_wrapped_text = None
         self._last_font_size = None
-        print("Conversation renderer loaded.")
+        logLn("Conversation renderer loaded.")
 
     def _load_font(self, font_size):
         try:
@@ -1366,8 +1380,8 @@ class Renderer3D:
         global current_app
         current_app.renderers.append(self)
         self.entities = []
-        print("Renderer 3d loaded.")
-        print("Renderer 3d if work in progress, expect bugs and missing features.")
+        logLn("Renderer 3d loaded.")
+        logLn("Renderer 3d if work in progress, expect bugs and missing features.")
         raise NotImplementedError("3d is not implemented yet.")
     def start(self):
         pass
@@ -1381,7 +1395,7 @@ class Renderer3D:
 # engine
 class WhaleEngine:
     def __init__(self, width=800, height=600, title="Whale Engine"):
-        print("Whale engine starting.")
+        logLn("Whale engine starting.")
         global current_app
         current_app = self
         self.width = width
@@ -1392,15 +1406,15 @@ class WhaleEngine:
         self.attrs = {}
         self.update = None
         self.last_render = perf_counter()
-        print("Whale engine started.")
+        logLn("Whale engine started.")
     def run(self):
-        print("Whale engine starting.")
+        logLn("Whale engine starting.")
         global current_app
         if len(self.renderers) == 0:
             self.renderers.append(Renderer2D())
         for i in self.renderers:
             i.start()
-        print("Whale engine started")
+        logLn("Whale engine started")
         while not self.window.should_close():
             this_update = perf_counter()
             dt = this_update-self.last_render
