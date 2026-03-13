@@ -2,7 +2,7 @@
 A game engine developed by dodo_rubics_cube.
 
 # This readme is deprecated!!!
-It's in development and this readme is made from older version of whale engine. Take note.
+It's in development and this readme is made for older version of whale engine. Take note. For documentation look at examples.
 
 ## Status
 
