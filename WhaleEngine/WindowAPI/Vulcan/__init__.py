@@ -1,0 +1,1 @@
+raise NotImplementedError("This module is not implemented yet. It is a placeholder for the Vulkan window API, which will be implemented in the future.")

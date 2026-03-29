@@ -7,7 +7,7 @@ SoundSystem()
 BetterCollisionSystem2D()
 ParentingSystem()
 
-music = Sound("music", "assets/music/Music.mp3")
+music = Sound("music", "assets/music/music.mp3")
 sound = Sound("sound", "assets/sounds/wtf.mp3")
 
 shapes = LoadShapes()

@@ -1,3 +1,4 @@
+from WhaleEngine.engine import *
 import glfw
 from OpenGL.GL import *
 from PIL import Image, ImageFont, ImageDraw
