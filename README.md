@@ -312,3 +312,4 @@ app.run()
 
 - The package currently uses the filename `entitys2d.py` internally; imports are already exposed through `from WhaleEngine import *`.
 - API is still evolving.
+- This readme was created by AI
