@@ -1,4 +1,3 @@
-from .engine import current_app
 from .logging import logLn
 import glfw
 from OpenGL.GL import *

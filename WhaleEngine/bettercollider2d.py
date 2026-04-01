@@ -1,7 +1,6 @@
 import math
 from PIL import Image
 from .plugin import Plugin
-from .entitys2d import Entity2D
 from .color import Color
 from .assets import LoadShapes
 from .utils2d import pixel_is_solid
@@ -25,6 +24,7 @@ class QuadCollider2D:
         self.type = "quad collider"
         self.visualize = visualize
         if visualize:
+            from .entitys2d import Entity2D
             self.visualition = Entity2D(texture=LoadShapes().square, scale=(w/100, h/100), rotation=rotation, color=visualition_color, renderer=visualition_renderer)
             ParentIn(self, self.visualition, attributes={"x": "set", "y": "set", "rotation": "set"})
         current_app.BetterCollisionSystem2D.add_quad(self)
@@ -81,6 +81,7 @@ class MeshCollider2D:
             ]
 
         if visualize:
+            from .entitys2d import Entity2D
             self.visualition = Entity2D(
                 texture=self.shape,
                 scale=(self.scale_x, self.scale_y),

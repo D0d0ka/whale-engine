@@ -5,7 +5,6 @@ from OpenGL.GL import *
 from PIL import Image, ImageDraw, ImageFont
 from .helpers import none
 from .destroy import destroy
-from .bettercollider2d import MeshCollider2D
 from .parenting import ParentIn
 from .utils2d import distance2D_points
 
@@ -34,6 +33,7 @@ class Entity2D:
 
 class Button2D(Entity2D):
     def __init__(self, onclick=none,onpress=none, *,density=16, texture, color=Color.white, position=(0, 0), renderer=0):
+        from .bettercollider2d import MeshCollider2D
         super().__init__(texture=texture, color=color, position=position, update=True, renderer=renderer)
         global current_app
         if not hasattr(current_app, "BetterCollisionSystem2D"):

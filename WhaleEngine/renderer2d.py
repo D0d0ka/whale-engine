@@ -1,10 +1,9 @@
 from .logging import logLn
 from OpenGL.GL import *
-from .engine import current_app
 
 class Renderer2D:
     def __init__(self):
-        global current_app
+        from .engine import current_app
         current_app.renderers.append(self)
         self.entities = []
         logLn("Renderer 2d loaded.")
