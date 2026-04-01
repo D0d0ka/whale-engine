@@ -1,4 +1,5 @@
 from WhaleEngine import *
+from WhaleEngine.helpers.fpscounter import *
 
 set_logging_file("boom.log")
 
@@ -155,10 +156,12 @@ class Player:
             self.view_direction = {"up": "right", "right": "down", "down": "left", "left": "up"}[self.view_direction]
             render_view((self.x,self.y), self.view_direction)
         if app.input.key_pressed(glfw.KEY_ESCAPE):
-            exit()
+            app.close_app()
 
-current_map_data = maps[1]
-current_map_name = maps[0]["name"]
+current_map_num = 1
+
+current_map_data = maps[current_map_num]
+current_map_name = maps[current_map_num]["name"]
 current_map = Map(current_map_data)
 current_map_spawn_position = current_map_data["spawn position"] 
 current_map_spawn_way = current_map_data["spawn way"]

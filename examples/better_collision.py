@@ -1,7 +1,6 @@
 from WhaleEngine import *
 from random import randint
 
-
 app = WhaleEngine(title="Better Collision System")
 render = Renderer2D()
 shapes = LoadShapes()

@@ -1,10 +1,10 @@
 from .plugin import Plugin
-from .engine import current_app
 import glfw
 
 class MouseSystem(Plugin):
     def __init__(self):
         super().__init__()
+        from .engine import current_app
         self.window = current_app.window
         self.x = 0
         self.y = 0

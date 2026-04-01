@@ -7,8 +7,14 @@ SoundSystem()
 BetterCollisionSystem2D()
 ParentingSystem()
 
-music = Sound("music", "assets/music/music.mp3")
-sound = Sound("sound", "assets/sounds/wtf.mp3")
+#this is how you load sounds and music
+#music = Sound("music", "assets/music/music.mp3")
+#sound = Sound("sound", "assets/sounds/wtf.mp3")
+#package has some built in sounds and music for testing that you can use like this:
+sounds = LoadSounds()
+music = sounds.music
+sound = sounds.sound
+#you can use just sounds.music or sounds.sound if you want, but i like to have them in variables for better readability
 
 shapes = LoadShapes()
 

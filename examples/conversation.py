@@ -1,4 +1,5 @@
 from WhaleEngine import *
+from WhaleEngine.conversationrenderer import ConversationRenderer
 
 app = WhaleEngine(title="Conversation")
 conversation = ConversationRenderer()

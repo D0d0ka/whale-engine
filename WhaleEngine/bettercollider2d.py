@@ -10,7 +10,7 @@ from .parenting import ParentIn
 
 class QuadCollider2D:
     def __init__(self, w=100, h=100, *, position=(0, 0), rotation=0, layers=[0], visualize=False, visualition_color=Color.cyan, visualition_renderer=0):
-        global current_app
+        from .engine import current_app
         self.x = position[0]
         self.y = position[1]
         self.w = w
@@ -35,7 +35,7 @@ class QuadCollider2D:
 
 class MeshCollider2D:
     def __init__(self, shape='Texture("Path to your texture") without string', density=16, *, position=(0, 0), scale=(1, 1), rotation=0, layers=[0], visualize=False, visualition_color=Color.cyan, visualition_renderer=0):
-        global current_app
+        from .engine import current_app
         self.x, self.y = position
         self.scale_x, self.scale_y = scale
         self.rotation = rotation
@@ -197,12 +197,12 @@ class BetterCollisionSystem2D(Plugin):
                     return False
         return True
     def _mouse_world_position(self):
+        from .engine import current_app
         mouse_system = current_app.MouseSystem
         if hasattr(mouse_system, "x") and hasattr(mouse_system, "y"):
             return mouse_system.x, mouse_system.y
         return mouse_system.get_position()
     def update(self, dt):
-        global current_app
         for collider in self.colliders:
             collider.colliding = False
         for first in self.colliders:

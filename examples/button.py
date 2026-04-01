@@ -8,7 +8,6 @@ MouseSystem()
 ParentingSystem()
 BetterCollisionSystem2D()
 
-
 def button1onclick():
     print("click")
 button1 = Button2D(onclick=button1onclick,texture=shapes.square,color=Color.white,density=15)

@@ -1,4 +1,5 @@
 from WhaleEngine import *
+from WhaleEngine.circlecollider2d import *
 
 app = WhaleEngine(title="Whale moving demo")
 
@@ -45,7 +46,7 @@ def update(dt):
         player.x -= speed*dt
         player.rotation = 0
     if app.input.key(glfw.KEY_ESCAPE):
-        sys.exit()
+        app.close_app()
     if app.input.key_pressed(glfw.KEY_E):
         destroy(dodo)
     if app.input.key_pressed(glfw.KEY_E):

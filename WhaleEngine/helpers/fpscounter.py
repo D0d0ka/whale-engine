@@ -1,3 +1,5 @@
+from WhaleEngine.logging import logLn
+
 min_fps = float("inf")
 max_fps = avg_fps = fps_timer = frame_count = 0
 FPS = 60
@@ -19,7 +21,7 @@ def FPS_counter(dt, fps_timer_lenght=1,print_fps=False):
     frame_count += 1
     if fps_timer >= fps_timer_lenght:
         if print_fps:
-            print(f"FPS: {fps}")
+            logLn(f"FPS: {fps}")
         FPS = fps
         fps_timer = 0.0
         frame_count = 0

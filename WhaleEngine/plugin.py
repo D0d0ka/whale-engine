@@ -1,10 +1,9 @@
 from .logging import logLn
-from .engine import current_app
 
 class Plugin:
     def __init__(self):
-        global current_app
         self.name = self.__class__.__name__
+        from .engine import current_app
         current_app.plugins[self.name] = self
         if not hasattr(current_app, "attrs"):
             current_app.attrs = {}

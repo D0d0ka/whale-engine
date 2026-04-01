@@ -10,7 +10,7 @@ class ParentingSystem(Plugin):
 
 class ParentIn:
     def __init__(self, parent, child, attributes={"x": "set", "y": "set"}):
-        global current_app
+        from .engine import current_app
         self.parent = parent
         self.child = child
         self.attrs = {}

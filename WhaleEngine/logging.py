@@ -9,4 +9,4 @@ def logLn(message, by="WhaleEngine"):
     if not logging_file:
         return
     with open(logging_file, "a") as f:
-        f.write(f"[{by}] {message}\n")
+        f.write(f"<{by}> {message}\n")

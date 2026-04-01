@@ -1,4 +1,8 @@
-from WhaleEngine import * 
+from WhaleEngine import *
+from WhaleEngine.helpers.fpscounter import FPS_counter, summarize_FPS
+from WhaleEngine.assets import LoadShapes
+
+set_logging_file("log.txt") # gives you a file that you can read the log from, instead of the console. Useful for debugging on mobile devices, where you dont have a console.
 
 app = WhaleEngine(title="Dodos moving demo")
 renderer = Renderer2D()
@@ -35,7 +39,7 @@ triangle = Entity2D(texture=shapes.triangle,color=Color.yellow,position=(-100,-2
 def update(dt):
     FPS_counter(dt,0.05)
     if app.input.key_pressed(glfw.KEY_ESCAPE):
-        summarize_FPS()
+        logLn(summarize_FPS(),"fps counter") #for logging
         app.close_app()
 app.update = update
 

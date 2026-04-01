@@ -8,7 +8,7 @@ shapes = LoadShapes()
 
 line = Line2D(start=(-100, -100), end=(100, 100), scale=10, color=Color.red, step=1, renderer=render)
 
-change = 100
+change = 101
 
 def update(dt):
     line.start_pos = (line.start_pos[0] + randint(-change, change), line.start_pos[1] + randint(-change, change))

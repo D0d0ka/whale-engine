@@ -1,19 +1,12 @@
 # whale-engine
-A game engine developed by dodo_rubics_cube.
 
-# This readme is deprecated!!!
-It's in development and this readme is made for older version of whale engine. Take note. For documentation look at examples.
+Whale Engine is a OpenGL game engine for Python.
+
+# developed by dodo_k
 
 ## Status
 
-Project is in development.
-
-## Project structure
-
-- `WhaleEngine.py` – core engine, rendering, input, colliders, plugins.
-- `AppBase.py` – minimal starter template.
-- `examples/` – usage examples (`whalemoving.py`, `button.py`, `conversation.py`, etc.).
-- `assets/` – built-in textures/shapes used by `LoadShapes`.
+Active development project.
 
 ## Requirements
 
@@ -25,29 +18,46 @@ pip install -r requirements.txt
 
 Current dependencies:
 
-- glfw
-- pillow
-- PyOpenGL
-- PyOpenGL-accelerate
-- numpy
+- cffi==2.0.0
+- glfw==2.10.0
+- numpy==2.4.2
+- pillow==12.1.1
+- pycparser==3.0
+- PyOpenGL==3.1.10
+- PyOpenGL-accelerate==3.1.10
+- sounddevice==0.5.2
+- soundfile==0.13.1
+
+## Project layout
+
+- `WhaleEngine/` - package source code.
+- `examples/` - sample programs.
+- `requirements.txt` - pinned dependencies.
 
 ## Quick start
-
-Engine file and your game script should be in the same folder.
-
-Minimal app (`AppBase.py`):
 
 ```python
 from WhaleEngine import *
 
-app = WhaleEngine(title="Whale engine app")
-render = Renderer2D()
-shapes = LoadShapes() #if you wan't to use built in textures
+app = WhaleEngine(title="Whale Engine App")
+
+# Optional systems: initialize only what your game uses.
+app.input = InputSystem()
+MouseSystem()
+ParentingSystem()
+CircleCollisionSystem2D()
+BetterCollisionSystem2D()
+
+renderer = Renderer2D()
+shapes = LoadShapes()
+
+player = Entity2D(texture=shapes.whale, position=(0, 0), renderer=renderer)
 
 def update(dt):
-    pass
-app.update = update
+    if app.input.key_pressed(glfw.KEY_SPACE):
+        print("Space pressed")
 
+app.update = update
 app.run()
 ```
 
@@ -57,248 +67,248 @@ Run:
 python AppBase.py
 ```
 
+## Important runtime notes
+
+- `WhaleEngine(...)` creates window + engine core.
+- Plugins are updated before your `app.update(dt)` callback in the main loop.
+- If no renderer exists, `run()` creates a default `Renderer2D()` automatically.
+- World coordinates are centered: `(0, 0)` is screen center, `+x` right, `+y` up.
+
+## Example scripts
+
+Available scripts in `examples/`:
+
+- `better_collision.py`
+- `boom.py`
+- `button.py`
+- `conversation.py`
+- `dodosmove.py`
+- `lines.py`
+- `sound.py`
+- `text.py`
+- `visualizecollider.py`
+- `whalemoving.py`
+
+### Running examples
+
+You still need to move the example file into the same folder as the `WhaleEngine` package before running it.
+
+Example:
+
+```bash
+python whalemoving.py
+```
+
 ## Core API
 
 ### Engine
 
 #### `WhaleEngine(width=800, height=600, title="Whale Engine")`
 
-Creates:
-- `window` (`Window`)
-- `input` (`Input`)
-- `mouse` (`Mouse`)
-- `collision_system` (`CollisionSystem`)
-- `plugins` dictionary
-- renderer list
+Methods:
 
-Important members:
-- `app.update = your_function` – per-frame callback called with `dt`.
-- `run()` – main loop.
+- `run()`
+- `close_app()`
 
 Main loop order:
-1. Input/mouse update
-2. User `app.update(dt)`
-3. Parenting update
-4. Collision update
-5. Plugin updates
-6. Renderer update + entity updates + render
 
----
+1. `window.poll()` + `window.clear()`
+2. all plugin updates
+3. user `app.update(dt)`
+4. each renderer: `update(dt)`
+5. each renderer: `update_entitys(dt)`
+6. each renderer: `render()`
+7. `window.swap()`
 
 ### Window
 
-#### `Window`
+#### `Window(width, height, title, color=Color(...))`
 
 Methods:
+
 - `set_size(width, height)`
 - `set_width(width)`
 - `set_height(height)`
 - `set_title(title)`
 - `set_color(color)`
+- `setup_2d()`
+- `clear()`
+- `poll()`
+- `swap()`
+- `should_close()`
 - `terminate()`
 
-Coordinates are centered: `(0, 0)` is screen center.
+### Rendering
 
----
+#### `Renderer2D()`
+
+Methods:
+
+- `start()`
+- `update(dt)`
+- `add(entity)`
+- `update_entitys(dt)`
+- `render()`
+
+#### `Entity2D(*, texture, color=Color.white, position=(0, 0), scale=(1, 1), rotation=0.0, update=False, renderer=0)`
+
+Notes:
+
+- `texture` is required.
+- When `update=True`, renderer calls `entity.update(dt)`.
+
+#### `Text2D(text, font_path="arial.ttf", font_size=32, color=Color.white, position=(0, 0), renderer=0)`
+
+Methods:
+
+- `set_text(new_text)`
+- `set_font_size(new_font_size)`
+
+#### `Button2D(onclick=None, onpress=None, *, density=16, texture, color=Color.white, position=(0, 0), renderer=0)`
+
+Important:
+
+- Requires `BetterCollisionSystem2D()` to be initialized first.
+- Uses an internal `MeshCollider2D` on layer `"mouse"`.
+
+#### `Line2D(start=(0, 0), end=(0, 0), scale=1, color=Color.white, step=1, renderer=0)`
+
+### Conversation UI
+
+#### `ConversationRenderer(text_color=Color.white, backround_color=Color.black, font_path="arial.ttf")`
+
+Methods:
+
+- `add_message(text)`
+
+Features:
+
+- bottom panel text box
+- automatic wrapping
+- automatic font size fitting
+
+### Input and mouse
+
+#### `InputSystem()`
+
+Methods:
+
+- `key(glfw.KEY_*)`
+- `key_pressed(glfw.KEY_*)`
+- `key_released(glfw.KEY_*)`
+
+#### `MouseSystem()`
+
+Members:
+
+- `x`, `y` (world-centered)
+- `wx`, `wy` (window cursor position)
+- `left_down`, `right_down`
+
+Methods:
+
+- `get_position()`
+- `left_pressed()`
+- `right_pressed()`
+
+### Collision
+
+#### Circle collision system
+
+- `CircleCollisionSystem2D()`
+- `CircleCollider2D(size, *, layers=[0], position=(0, 0), visualize=False, visualition_color=Color.cyan, visualition_renderer=0)`
+- `MeshCircleCollider2D(shape, density=8, size=8, offset_x=50, offset_y=60, *, layers=[0], position=(0, 0), visualize=False, visualition_color=Color.cyan, visualition_renderer=0, load_once=10)`
+
+#### Polygon collision system
+
+- `BetterCollisionSystem2D()`
+- `QuadCollider2D(w=100, h=100, *, position=(0, 0), rotation=0, layers=[0], visualize=False, visualition_color=Color.cyan, visualition_renderer=0)`
+- `MeshCollider2D(shape, density=16, *, position=(0, 0), scale=(1, 1), rotation=0, layers=[0], visualize=False, visualition_color=Color.cyan, visualition_renderer=0)`
+
+### Parenting
+
+- `ParentingSystem()`
+- `ParentIn(parent, child, attributes={"x": "set", "y": "set"})`
+
+`attributes` mode values:
+
+- `"set"`: child attribute follows parent directly.
+- `"add"`: child gets parent delta movement.
 
 ### Colors
 
-#### `Color(r, g, b, a=1)`
+#### `Color(r=1, g=1, b=1, a=1)`
 
-Factory helpers:
-- `Color.rgb(r, g, b)` (`0-255` range)
+Helpers:
+
+- `Color.rgb(r, g, b)`
 - `Color.rgba(r, g, b, a)`
 - `Color.hsv(h, s, v)`
 - `Color.hex("#RRGGBB")`
 
-Presets:
-- `Color.white`, `Color.black`, `Color.red`, `Color.green`, `Color.blue`, `Color.yellow`, `Color.magenta`, `Color.cyan`
+Includes many presets like `white`, `black`, `red`, `green`, `blue`, `cyan`, `orange`, `purple`, `gray`.
 
----
+### Assets, textures, audio
 
-### Textures and built-in assets
+- `Texture(path)`
+- `LoadShapes()` with built-ins: `dodo`, `whale`, `square`, `circle`, `triangle`, `grid`, `dot`
+- `LoadSounds()` with built-ins: `music`, `sound`
+- `SoundSystem()`
+- `Sound(name, path)`
 
-#### `Texture(path)`
+`Sound` requires `SoundSystem()` to be initialized first.
 
-Loads RGBA image into OpenGL texture.
+### Utility functions
 
-#### `LoadShapes()`
+- `raycast2d(start=(0, 0), end=(0, 0), layers=None)`
+- `destroy(entity)`
+- `distance2D(entity1, entity2)`
+- `distance2D_points(pos1, pos2)`
+- `angle_to2D(pos1, pos2)`
+- `forwardPos2D(pos, angle, distance)`
+- `forwardMove2D(angle, distance)`
+- `pixel_is_solid(r, g, b, a, alpha_threshold=10)`
 
-Provides built-ins:
-- `dodo`
-- `whale`
-- `square`
-- `circle`
-- `triangle`
-- `grid`
-- `dot`
+### FPS helper
 
----
-
-### Rendering and entities
-
-#### `Renderer2D(app)`
-
-Methods:
-- `start()`
-- `update(dt)`
-- `add(entity)`
-- `render()`
-
-#### `Entity2D(...)`
-
-Constructor arguments:
-- `texture` (required)
-- `color=Color.white`
-- `position=(0, 0)`
-- `scale=(1, 1)`
-- `rotation=0.0`
-- `update=False`
-- `app=0`
-- `renderer=0`
-
-When `update=True`, engine calls `entity.update(dt)` every frame.
-
-#### `Text2D(text, font_path="arial.ttf", font_size=32, color=Color.white, position=(0,0), app=0, renderer=0)`
-
-Methods:
-- `set_text(new_text)`
-- `set_font_size(new_font_size)`
-
-#### `Button2D(...)`
-
-Clickable 2D button using mesh collider.
-
-Important args:
-- `onclick` – called once on left mouse press.
-- `onpress` – called while left mouse is held down.
-- `texture` (required)
-- `density` for collider quality.
-
-Requires `BetterCollisionSystem2D()`.
-
-#### `destroy(entity)`
-
-Removes entities/colliders/parenting links safely from engine systems.
-
----
-
-### Input and mouse
-
-#### `Input`
-
-Methods:
-- `key(glfw.KEY_*)` – key is currently down.
-- `key_pressed(glfw.KEY_*)` – key pressed this frame.
-- `mouse_button(glfw.MOUSE_BUTTON_*)`
-
-#### `Mouse`
-
-Properties and methods:
-- `x`, `y` – cursor position in window coordinates.
-- `wx`, `wy` – world-centered coordinates.
-- `get_position()`
-- `left_pressed()`, `right_pressed()`
-- `left_down`, `right_down`
-
----
-
-### Collision system
-
-Layer-based collision is used (`layers` list on colliders).
-
-#### `CircleCollider2D(size, ..., layers=[0], position=(0,0), visualize=False, ...)`
-
-Features:
-- circle-vs-circle collision
-- optional visualization
-- `ignore(other_collider)`
-- `colliding` flag
-
-#### `MeshCollider2D(shape, density=8, size=8, offset_x=50, offset_y=60, ..., layers=[0], visualize=False, ...)`
-
-Builds collider from opaque pixels of texture (sampled by `density`).
-
-Features:
-- per-pixel-like approximation via many circle dots
-- optional visualization
-- `ignore(other_collider)`
-- `colliding` flag
-
-Helpers:
-- `layers_match(a, b)`
-- `distance2D(a, b)`
-
----
-
-### Parenting
-
-#### `ParentIn(parent, child, attributes={"x": "set", "y": "set"}, app=0)`
-
-Links child transform updates to parent.
-
-Modes:
-- `"set"` – child attribute equals parent attribute.
-- `"add"` – child moves by parent delta.
-
-Used internally by collider visualizations and mesh dot colliders.
-
----
-
-### Plugins
-
-#### `Plugin(app=0, name="Plugin")`
-
-Base class for custom plugins.
-
-Override:
-- `update(dt)`
-
-Built-in plugin:
-- `ParentingPlugin`
-
----
-
-### Conversation UI
-
-#### `ConversationRenderer(app, text_color=Color.white, backround_color=Color.black, font_path="arial.ttf")`
-
-Specialized renderer for dialogue box style text.
-
-Method:
-- `add_message(text)`
-
-Auto-wraps text and adjusts font size to fit bottom panel.
-
----
-
-### FPS utilities
+From `WhaleEngine.helpers.fpscounter`:
 
 - `FPS_counter(dt, fps_timer_lenght=1, print_fps=False)`
 - `get_FPS()`
 - `summarize_FPS()`
 
-Use `FPS_counter(dt)` each frame, then read FPS via `get_FPS()`.
+## Minimal setup patterns
 
-## Examples
+Only engine + renderer:
 
-In `examples/`:
+```python
+app = WhaleEngine()
+renderer = Renderer2D()
+app.run()
+```
 
-- `whalemoving.py` – movement + circle colliders + collision print.
-- `button.py` – clickable button.
-- `text.py` – moving `Text2D`.
-- `conversation.py` – dialogue renderer usage.
-- `visualizecollider.py` – mesh collider visualization.
-- `dodosmove.py` – multiple entities, simple movement logic, FPS helper.
-- `boom.py` – larger example with map/view logic.
+Add keyboard + mouse input:
 
-Run example:
+```python
+app = WhaleEngine()
+app.input = InputSystem()
+MouseSystem()
+renderer = Renderer2D()
+app.run()
+```
 
-```bash
-python examples/whalemoving.py
+Add button support:
+
+```python
+app = WhaleEngine()
+MouseSystem()
+BetterCollisionSystem2D()
+renderer = Renderer2D()
+button = Button2D(texture=LoadShapes().square, renderer=renderer)
+app.run()
 ```
 
 ## Notes
 
-- Some classes use `app=0` / `renderer=0` defaults (first app/renderer).
-- Because the project is in development, API details can still change.
+- The package currently uses the filename `entitys2d.py` internally; imports are already exposed through `from WhaleEngine import *`.
+- API is still evolving.

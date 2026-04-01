@@ -1,6 +1,6 @@
 from WhaleEngine import *
 
-app = WhaleEngine(title="text")
+app = WhaleEngine(title="Text")
 renderer = Renderer2D()
 app.input = InputSystem()
 shapes = LoadShapes()

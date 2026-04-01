@@ -1,6 +1,7 @@
 from WhaleEngine import *
+from WhaleEngine.circlecollider2d import *
 
-app = WhaleEngine(title="Mesh collider show")
+app = WhaleEngine(title="circle mesh collider show")
 renderer = Renderer2D()
 app.input = InputSystem()
 ParentingSystem()
@@ -9,7 +10,7 @@ CircleCollisionSystem2D()
 
 shapes = LoadShapes()
 
-shape = shapes.grid
+shape = shapes.dodo
 
 dodo = Entity2D(
     texture=shape,
@@ -18,10 +19,10 @@ dodo = Entity2D(
 
 collider = MeshCircleCollider2D(
     shape=shape,
-    density=6,
-    size=80,
-    offset_x=40,
-    offset_y=35,
+    density=16,
+    size=40,
+    offset_x=0,
+    offset_y=0,
     visualize=True
 )
 

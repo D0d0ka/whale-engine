@@ -101,11 +101,11 @@ class ConversationRenderer(Renderer2D):
         return selected_text, selected_size
 
     def start(self): 
-        global current_app
+        from .engine import current_app
         self.backround = Entity2D(texture=LoadShapes().dot,renderer=self)
         self.text_entity = Text2D(text=self.text,font_path=self.font_path,color=self.text_color,position=(0,-current_app.window.height/2 + self.backround.scale_y),renderer=self)
     def update(self,dt):
-        global current_app
+        from .engine import current_app
         self.backround.scale_x = current_app.window.width
         self.backround.scale_y = current_app.window.height/3
         self.backround.color = self.backround_color

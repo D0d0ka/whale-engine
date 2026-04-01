@@ -10,7 +10,7 @@ from .utils2d import distance2D_points
 
 class Entity2D:
     def __init__(self, *,texture,color=Color.white,position=(0, 0),scale=(1, 1),rotation=0.0,update=False,renderer=0):
-        global current_app
+        from .engine import current_app
         if type(texture) == str:
             texture = Texture(texture)
         self.texture = texture
@@ -35,7 +35,7 @@ class Button2D(Entity2D):
     def __init__(self, onclick=none,onpress=none, *,density=16, texture, color=Color.white, position=(0, 0), renderer=0):
         from .bettercollider2d import MeshCollider2D
         super().__init__(texture=texture, color=color, position=position, update=True, renderer=renderer)
-        global current_app
+        from .engine import current_app
         if not hasattr(current_app, "BetterCollisionSystem2D"):
             raise RuntimeError("Button2D requires BetterCollisionSystem2D() when using MeshCollider2D.")
         self.collider = MeshCollider2D(texture, density=density, position=position, layers=["mouse"])
@@ -43,7 +43,7 @@ class Button2D(Entity2D):
         self.onclick = onclick
         self.onpress = onpress
     def update(self, dt):
-        global current_app
+        from .engine import current_app
         if self.collider.colliding and current_app.MouseSystem.left_pressed():
             self.onclick()
         if self.collider.colliding and current_app.MouseSystem.left_down:

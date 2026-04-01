@@ -12,7 +12,7 @@ from .destroy import destroy
 
 class CircleCollider2D:
     def __init__(self,size,*,layers=[0],position=(0,0),visualize=False,visualition_color=Color.cyan,visualition_renderer=0):
-        global current_app
+        from .engine import current_app
         self.x, self.y = position
         self.size = size/2
         self.layers = layers
@@ -46,7 +46,7 @@ class CircleCollider2D:
 
 class MeshCircleCollider2D:
     def __init__(self,shape='Texture("Path to your texture") without string',density=8,size=8,offset_x=50,offset_y=60,*,layers=[0],position=(0,0),visualize=False,visualition_color=Color.cyan,visualition_renderer=0,load_once=10):
-        global current_app
+        from .engine import current_app
         self.x, self.y = position
         self.shape = shape
         if shape == 'Texture("Path to your texture") without string':
@@ -110,7 +110,7 @@ class CircleCollisionSystem2D(Plugin):
     def add_mesh(self, collider):
         self.mesh_colliders.append(collider)
     def update(self,dt):
-        global current_app
+        from .engine import current_app
         for c in self.circle_colliders:
             c.colliding = False
         for c in self.mesh_colliders:

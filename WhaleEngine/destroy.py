@@ -1,6 +1,5 @@
-from .engine import current_app
-
 def destroy(entity):
+    from .engine import current_app
     if entity.entity_type == "Entity":
         if entity in entity.renderer.entities:
             entity.renderer.entities.remove(entity)

@@ -5,6 +5,7 @@ import glfw
 class InputSystem(Plugin):
     def __init__(self):
         super().__init__()
+        from .engine import current_app
         self.window = current_app.window
         self.keys = {}
         self.mouse = {}

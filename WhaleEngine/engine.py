@@ -19,7 +19,6 @@ class WhaleEngine:
         logLn("Whale engine started.")
     def run(self):
         logLn("Whale engine starting.")
-        global current_app
         if len(self.renderers) == 0:
             self.renderers.append(Renderer2D())
         for i in self.renderers:

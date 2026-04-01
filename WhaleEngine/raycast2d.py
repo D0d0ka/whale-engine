@@ -63,7 +63,7 @@ def _point_in_polygon(point_x, point_y, polygon):
     return inside
 
 def raycast2d(start=(0, 0), end=(0, 0), layers=None):
-    global current_app
+    from .engine import current_app
     if current_app is None:
         return None
 

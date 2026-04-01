@@ -1,0 +1,24 @@
+[WhaleEngine] Whale engine starting.
+[WhaleEngine] Window loaded.
+[WhaleEngine] Whale engine started.
+[WhaleEngine] Renderer 2d loaded.
+[WhaleEngine] Shapes loaded.
+[WhaleEngine] InputSystem loaded.
+[WhaleEngine] Whale engine starting.
+[WhaleEngine] Whale engine started
+[fps counter] Min FPS: 19.541249623651552,
+Avg FPS: 60.08356827340877,
+Max FPS: 385.59420086258325
+[WhaleEngine] App closed.
+<WhaleEngine> Whale engine starting.
+<WhaleEngine> Window loaded.
+<WhaleEngine> Whale engine started.
+<WhaleEngine> Renderer 2d loaded.
+<WhaleEngine> Shapes loaded.
+<WhaleEngine> InputSystem loaded.
+<WhaleEngine> Whale engine starting.
+<WhaleEngine> Whale engine started
+<fps counter> Min FPS: 19.743141726379797,
+Avg FPS: 61.8749875647838,
+Max FPS: 835.5614974038714
+<WhaleEngine> App closed.

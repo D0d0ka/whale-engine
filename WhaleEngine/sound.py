@@ -147,7 +147,7 @@ class SoundSystem(Plugin):
 
 class Sound:
     def __init__(self, name, path):
-        global current_app
+        from .engine import current_app
         if not os.path.isfile(path):
             raise ValueError(f"Sound file not found: {path}")
         self.name = name
