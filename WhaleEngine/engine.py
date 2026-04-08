@@ -4,6 +4,10 @@ from .logging import logLn
 from .window import Window
 from .renderer2d import Renderer2D
 
+# while developing this engine: I'll log everithing.
+from .logging import set_logging_folder
+set_logging_folder("logs")
+
 class WhaleEngine:
     def __init__(self, width=800, height=600, title="Whale Engine"):
         logLn("Whale engine starting.")
