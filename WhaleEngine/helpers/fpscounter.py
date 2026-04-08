@@ -29,6 +29,9 @@ def FPS_counter(dt, fps_timer_lenght=1,print_fps=False):
 def get_FPS():
     return FPS
 
-def summarize_FPS():
+def summarize_FPS(print_summary=False):
     global min_fps, max_fps, avg_fps, fps_timer, frame_count
-    return f"Min FPS: {min_fps},\nAvg FPS: {avg_fps},\nMax FPS: {max_fps}"
+    summary = f"Min FPS: {min_fps},\nAvg FPS: {avg_fps},\nMax FPS: {max_fps}"
+    if print_summary:
+        logLn(summary)
+    return summary
