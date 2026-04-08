@@ -1,4 +1,3 @@
 __pycache__/
 *.pyc
-log.txt # example log file
-boom.log # example boom log file
+*.log
