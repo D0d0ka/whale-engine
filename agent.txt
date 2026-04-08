@@ -21,6 +21,15 @@ WhaleEngine\utils.py
 WhaleEngine\utils2d.py
 WhaleEngine\window.py
 WhaleEngine\__init__.py
+WhaleEngine\assets\music\music.mp3
+WhaleEngine\assets\shapes\circle.png
+WhaleEngine\assets\shapes\dot.png
+WhaleEngine\assets\shapes\square.png
+WhaleEngine\assets\shapes\triangle.png
+WhaleEngine\assets\sounds\wtf.mp3
+WhaleEngine\assets\textures\dodo.png
+WhaleEngine\assets\textures\grid.png
+WhaleEngine\assets\textures\whale.png
 WhaleEngine\helpers\fpscounter.py
 WhaleEngine\helpers\json_save.py
 WhaleEngine\helpers\presset.py
