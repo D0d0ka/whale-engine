@@ -1,14 +1,11 @@
 from WhaleEngine import *
 from WhaleEngine.WindowAPI.OpenGL import *
 
-#set_logging_file("app.log")
-
-app = WhaleEngine(title="Whale engine app")
+window = windowAPI(title="Whale engine app")
+app = WhaleEngine(window=window)
 render = Renderer2D()
 #app.input = InputSystem()
-shapes = LoadShapes()
-
-#entity = Entity2D(texture=shapes.square)
+#shapes = LoadShapes()
 
 def update(dt):
     #if app.input.key(glfw.KEY_SPACE):

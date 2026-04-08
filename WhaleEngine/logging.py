@@ -9,7 +9,7 @@ def set_logging_file(path):
     global logging_file, logging_mode
     logging_file = path
     logging_mode = "file"
-    string = f"<Logger> Log file set to {path} and created."
+    string = f'<Logger> Log file set to "{path}" and created.'
     with open(logging_file, "w") as f:
         f.write(string)
     print(string)
@@ -18,7 +18,7 @@ def set_logging_folder(path):
     global logging_mode, logging_file
     logging_mode = "folder"
     logging_file = f"{path}/{datetime.now().strftime('%H-%M-%S_%d-%m-%Y')}&&{str(uuid4())[:10]}.log"
-    string = f"<Logger> Log file set to {logging_file} and created."
+    string = f'<Logger> Log file set to "{logging_file}" and created.'
     if not os_path.exists(path):
         makedirs(path, exist_ok=True)
         string = f'<Logger> Logging folder "{path}" missing. Created new folder.\n{string}'
@@ -26,9 +26,10 @@ def set_logging_folder(path):
         f.write(string)    
     print(string)
 
-def logLn(message, by="WhaleEngine"):
+def logLn(message, by="WhaleEngine",*, only_write=False):
     string = f"<{by}> {message}"
-    print(string)
+    if not only_write:
+        print(string)
     if not logging_file:
         return
     with open(logging_file, "a") as f:
