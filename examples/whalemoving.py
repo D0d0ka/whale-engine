@@ -1,7 +1,9 @@
 from WhaleEngine import *
 from WhaleEngine.circlecollider2d import *
+from WhaleEngine.WindowAPI.OpenGL import *
 
-app = WhaleEngine(title="Whale moving demo")
+window = windowAPI(title="Whale moving demo")
+app = WhaleEngine(window=window)
 
 app.input = InputSystem()
 ParentingSystem()
@@ -25,13 +27,13 @@ def update(dt):
     global speed, way
     if player.collider.colliding:
         print(f"Player is colliding! Pos: ({player.collider.x:.1f},{player.collider.y:.1f})")
-    if app.input.key(glfw.KEY_W) or app.input.key(glfw.KEY_UP):
+    if app.input.key(Keys.W) or app.input.key(Keys.UP):
         way = "u"
-    elif app.input.key(glfw.KEY_S) or app.input.key(glfw.KEY_DOWN):
+    elif app.input.key(Keys.S) or app.input.key(Keys.DOWN):
         way = "d"
-    if app.input.key(glfw.KEY_D) or app.input.key(glfw.KEY_RIGHT):
+    if app.input.key(Keys.D) or app.input.key(Keys.RIGHT):
         way = "r"
-    if app.input.key(glfw.KEY_A) or app.input.key(glfw.KEY_LEFT):
+    if app.input.key(Keys.A) or app.input.key(Keys.LEFT):
         way = "l"
     if way == "u":
         player.y += speed*dt
@@ -45,11 +47,11 @@ def update(dt):
     elif way == "l":
         player.x -= speed*dt
         player.rotation = 0
-    if app.input.key(glfw.KEY_ESCAPE):
+    if app.input.key(Keys.ESCAPE):
         app.close_app()
-    if app.input.key_pressed(glfw.KEY_E):
+    if app.input.key_pressed(Keys.E):
         destroy(dodo)
-    if app.input.key_pressed(glfw.KEY_E):
+    if app.input.key_pressed(Keys.E):
         destroy(collider)
 app.update = update
 

@@ -1,9 +1,10 @@
 from WhaleEngine import *
 from random import randint
+from WhaleEngine.WindowAPI.OpenGL import windowAPI
 
-app = WhaleEngine(title="Lines demo", width=1200, height=800)
+window = windowAPI(title="Lines demo", width=1200, height=800)
+app = WhaleEngine(window=window)
 render = Renderer2D()
-app.input = InputSystem()
 shapes = LoadShapes()
 
 line = Line2D(start=(-100, -100), end=(100, 100), scale=10, color=Color.red, step=1, renderer=render)

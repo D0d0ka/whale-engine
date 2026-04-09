@@ -1,12 +1,13 @@
 from WhaleEngine import *
 from WhaleEngine.circlecollider2d import *
+from WhaleEngine.WindowAPI.OpenGL import windowAPI
 
-app = WhaleEngine(title="circle mesh collider show")
+window = windowAPI(title="circle mesh collider show", width=800, height=600)
+app = WhaleEngine(window=window)
 renderer = Renderer2D()
 app.input = InputSystem()
 ParentingSystem()
 CircleCollisionSystem2D()
-
 
 shapes = LoadShapes()
 
@@ -27,7 +28,7 @@ collider = MeshCircleCollider2D(
 )
 
 def update(dt):
-    if app.input.key_pressed(glfw.KEY_E):
+    if app.input.key_pressed(Keys.E):
         destroy(collider)
 app.update = update
 

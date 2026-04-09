@@ -2,7 +2,6 @@ from .plugin import Plugin
 from .entitys2d import Entity2D
 from .assets import LoadShapes
 from PIL import Image
-import glfw
 from .utils2d import distance2D, pixel_is_solid
 from .utils import layers_match
 from .color import Color
@@ -92,7 +91,7 @@ class MeshCircleCollider2D:
                 dot.owner = self
                 self.dots.append(dot)
                 if loaded >= load_once:
-                    glfw.poll_events()
+                    current_app.window.poll()
                     loaded = 0
             current_app.CircleCollisionSystem2D.add_mesh(self)
     def get_position(self):

@@ -1,6 +1,8 @@
 from WhaleEngine import *
+from WhaleEngine.WindowAPI.OpenGL import *
 
-app = WhaleEngine(title="button")
+window = windowAPI(title="button", width=800, height=600)
+app = WhaleEngine(window=window)
 renderer = Renderer2D()
 shapes = LoadShapes()
 app.input = InputSystem()
@@ -14,7 +16,7 @@ button1 = Button2D(onclick=button1onclick,texture=shapes.square,color=Color.whit
 
 def update(dt):
     button1.x += dt*10
-    if app.input.key_pressed(glfw.KEY_E):
+    if app.input.key_pressed(Keys.E):
         destroy(button1)
 app.update = update
 

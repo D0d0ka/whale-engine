@@ -17,7 +17,7 @@ def set_logging_file(path):
 def set_logging_folder(path):
     global logging_mode, logging_file
     logging_mode = "folder"
-    logging_file = f"{path}/{datetime.now().strftime('%H-%M-%S_%d-%m-%Y')}&&{str(uuid4())[:10]}.log"
+    logging_file = f"{path}/{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}-{str(uuid4())[:10]}.log"
     string = f'<Logger> Log file set to "{logging_file}" and created.'
     if not os_path.exists(path):
         makedirs(path, exist_ok=True)

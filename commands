@@ -1,8 +1,16 @@
-python -m venv venv
+python -m venv .venv
 
-venv\Scripts\activate
-source venv/bin/activate
+windows:
+.venv\Scripts\activate
 
-python -m pip install -r requirements.txt
+linux:
+source .venv/bin/activate
 
-pip freeze > requirements.txt # to save requirements
+# you need to install theese
+python -m pip install -r requirements/mainrequirements.txt
+
+# if you wan't to use openGL then you need to install this:
+python -m pip install -r requirements/openGLrequirements.txt
+
+# to save requirements
+pip freeze > requirements.txt

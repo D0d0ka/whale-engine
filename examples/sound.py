@@ -1,6 +1,8 @@
 from WhaleEngine import *
+from WhaleEngine.WindowAPI.OpenGL import windowAPI
 
-app = WhaleEngine(title="Whale engine app")
+window = windowAPI(title="sound test", width=800, height=600)
+app = WhaleEngine(window=window)
 render = Renderer2D()
 MouseSystem()
 SoundSystem()

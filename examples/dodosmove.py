@@ -1,10 +1,13 @@
 from WhaleEngine import *
 from WhaleEngine.helpers.fpscounter import FPS_counter, summarize_FPS
 from WhaleEngine.assets import LoadShapes
+from WhaleEngine.WindowAPI.OpenGL import windowAPI
 
-set_logging_file("log.log") # gives you a file that you can read the log from, instead of the console. Useful for debugging on mobile devices, where you dont have a console.
+#set_logging_file("log.log") # gives you a file that you can read the log from, instead of the console. Useful for debugging on mobile devices, where you dont have a console.
 
-app = WhaleEngine(title="Dodos moving demo")
+window = windowAPI(title="Dodos moving demo")
+
+app = WhaleEngine(window=window)
 renderer = Renderer2D()
 app.window.set_color(Color.white)
 shapes = LoadShapes()
@@ -19,7 +22,7 @@ class dodoentity(Entity2D):
         self.spawn_x, self.spawn_y = position
         self.player = player
     def update(self,dt):
-        if app.input.key(glfw.KEY_SPACE) or not self.player:
+        if app.input.key(Keys.SPACE) or not self.player:
             self.x += self.speed*dt*self.way
         if self.x > self.spawn_x+self.range:
             self.way = -1
@@ -38,8 +41,8 @@ triangle = Entity2D(texture=shapes.triangle,color=Color.yellow,position=(-100,-2
 
 def update(dt):
     FPS_counter(dt,0.05)
-    if app.input.key_pressed(glfw.KEY_ESCAPE):
-        logLn(summarize_FPS(),"fps counter") #for logging
+    if app.input.key_pressed(Keys.ESCAPE):
+        summarize_FPS(print_summary=True) #for logging
         app.close_app()
 app.update = update
 

@@ -1,4 +1,4 @@
-All python files in the WhaleEngine package code:
+All files in the WhaleEngine package code:
 WhaleEngine\assets.py
 WhaleEngine\bettercollider2d.py
 WhaleEngine\circlecollider2d.py
@@ -7,6 +7,7 @@ WhaleEngine\conversationrenderer.py
 WhaleEngine\destroy.py
 WhaleEngine\engine.py
 WhaleEngine\entitys2d.py
+WhaleEngine\errorlogging.py
 WhaleEngine\input.py
 WhaleEngine\logging.py
 WhaleEngine\mouse.py
@@ -16,10 +17,8 @@ WhaleEngine\raycast2d.py
 WhaleEngine\renderer2d.py
 WhaleEngine\sound.py
 WhaleEngine\texture.py
-WhaleEngine\unused.py
 WhaleEngine\utils.py
 WhaleEngine\utils2d.py
-WhaleEngine\window.py
 WhaleEngine\__init__.py
 WhaleEngine\assets\music\music.mp3
 WhaleEngine\assets\shapes\circle.png
@@ -30,6 +29,10 @@ WhaleEngine\assets\sounds\wtf.mp3
 WhaleEngine\assets\textures\dodo.png
 WhaleEngine\assets\textures\grid.png
 WhaleEngine\assets\textures\whale.png
+WhaleEngine\builds\extended.py
+WhaleEngine\builds\minimal.py
+WhaleEngine\builds\standard.py
+WhaleEngine\builds\__init__.py
 WhaleEngine\helpers\fpscounter.py
 WhaleEngine\helpers\json_save.py
 WhaleEngine\helpers\presset.py
@@ -38,3 +41,23 @@ WhaleEngine\helpers\__init__.py
 WhaleEngine\WindowAPI\OpenGL\__init__.py
 WhaleEngine\WindowAPI\Vulcan\__init__.py
 WhaleEngine\WindowAPI\WebGL\__init__.py
+All files in the requirements folder:
+requirements\mainrequirements.txt
+requirements\openGLrequirements.txt
+All files in the examples folder:
+examples\better_collision.py
+examples\boom.py
+examples\button.py
+examples\conversation.py
+examples\dodosmove.py
+examples\errorhandling.py
+examples\lines.py
+examples\sound.py
+examples\text.py
+examples\visualizecollider.py
+examples\whalemoving.py
+examples\boomassets\textures\closed left side.png
+examples\boomassets\textures\closed right side.png
+examples\boomassets\textures\closed sides.png
+examples\boomassets\textures\closed.png
+examples\boomassets\textures\open.png

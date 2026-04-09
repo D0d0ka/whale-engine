@@ -1,5 +1,5 @@
 from .plugin import Plugin
-import glfw
+from .keys import MouseButtons
 
 class MouseSystem(Plugin):
     def __init__(self):
@@ -15,14 +15,13 @@ class MouseSystem(Plugin):
         self.prev_left = False
         self.prev_right = False
     def update(self,dt):
-        win = self.window.handle
-        mx, my = glfw.get_cursor_pos(win)
+        mx, my = self.window.get_cursor_pos()
         self.wx = mx
         self.wy = my
         self.prev_left = self.left_down
         self.prev_right = self.right_down
-        self.left_down = glfw.get_mouse_button(win, glfw.MOUSE_BUTTON_LEFT) == glfw.PRESS
-        self.right_down = glfw.get_mouse_button(win, glfw.MOUSE_BUTTON_RIGHT) == glfw.PRESS
+        self.left_down = self.window.is_mouse_button_down(MouseButtons.LEFT)
+        self.right_down = self.window.is_mouse_button_down(MouseButtons.RIGHT)
         w = self.window.width
         h = self.window.height
         self.x = (mx / w) * w - w / 2

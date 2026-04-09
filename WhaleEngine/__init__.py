@@ -14,5 +14,6 @@ from .logging import *
 from .raycast2d import raycast2d
 from .utils2d import *
 from .helpers.presset import *
+from .keys import *
 
 logLn("Loaded standard build", "python")

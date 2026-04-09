@@ -1,7 +1,9 @@
 from WhaleEngine.logging import logLn
 import glfw
 from OpenGL.GL import *
+from PIL import Image
 from WhaleEngine.color import Color
+from WhaleEngine.keys import KeyAction, Keys, MouseButtons
 import sys
 
 class windowAPI:
@@ -32,6 +34,7 @@ class windowAPI:
         glfw.set_key_callback(self.handle, self._on_key)
 
         self.keys = {}
+        self.key_callbacks = []
         self.setup_2d()
 
         logLn("Window loaded.")
@@ -88,8 +91,127 @@ class windowAPI:
         glfw.terminate()
         sys.exit()
 
-    def _on_key(self, window, key, scancode, action, mods):
+    def normalize_key(self, key):
+        if isinstance(key, str):
+            return key
+        return self._key_name_from_native(key)
+
+    def set_key_callback(self, callback):
+        self.key_callbacks.append(callback)
+
+    def get_cursor_pos(self):
+        return glfw.get_cursor_pos(self.handle)
+
+    def _normalize_mouse_button(self, button):
+        if button == MouseButtons.LEFT:
+            return glfw.MOUSE_BUTTON_LEFT
+        if button == MouseButtons.RIGHT:
+            return glfw.MOUSE_BUTTON_RIGHT
+        if button == MouseButtons.MIDDLE:
+            return glfw.MOUSE_BUTTON_MIDDLE
+        if isinstance(button, int):
+            return button
+        raise ValueError(f"Unknown mouse button: {button}")
+
+    def is_mouse_button_down(self, button):
+        native_button = self._normalize_mouse_button(button)
+        return glfw.get_mouse_button(self.handle, native_button) == glfw.PRESS
+
+    def create_texture_from_image(self, image):
+        img = image.convert("RGBA").transpose(Image.FLIP_TOP_BOTTOM)
+        width, height = img.size
+        data = img.tobytes()
+
+        tex_id = glGenTextures(1)
+        glBindTexture(GL_TEXTURE_2D, tex_id)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        glTexImage2D(
+            GL_TEXTURE_2D,
+            0,
+            GL_RGBA,
+            width,
+            height,
+            0,
+            GL_RGBA,
+            GL_UNSIGNED_BYTE,
+            data,
+        )
+        return tex_id
+
+    def render_2d_entities(self, entities):
+        glEnable(GL_TEXTURE_2D)
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        for e in entities:
+            glBindTexture(GL_TEXTURE_2D, e.texture.id)
+            glColor4f(e.color.r, e.color.g, e.color.b, e.color.a)
+
+            glPushMatrix()
+            glTranslatef(e.x, e.y, 0)
+            glRotatef(e.rotation, 0, 0, 1)
+            glScalef(e.scale_x, e.scale_y, 1)
+            w = e.w / 2
+            h = e.h / 2
+            glBegin(GL_QUADS)
+            glTexCoord2f(0, 0)
+            glVertex2f(-w, -h)
+            glTexCoord2f(1, 0)
+            glVertex2f(w, -h)
+            glTexCoord2f(1, 1)
+            glVertex2f(w, h)
+            glTexCoord2f(0, 1)
+            glVertex2f(-w, h)
+            glEnd()
+            glPopMatrix()
+        glColor4f(1, 1, 1, 1)
+        glDisable(GL_BLEND)
+        glDisable(GL_TEXTURE_2D)
+
+    def _action_name_from_native(self, action):
         if action == glfw.PRESS:
-            self.keys[key] = True
-        elif action == glfw.RELEASE:
-            self.keys[key] = False
+            return KeyAction.PRESS
+        if action == glfw.REPEAT:
+            return KeyAction.REPEAT
+        if action == glfw.RELEASE:
+            return KeyAction.RELEASE
+        return str(action)
+
+    def _key_name_from_native(self, key):
+        named_keys = {
+            glfw.KEY_UP: Keys.UP,
+            glfw.KEY_DOWN: Keys.DOWN,
+            glfw.KEY_LEFT: Keys.LEFT,
+            glfw.KEY_RIGHT: Keys.RIGHT,
+            glfw.KEY_SPACE: Keys.SPACE,
+            glfw.KEY_ESCAPE: Keys.ESCAPE,
+            glfw.KEY_ENTER: Keys.ENTER,
+            glfw.KEY_TAB: Keys.TAB,
+            glfw.KEY_BACKSPACE: Keys.BACKSPACE,
+            glfw.KEY_LEFT_SHIFT: Keys.LEFT_SHIFT,
+            glfw.KEY_RIGHT_SHIFT: Keys.RIGHT_SHIFT,
+            glfw.KEY_LEFT_CONTROL: Keys.LEFT_CTRL,
+            glfw.KEY_RIGHT_CONTROL: Keys.RIGHT_CTRL,
+            glfw.KEY_LEFT_ALT: Keys.LEFT_ALT,
+            glfw.KEY_RIGHT_ALT: Keys.RIGHT_ALT,
+        }
+        if key in named_keys:
+            return named_keys[key]
+
+        # Letters map to lowercase single-char keys.
+        if glfw.KEY_A <= key <= glfw.KEY_Z:
+            return chr(ord("a") + (key - glfw.KEY_A))
+
+        return f"key_{key}"
+
+    def _on_key(self, window, key, scancode, action, mods):
+        key_name = self._key_name_from_native(key)
+        action_name = self._action_name_from_native(action)
+
+        if action_name in (KeyAction.PRESS, KeyAction.REPEAT):
+            self.keys[key_name] = True
+        elif action_name == KeyAction.RELEASE:
+            self.keys[key_name] = False
+
+        for callback in self.key_callbacks:
+            callback(window, key_name, scancode, action_name, mods)

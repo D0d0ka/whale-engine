@@ -37,6 +37,7 @@ class ParentIn:
                         )
                     data["last"] = parent_value
         except:
+            from engine import current_app
             current_app.ParentingSystem.parentchildrelationships.remove(self)
             self.child.parentings.remove(self)
             self.parent.parentings.remove(self)

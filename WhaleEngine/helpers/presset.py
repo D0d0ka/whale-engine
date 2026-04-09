@@ -8,7 +8,7 @@ shapes = LoadShapes()
 #entity = Entity2D(texture=shapes.square)
 
 def update(dt):
-    #if app.input.key(glfw.KEY_SPACE):
+    #if app.input.key(Keys.SPACE):
     #    entity.rotation += 90 * dt
     #    entity.x += 100 * dt
     pass

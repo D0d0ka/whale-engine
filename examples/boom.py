@@ -1,9 +1,8 @@
 from WhaleEngine import *
 from WhaleEngine.helpers.fpscounter import *
+from WhaleEngine.WindowAPI.OpenGL import *
 
-set_logging_file("boom.log")
-
-window_size_multiplier = 1.5
+#set_logging_file("boom.log")
 
 assets_folder = "boomassets/"
 
@@ -12,7 +11,10 @@ def load_texture(name):
 
 directions = {"up": (0, -1),"down": (0, 1),"left": (-1, 0),"right": (1, 0)}
 
-app = WhaleEngine(title="Boom",width=round(window_size_multiplier*800),height=round(window_size_multiplier*600))
+window_size_multiplier = 1.5
+window = windowAPI(title="Boom",width=round(window_size_multiplier*800),height=round(window_size_multiplier*600))
+
+app = WhaleEngine(window=window)
 main_renderer = Renderer2D()
 app.input = InputSystem()
 
@@ -115,7 +117,7 @@ class Player:
         self.view_direction = view_direction
         render_view(position,self.view_direction)
     def update(self,dt):
-        if app.input.key_pressed(glfw.KEY_W):
+        if app.input.key_pressed(Keys.W):
             self.x += directions[self.view_direction][0]
             self.y += directions[self.view_direction][1]
             if current_map.get_tile((self.x,self.y)) == 1:
@@ -123,7 +125,7 @@ class Player:
                 self.y -= directions[self.view_direction][1]
             else:
                 render_view((self.x,self.y), self.view_direction)
-        if app.input.key_pressed(glfw.KEY_S):
+        if app.input.key_pressed(Keys.S):
             self.x -= directions[self.view_direction][0]
             self.y -= directions[self.view_direction][1]
             if current_map.get_tile((self.x,self.y)) == 1:
@@ -131,7 +133,7 @@ class Player:
                 self.y += directions[self.view_direction][1]
             else:
                 render_view((self.x,self.y), self.view_direction)
-        if app.input.key_pressed(glfw.KEY_A):
+        if app.input.key_pressed(Keys.A):
             way = {"up": "left", "left": "down", "down": "right", "right": "up"}[self.view_direction]
             self.x += directions[way][0]
             self.y += directions[way][1]
@@ -140,7 +142,7 @@ class Player:
                 self.y -= directions[way][1]
             else:
                 render_view((self.x,self.y), self.view_direction)
-        if app.input.key_pressed(glfw.KEY_D):
+        if app.input.key_pressed(Keys.D):
             way = {"up": "right", "right": "down", "down": "left", "left": "up"}[self.view_direction]
             self.x += directions[way][0]
             self.y += directions[way][1]
@@ -149,13 +151,13 @@ class Player:
                 self.y -= directions[way][1]
             else:
                 render_view((self.x,self.y), self.view_direction)
-        if app.input.key_pressed(glfw.KEY_LEFT):
+        if app.input.key_pressed(Keys.LEFT):
             self.view_direction = {"up": "left", "left": "down", "down": "right", "right": "up"}[self.view_direction]
             render_view((self.x,self.y), self.view_direction)
-        if app.input.key_pressed(glfw.KEY_RIGHT):
+        if app.input.key_pressed(Keys.RIGHT):
             self.view_direction = {"up": "right", "right": "down", "down": "left", "left": "up"}[self.view_direction]
             render_view((self.x,self.y), self.view_direction)
-        if app.input.key_pressed(glfw.KEY_ESCAPE):
+        if app.input.key_pressed(Keys.ESCAPE):
             app.close_app()
 
 current_map_num = 1
@@ -165,6 +167,7 @@ current_map_name = maps[current_map_num]["name"]
 current_map = Map(current_map_data)
 current_map_spawn_position = current_map_data["spawn position"] 
 current_map_spawn_way = current_map_data["spawn way"]
+logLn(f"Loaded map: {current_map_name}","boom")
 
 view_entitys = []
 

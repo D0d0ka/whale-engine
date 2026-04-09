@@ -1,6 +1,5 @@
 from .plugin import Plugin
-from .engine import current_app
-import glfw
+from .keys import KeyAction
 
 class InputSystem(Plugin):
     def __init__(self):
@@ -12,23 +11,21 @@ class InputSystem(Plugin):
         self.prev_keys = {}
         self.pressed_keys = {}
         self.released_keys = {}
-        glfw.set_key_callback(self.window.handle, self._key)
+        self.window.set_key_callback(self._key)
     def _key(self, win, key, scancode, action, mods):
-        if action == glfw.PRESS:
+        if action in (KeyAction.PRESS, KeyAction.REPEAT):
             self.keys[key] = True
-        elif action == glfw.REPEAT:
-            self.keys[key] = True
-        elif action == glfw.RELEASE:
+        elif action == KeyAction.RELEASE:
             self.keys[key] = False
 
     def key(self, k):
-        return self.keys.get(k, False)
+        return self.keys.get(self.window.normalize_key(k), False)
     
     def key_pressed(self, k):
-        return self.pressed_keys.get(k, False)
+        return self.pressed_keys.get(self.window.normalize_key(k), False)
 
     def key_released(self, k):
-        return self.released_keys.get(k, False)
+        return self.released_keys.get(self.window.normalize_key(k), False)
     
     def update(self,dt):
         self.pressed_keys = {}

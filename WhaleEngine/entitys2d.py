@@ -1,12 +1,12 @@
 from .engine import current_app
 from .color import Color
 from .texture import Texture
-from OpenGL.GL import *
 from PIL import Image, ImageDraw, ImageFont
 from .helpers import none
 from .destroy import destroy
 from .parenting import ParentIn
 from .utils2d import distance2D_points
+from .assets import LoadShapes
 
 class Entity2D:
     def __init__(self, *,texture,color=Color.white,position=(0, 0),scale=(1, 1),rotation=0.0,update=False,renderer=0):
@@ -80,23 +80,7 @@ class Text2D(Entity2D):
         r, g, b, a = int(color.r*255), int(color.g*255), int(color.b*255), int(color.a*255)
         draw.multiline_text((-bbox[0], -bbox[1]), safe_text, font=font, fill=(r,g,b,a), spacing=self.line_spacing)  # adjust for bbox
 
-        # Convert to OpenGL texture
-        img = img.transpose(Image.FLIP_TOP_BOTTOM)
-        data = img.tobytes()
-        tex_id = glGenTextures(1)
-        glBindTexture(GL_TEXTURE_2D, tex_id)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data)
-
-        # Wrap in a dummy Texture object so it works with your Entity2D
-        class DummyTex:
-            def __init__(self, id, w, h):
-                self.id = id
-                self.w = w
-                self.h = h
-
-        return DummyTex(tex_id, width, height)
+        return Texture.from_image(img, path="<generated-text>")
 
     def set_text(self, new_text):
         self.text = new_text
@@ -123,8 +107,9 @@ class Line2D():
         self.renderer = renderer
         self.last_start = start
         self.last_end = end
-        self.start = Entity2D(texture=Texture("assets/shapes/dot.png"), color=color, position=start, scale=(scale, scale), update=False, renderer=renderer)
-        self.end = Entity2D(texture=Texture("assets/shapes/dot.png"), color=color, position=end, scale=(scale, scale), update=False, renderer=renderer)
+        self.shapes = LoadShapes()
+        self.start = Entity2D(texture=self.shapes.dot, color=color, position=start, scale=(scale, scale), update=False, renderer=renderer)
+        self.end = Entity2D(texture=self.shapes.dot, color=color, position=end, scale=(scale, scale), update=False, renderer=renderer)
         self.generate_parts()
     def generate_parts(self):
         for part in self.parts:
@@ -142,7 +127,7 @@ class Line2D():
         while moved < dist:
             pos_x = start_x + dir_x * moved
             pos_y = start_y + dir_y * moved
-            part = Entity2D(texture=Texture("assets/shapes/dot.png"), color=self.color, position=(pos_x, pos_y), scale=(self.scale, self.scale), update=False, renderer=self.renderer)
+            part = Entity2D(texture=self.shapes.dot, color=self.color, position=(pos_x, pos_y), scale=(self.scale, self.scale), update=False, renderer=self.renderer)
             self.parts.append(part)
             moved += step_size
     def update(self):

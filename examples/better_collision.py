@@ -1,7 +1,9 @@
 from WhaleEngine import *
 from random import randint
+from WhaleEngine.WindowAPI.OpenGL import windowAPI
 
-app = WhaleEngine(title="Better Collision System")
+window = windowAPI(title="Better Collision System")
+app = WhaleEngine(window=window)
 render = Renderer2D()
 shapes = LoadShapes()
 ParentingSystem()
