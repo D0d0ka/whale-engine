@@ -1,6 +1,7 @@
 import sys
 import math
 import glfw
+import numpy as np
 
 from WhaleEngine.logging import logLn
 from WhaleEngine.color import Color
@@ -56,6 +57,7 @@ class windowAPI:
         self._pending_entities = []
         self._next_texture_id = 1
         self._textures = {}
+        self._recovering = False
 
         # Single frame in flight is slower but significantly more stable for this minimal backend.
         self._max_frames_in_flight = 1
@@ -91,7 +93,17 @@ class windowAPI:
         pass
 
     def swap(self):
-        self._draw_frame()
+        try:
+            self._draw_frame()
+        except VkErrorOutOfDateKhr:
+            self._recreate_swapchain()
+        except VkErrorDeviceLost:
+            logLn("Vulkan device lost, attempting renderer recovery.", "error logger")
+            self._recover_vulkan_renderer()
+        except Exception as exc:
+            # Keep app alive on transient Vulkan issues and attempt to rebuild context.
+            logLn(f"Vulkan draw error: {exc}", "error logger")
+            self._recover_vulkan_renderer()
 
     def should_close(self):
         return glfw.window_should_close(self.handle)
@@ -133,10 +145,11 @@ class windowAPI:
         img = image.convert("RGBA")
         tex_id = self._next_texture_id
         self._next_texture_id += 1
+        pixels_np = np.frombuffer(img.tobytes(), dtype=np.uint8).reshape((img.size[1], img.size[0], 4)).copy()
         self._textures[tex_id] = {
             "width": img.size[0],
             "height": img.size[1],
-            "pixels": img.tobytes(),
+            "pixels_np": pixels_np,
         }
         return tex_id
 
@@ -436,7 +449,8 @@ class windowAPI:
         self._fb_width = int(self.swapchain_extent.width)
         self._fb_height = int(self.swapchain_extent.height)
         self._fb_size = self._fb_width * self._fb_height * 4
-        self._cpu_framebuffer = bytearray(self._fb_size)
+        self._cpu_framebuffer_np = np.zeros((self._fb_height, self._fb_width, 4), dtype=np.uint8)
+        self._cpu_framebuffer = self._cpu_framebuffer_np.reshape(-1)
 
         buffer_info = VkBufferCreateInfo(
             sType=VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
@@ -465,6 +479,7 @@ class windowAPI:
         if getattr(self, "_staging_memory", None):
             vkFreeMemory(self.device, self._staging_memory, None)
             self._staging_memory = None
+        self._cpu_framebuffer_np = None
         self._cpu_framebuffer = None
         self._fb_width = 0
         self._fb_height = 0
@@ -669,10 +684,15 @@ class windowAPI:
         b = max(0, min(255, int(self._color.b * 255)))
         a = max(0, min(255, int(self._color.a * 255)))
         if self._swapchain_is_bgra:
-            px = bytes((b, g, r, a))
+            self._cpu_framebuffer_np[:, :, 0] = b
+            self._cpu_framebuffer_np[:, :, 1] = g
+            self._cpu_framebuffer_np[:, :, 2] = r
+            self._cpu_framebuffer_np[:, :, 3] = a
         else:
-            px = bytes((r, g, b, a))
-        self._cpu_framebuffer[:] = px * (self._fb_width * self._fb_height)
+            self._cpu_framebuffer_np[:, :, 0] = r
+            self._cpu_framebuffer_np[:, :, 1] = g
+            self._cpu_framebuffer_np[:, :, 2] = b
+            self._cpu_framebuffer_np[:, :, 3] = a
 
     def _blend_pixel(self, x, y, sr, sg, sb, sa):
         if x < 0 or y < 0 or x >= self._fb_width or y >= self._fb_height:
@@ -723,7 +743,7 @@ class windowAPI:
         if tw <= 0 or th <= 0:
             return
 
-        tex = texture_info["pixels"]
+        tex = texture_info["pixels_np"]
         half_w = abs(float(entity.w) * float(entity.scale_x)) * 0.5
         half_h = abs(float(entity.h) * float(entity.scale_y)) * 0.5
         if half_w < 0.5 or half_h < 0.5:
@@ -752,37 +772,70 @@ class windowAPI:
         flip_u = (float(entity.scale_x) < 0.0) ^ rot_flip
         flip_v = (float(entity.scale_y) < 0.0) ^ rot_flip
 
+        xs = np.arange(min_x, max_x + 1, dtype=np.float32) + 0.5
+        ys = np.arange(min_y, max_y + 1, dtype=np.float32) + 0.5
+
+        ww = float(max(1, self.width))
+        wh = float(max(1, self.height))
+        fbw = float(max(1, self._fb_width))
+        fbh = float(max(1, self._fb_height))
+
+        wx = (xs / fbw) * ww - (ww * 0.5)
+        wy = (wh * 0.5) - (ys / fbh) * wh
+
         inv_w = 1.0 / max(1.0, (2.0 * half_w))
         inv_h = 1.0 / max(1.0, (2.0 * half_h))
 
-        for py in range(min_y, max_y + 1):
-            wy = self._screen_to_world_y(py + 0.5)
-            v = ((wy - float(entity.y)) * inv_h) + 0.5
-            if flip_v:
-                v = 1.0 - v
+        u = ((wx - float(entity.x)) * inv_w) + 0.5
+        v = ((wy - float(entity.y)) * inv_h) + 0.5
+
+        if flip_u:
+            u = 1.0 - u
+        if flip_v:
             v = 1.0 - v
-            ty = max(0, min(th - 1, int(v * (th - 1))))
 
-            for px in range(min_x, max_x + 1):
-                wx = self._screen_to_world_x(px + 0.5)
-                u = ((wx - float(entity.x)) * inv_w) + 0.5
-                if flip_u:
-                    u = 1.0 - u
-                tx = max(0, min(tw - 1, int(u * (tw - 1))))
+        # Match OpenGL-style orientation from existing engine assets.
+        v = 1.0 - v
 
-                tidx = (ty * tw + tx) * 4
-                tr = tex[tidx]
-                tg = tex[tidx + 1]
-                tb = tex[tidx + 2]
-                ta = tex[tidx + 3]
+        tx = np.clip((u * (tw - 1)).astype(np.int32), 0, tw - 1)
+        ty = np.clip((v * (th - 1)).astype(np.int32), 0, th - 1)
 
-                sa_px = int(ta * color_a)
-                if sa_px <= 0:
-                    continue
-                sr = int(tr * color_r)
-                sg = int(tg * color_g)
-                sb = int(tb * color_b)
-                self._blend_pixel(px, py, sr, sg, sb, sa_px)
+        src = tex[ty[:, None], tx[None, :], :].astype(np.uint16)
+        src[:, :, 0] = (src[:, :, 0] * int(color_r * 255)) // 255
+        src[:, :, 1] = (src[:, :, 1] * int(color_g * 255)) // 255
+        src[:, :, 2] = (src[:, :, 2] * int(color_b * 255)) // 255
+        src[:, :, 3] = (src[:, :, 3] * int(color_a * 255)) // 255
+
+        dst = self._cpu_framebuffer_np[min_y:max_y + 1, min_x:max_x + 1, :]
+        dst16 = dst.astype(np.uint16)
+
+        sa = src[:, :, 3]
+        inv = 255 - sa
+
+        if self._swapchain_is_bgra:
+            dr = dst16[:, :, 2]
+            dg = dst16[:, :, 1]
+            db = dst16[:, :, 0]
+        else:
+            dr = dst16[:, :, 0]
+            dg = dst16[:, :, 1]
+            db = dst16[:, :, 2]
+        da = dst16[:, :, 3]
+
+        out_r = (src[:, :, 0] * sa + dr * inv) // 255
+        out_g = (src[:, :, 1] * sa + dg * inv) // 255
+        out_b = (src[:, :, 2] * sa + db * inv) // 255
+        out_a = sa + (da * inv) // 255
+
+        if self._swapchain_is_bgra:
+            dst[:, :, 0] = np.clip(out_b, 0, 255).astype(np.uint8)
+            dst[:, :, 1] = np.clip(out_g, 0, 255).astype(np.uint8)
+            dst[:, :, 2] = np.clip(out_r, 0, 255).astype(np.uint8)
+        else:
+            dst[:, :, 0] = np.clip(out_r, 0, 255).astype(np.uint8)
+            dst[:, :, 1] = np.clip(out_g, 0, 255).astype(np.uint8)
+            dst[:, :, 2] = np.clip(out_b, 0, 255).astype(np.uint8)
+        dst[:, :, 3] = np.clip(out_a, 0, 255).astype(np.uint8)
 
     def _world_to_screen(self, x, y):
         ww = float(max(1, self.width))
@@ -817,7 +870,7 @@ class windowAPI:
         if tw <= 0 or th <= 0:
             return
 
-        tex = texture_info["pixels"]
+        tex = texture_info["pixels_np"]
 
         half_w = abs(float(entity.w) * float(entity.scale_x)) * 0.5
         half_h = abs(float(entity.h) * float(entity.scale_y)) * 0.5
@@ -881,11 +934,7 @@ class windowAPI:
                 tx = max(0, min(tw - 1, int(u * (tw - 1))))
                 ty = max(0, min(th - 1, int(v * (th - 1))))
 
-                tidx = (ty * tw + tx) * 4
-                tr = tex[tidx]
-                tg = tex[tidx + 1]
-                tb = tex[tidx + 2]
-                ta = tex[tidx + 3]
+                tr, tg, tb, ta = tex[ty, tx]
 
                 sr = int(tr * color_r)
                 sg = int(tg * color_g)
@@ -1104,6 +1153,91 @@ class windowAPI:
         self._create_swapchain_and_dependents()
         self._create_software_framebuffer_resources()
         self._create_command_buffers()
+
+    def _destroy_vulkan_objects_best_effort(self):
+        # Device can already be lost; every destroy call here is best-effort.
+        device = getattr(self, "device", None)
+        if device is not None:
+            try:
+                vkDeviceWaitIdle(device)
+            except Exception:
+                pass
+
+        sems = getattr(self, "image_available_semaphores", [])
+        fins = getattr(self, "render_finished_semaphores", [])
+        fences = getattr(self, "in_flight_fences", [])
+        for i in range(min(len(sems), len(fins), len(fences))):
+            try:
+                vkDestroySemaphore(device, sems[i], None)
+            except Exception:
+                pass
+            try:
+                vkDestroySemaphore(device, fins[i], None)
+            except Exception:
+                pass
+            try:
+                vkDestroyFence(device, fences[i], None)
+            except Exception:
+                pass
+
+        self.image_available_semaphores = []
+        self.render_finished_semaphores = []
+        self.in_flight_fences = []
+
+        try:
+            self._destroy_software_framebuffer_resources()
+        except Exception:
+            pass
+
+        if device is not None and getattr(self, "command_pool", None):
+            try:
+                vkDestroyCommandPool(device, self.command_pool, None)
+            except Exception:
+                pass
+            self.command_pool = None
+
+        if device is not None and getattr(self, "swapchain", None):
+            try:
+                self.vkDestroySwapchainKHR(device, self.swapchain, None)
+            except Exception:
+                pass
+            self.swapchain = None
+
+        if device is not None:
+            try:
+                vkDestroyDevice(device, None)
+            except Exception:
+                pass
+            self.device = None
+
+        if getattr(self, "surface", None):
+            try:
+                self.vkDestroySurfaceKHR(self.instance, self.surface, None)
+            except Exception:
+                pass
+            self.surface = None
+
+        if getattr(self, "instance", None):
+            try:
+                vkDestroyInstance(self.instance, None)
+            except Exception:
+                pass
+            self.instance = None
+
+    def _recover_vulkan_renderer(self):
+        if self._recovering:
+            return
+        self._recovering = True
+        try:
+            self._destroy_vulkan_objects_best_effort()
+            self._create_vulkan_context()
+            self._current_frame = 0
+            logLn("Vulkan renderer recovered.")
+        except Exception as exc:
+            logLn(f"Vulkan recovery failed: {exc}", "error logger")
+            glfw.set_window_should_close(self.handle, True)
+        finally:
+            self._recovering = False
 
     # Cleanup
     def _cleanup(self):
