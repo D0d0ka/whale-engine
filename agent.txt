@@ -51,6 +51,7 @@ examples\better_collision.py
 examples\boom.py
 examples\button.py
 examples\conversation.py
+examples\dodosmove.py
 examples\errorhandling.py
 examples\lines.py
 examples\sound.py
