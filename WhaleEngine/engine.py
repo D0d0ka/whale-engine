@@ -25,6 +25,7 @@ class WhaleEngine:
         self.attrs = {}
         self.update = None
         self.last_render = perf_counter()
+        self.clamping = False
         logLn("Whale engine loaded.")
     def run(self):
         logLn("Whale engine starting.")
@@ -36,6 +37,9 @@ class WhaleEngine:
         while not self.window.should_close():
             this_update = perf_counter()
             dt = this_update-self.last_render
+            if self.clamping and dt > 0.1:
+                logLn(f"Clamping dt from {dt} to 0.1 seconds.", "warning")
+                dt = 0.1
             self.window.poll()
             self.window.clear()
             for i in self.plugins:

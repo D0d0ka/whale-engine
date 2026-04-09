@@ -58,6 +58,7 @@ class windowAPI:
         self._next_texture_id = 1
         self._textures = {}
         self._recovering = False
+        self._fence_wait_timeout_ns = 100_000_000
 
         # Single frame in flight is slower but significantly more stable for this minimal backend.
         self._max_frames_in_flight = 1
@@ -994,7 +995,20 @@ class windowAPI:
 
     # Rendering
     def _draw_frame(self):
-        vkWaitForFences(self.device, 1, [self.in_flight_fences[self._current_frame]], True, 0xFFFFFFFFFFFFFFFF)
+        wait_result = vkWaitForFences(
+            self.device,
+            1,
+            [self.in_flight_fences[self._current_frame]],
+            True,
+            self._fence_wait_timeout_ns,
+        )
+        wait_result = self._parse_result_code(wait_result)
+        if wait_result == VK_TIMEOUT:
+            logLn("Vulkan fence wait timed out, attempting renderer recovery.", "error logger")
+            self._recover_vulkan_renderer()
+            return
+        if wait_result not in (VK_SUCCESS,):
+            raise RuntimeError(f"vkWaitForFences failed with result={wait_result}")
 
         image_index_ptr = ffi.new("uint32_t[1]")
         try:
@@ -1066,7 +1080,7 @@ class windowAPI:
         self._current_frame = (self._current_frame + 1) % self._max_frames_in_flight
 
     def _parse_result_code(self, value):
-        known = {VK_SUCCESS, VK_SUBOPTIMAL_KHR, VK_ERROR_OUT_OF_DATE_KHR}
+        known = {VK_SUCCESS, VK_SUBOPTIMAL_KHR, VK_ERROR_OUT_OF_DATE_KHR, VK_TIMEOUT}
         if isinstance(value, tuple):
             for item in value:
                 try:
