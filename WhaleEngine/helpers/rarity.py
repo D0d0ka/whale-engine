@@ -2,7 +2,6 @@ class rarity:
     def __init__(self, one_out_of):
         self.key = 0
         self.reach = one_out_of
-
     def generate(self, times=1):
         self.key += times
         i = 0
