@@ -7,7 +7,7 @@ from WhaleEngine.keys import KeyAction, Keys, MouseButtons
 import sys
 
 class windowAPI:
-    def __init__(self, width=800, height=600, title="Whale Engine", color=Color(0.1, 0.1, 0.1, 1)):
+    def __init__(self, width=800, height=600, title="Whale Engine (OpenGL)", color=Color(0.1, 0.1, 0.1, 1)):
         if not glfw.init():
             logLn("GLFW initialization failed.")
             sys.exit(1)

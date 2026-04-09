@@ -9,6 +9,7 @@ WhaleEngine\engine.py
 WhaleEngine\entitys2d.py
 WhaleEngine\errorlogging.py
 WhaleEngine\input.py
+WhaleEngine\keys.py
 WhaleEngine\logging.py
 WhaleEngine\mouse.py
 WhaleEngine\parenting.py
@@ -44,6 +45,7 @@ WhaleEngine\WindowAPI\WebGL\__init__.py
 All files in the requirements folder:
 requirements\mainrequirements.txt
 requirements\openGLrequirements.txt
+requirements\vulcanrequirements.txt
 All files in the examples folder:
 examples\better_collision.py
 examples\boom.py

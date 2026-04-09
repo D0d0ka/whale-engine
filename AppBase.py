@@ -1,5 +1,5 @@
 from WhaleEngine import *
-from WhaleEngine.WindowAPI.OpenGL import windowAPI
+from WhaleEngine.WindowAPI.Vulcan import windowAPI # from WhaleEngine.WindowAPI.OpenGL import windowAPI
 
 window = windowAPI(title="Whale engine app")
 app = WhaleEngine(window=window)
