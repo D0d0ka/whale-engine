@@ -193,8 +193,9 @@ class windowAPI:
             callback(window, key_name, scancode, action_name, mods)
 
     def _resize(self, window, w, h):
-        self.width = w
-        self.height = h
+        ww, hh = glfw.get_window_size(self.handle)
+        self.width = ww if ww > 0 else w
+        self.height = hh if hh > 0 else h
         self._framebuffer_resized = True
 
     # Vulkan setup
@@ -728,10 +729,13 @@ class windowAPI:
         if half_w < 0.5 or half_h < 0.5:
             return
 
-        left = int(math.floor(float(entity.x) - half_w + (self._fb_width / 2.0)))
-        right = int(math.ceil(float(entity.x) + half_w + (self._fb_width / 2.0)))
-        top = int(math.floor((self._fb_height / 2.0) - (float(entity.y) + half_h)))
-        bottom = int(math.ceil((self._fb_height / 2.0) - (float(entity.y) - half_h)))
+        sx0, sy0 = self._world_to_screen(float(entity.x) - half_w, float(entity.y) + half_h)
+        sx1, sy1 = self._world_to_screen(float(entity.x) + half_w, float(entity.y) - half_h)
+
+        left = int(math.floor(min(sx0, sx1)))
+        right = int(math.ceil(max(sx0, sx1)))
+        top = int(math.floor(min(sy0, sy1)))
+        bottom = int(math.ceil(max(sy0, sy1)))
 
         min_x = max(0, left)
         max_x = min(self._fb_width - 1, right)
@@ -752,7 +756,7 @@ class windowAPI:
         inv_h = 1.0 / max(1.0, (2.0 * half_h))
 
         for py in range(min_y, max_y + 1):
-            wy = (self._fb_height / 2.0) - (py + 0.5)
+            wy = self._screen_to_world_y(py + 0.5)
             v = ((wy - float(entity.y)) * inv_h) + 0.5
             if flip_v:
                 v = 1.0 - v
@@ -760,7 +764,7 @@ class windowAPI:
             ty = max(0, min(th - 1, int(v * (th - 1))))
 
             for px in range(min_x, max_x + 1):
-                wx = (px + 0.5) - (self._fb_width / 2.0)
+                wx = self._screen_to_world_x(px + 0.5)
                 u = ((wx - float(entity.x)) * inv_w) + 0.5
                 if flip_u:
                     u = 1.0 - u
@@ -781,9 +785,19 @@ class windowAPI:
                 self._blend_pixel(px, py, sr, sg, sb, sa_px)
 
     def _world_to_screen(self, x, y):
-        sx = x + (self._fb_width / 2.0)
-        sy = (self._fb_height / 2.0) - y
+        ww = float(max(1, self.width))
+        wh = float(max(1, self.height))
+        sx = ((float(x) + (ww * 0.5)) / ww) * float(self._fb_width)
+        sy = (((wh * 0.5) - float(y)) / wh) * float(self._fb_height)
         return sx, sy
+
+    def _screen_to_world_x(self, sx):
+        ww = float(max(1, self.width))
+        return (float(sx) / float(max(1, self._fb_width))) * ww - (ww * 0.5)
+
+    def _screen_to_world_y(self, sy):
+        wh = float(max(1, self.height))
+        return (wh * 0.5) - ((float(sy) / float(max(1, self._fb_height))) * wh)
 
     def _draw_entity_software(self, entity):
         texture_info = self._textures.get(getattr(entity.texture, "id", None))
@@ -841,9 +855,9 @@ class windowAPI:
         flip_v = float(entity.scale_y) < 0.0
 
         for py in range(min_y, max_y + 1):
-            wy = (self._fb_height / 2.0) - (py + 0.5)
+            wy = self._screen_to_world_y(py + 0.5)
             for px in range(min_x, max_x + 1):
-                wx = (px + 0.5) - (self._fb_width / 2.0)
+                wx = self._screen_to_world_x(px + 0.5)
 
                 dx = wx - float(entity.x)
                 dy = wy - float(entity.y)
@@ -933,19 +947,30 @@ class windowAPI:
     def _draw_frame(self):
         vkWaitForFences(self.device, 1, [self.in_flight_fences[self._current_frame]], True, 0xFFFFFFFFFFFFFFFF)
 
+        image_index_ptr = ffi.new("uint32_t[1]")
         try:
-            acquire = self.vkAcquireNextImageKHR(
+            acquire_result = self.vkAcquireNextImageKHR(
                 self.device,
                 self.swapchain,
                 0xFFFFFFFFFFFFFFFF,
                 self.image_available_semaphores[self._current_frame],
                 VK_NULL_HANDLE,
+                image_index_ptr,
             )
         except VkErrorOutOfDateKhr:
             self._recreate_swapchain()
             return
 
-        image_index = self._extract_image_index(acquire)
+        acquire_result = self._parse_result_code(acquire_result)
+        if acquire_result == VK_ERROR_OUT_OF_DATE_KHR:
+            self._recreate_swapchain()
+            return
+        if acquire_result not in (VK_SUCCESS, VK_SUBOPTIMAL_KHR):
+            raise RuntimeError(f"vkAcquireNextImageKHR failed with result={acquire_result}")
+
+        image_index = int(image_index_ptr[0])
+        if image_index < 0 or image_index >= len(self.command_buffers):
+            raise RuntimeError(f"Acquire returned invalid image index {image_index} for {len(self.command_buffers)} command buffers")
 
         if self._framebuffer_resized:
             self._framebuffer_resized = False
@@ -983,14 +1008,36 @@ class windowAPI:
 
         try:
             present_result = self.vkQueuePresentKHR(self.present_queue, present_info)
-            if present_result == VK_ERROR_OUT_OF_DATE_KHR or present_result == VK_SUBOPTIMAL_KHR:
+            present_result = self._parse_result_code(present_result)
+            if present_result == VK_ERROR_OUT_OF_DATE_KHR:
                 self._recreate_swapchain()
         except VkErrorOutOfDateKhr:
             self._recreate_swapchain()
 
         self._current_frame = (self._current_frame + 1) % self._max_frames_in_flight
 
-    def _extract_image_index(self, acquire_result):
+    def _parse_result_code(self, value):
+        known = {VK_SUCCESS, VK_SUBOPTIMAL_KHR, VK_ERROR_OUT_OF_DATE_KHR}
+        if isinstance(value, tuple):
+            for item in value:
+                try:
+                    item_i = int(item)
+                except Exception:
+                    continue
+                if item_i in known:
+                    return item_i
+            return VK_SUCCESS
+        try:
+            value_i = int(value)
+            if value_i in known:
+                return value_i
+        except Exception:
+            pass
+        return VK_SUCCESS
+
+    def _parse_acquire_result(self, acquire_result):
+        known = {VK_SUCCESS, VK_SUBOPTIMAL_KHR, VK_ERROR_OUT_OF_DATE_KHR}
+
         def _to_int(value):
             try:
                 return int(value)
@@ -1004,27 +1051,40 @@ class windowAPI:
                 second = _to_int(second_raw)
 
                 # Common binding shape: (VkResult, image_index)
-                if first in (VK_SUCCESS, VK_SUBOPTIMAL_KHR) and second is not None:
-                    if 0 <= second < len(self.command_buffers):
-                        return second
+                if first in known:
+                    if first == VK_ERROR_OUT_OF_DATE_KHR:
+                        return first, None
+                    if second is not None and 0 <= second < len(self.command_buffers):
+                        return first, second
 
                 # Alternate shape: (image_index, VkResult)
-                if second in (VK_SUCCESS, VK_SUBOPTIMAL_KHR) and first is not None:
-                    if 0 <= first < len(self.command_buffers):
-                        return first
+                if second in known:
+                    if second == VK_ERROR_OUT_OF_DATE_KHR:
+                        return second, None
+                    if first is not None and 0 <= first < len(self.command_buffers):
+                        return second, first
 
             # Fallback: return first tuple member that looks like a valid image index.
             for value in acquire_result:
                 parsed = _to_int(value)
                 if parsed is not None and 0 <= parsed < len(self.command_buffers):
-                    return parsed
+                    return VK_SUCCESS, parsed
 
             raise RuntimeError(f"Could not parse Vulkan image index from acquire result: {acquire_result!r}")
 
         parsed = _to_int(acquire_result)
         if parsed is None:
             raise RuntimeError(f"Unexpected Vulkan acquire result type: {type(acquire_result)}")
-        return parsed
+
+        if parsed in known:
+            if parsed == VK_ERROR_OUT_OF_DATE_KHR:
+                return parsed, None
+            raise RuntimeError(f"Acquire returned result={parsed} without image index.")
+
+        if 0 <= parsed < len(self.command_buffers):
+            return VK_SUCCESS, parsed
+
+        raise RuntimeError(f"Acquire returned unexpected scalar value: {parsed}")
 
     def _recreate_swapchain(self):
         w, h = glfw.get_framebuffer_size(self.handle)

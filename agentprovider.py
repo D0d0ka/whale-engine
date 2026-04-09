@@ -1,7 +1,7 @@
 import os
 from WhaleEngine.logging import *
 
-set_logging_file("agent.log")
+#set_logging_file("agent.log")
 
 allowed_extensions = [".py", ".png", ".mp3", ".txt"]
 

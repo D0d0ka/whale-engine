@@ -1,7 +1,7 @@
 from .errorlogging import setup_global_error_handler
 from .logging import logLn
 setup_global_error_handler()
-logLn("Global error handler set up.")
+logLn("Global error handler set up.", "error logger")
 
 from time import perf_counter
 from traceback import format_exc
