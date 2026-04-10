@@ -18,4 +18,5 @@ class Renderer2D:
             if i.do_update:
                 i.update(dt)
     def render(self):
-        self.window.render_2d_entities(self.entities)
+        visible_entities = [entity for entity in self.entities if getattr(entity, "visible", True)]
+        self.window.render_2d_entities(visible_entities)

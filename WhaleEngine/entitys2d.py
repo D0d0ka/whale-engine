@@ -9,7 +9,7 @@ from .utils2d import distance2D_points
 from .assets import LoadShapes
 
 class Entity2D:
-    def __init__(self, *,texture,color=Color.white,position=(0, 0),scale=(1, 1),rotation=0.0,update=False,renderer=0):
+    def __init__(self, *,texture,color=Color.white,position=(0, 0),scale=(1, 1),rotation=0.0,update=False,renderer=0,visible=True):
         from .engine import current_app
         if type(texture) == str:
             texture = Texture(texture)
@@ -19,6 +19,7 @@ class Entity2D:
         self.scale_x, self.scale_y = scale
         self.rotation = rotation
         self.do_update = update
+        self.visible = visible
         self.color = color
         if type(renderer) == int:
             renderer = current_app.renderers[renderer]

@@ -89,7 +89,7 @@ class MeshCollider2D:
                 color=visualition_color,
                 renderer=visualition_renderer
             )
-            ParentIn(self, self.visualition, attributes={"x": "set", "y": "set", "rotation": "set"})
+            ParentIn(self, self.visualition, attributes={"x": "set", "y": "set", "rotation": "set", "scale_x": "set", "scale_y": "set"})
 
         current_app.BetterCollisionSystem2D.add_mesh(self)
 
