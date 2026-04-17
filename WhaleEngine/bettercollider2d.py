@@ -101,7 +101,7 @@ class MeshCollider2D:
 
 class BetterCollisionSystem2D(Plugin):
     def __init__(self):
-        super().__init__()
+        super().__init__(requirements=["ParentingSystem"],incompatibilities=["CircleCollisionSystem2D"])
         self.colliders = []
     def add_quad(self, collider):
         self.colliders.append(collider)

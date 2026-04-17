@@ -101,7 +101,7 @@ class MeshCircleCollider2D:
 
 class CircleCollisionSystem2D(Plugin):
     def __init__(self):
-        super().__init__()
+        super().__init__(requirements=["ParentingSystem"], incompatibilities=["BetterCollisionSystem2D"])
         self.circle_colliders = []
         self.mesh_colliders = []
     def add_circle(self, collider): 

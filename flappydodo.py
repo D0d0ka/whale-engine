@@ -8,13 +8,16 @@ window = windowAPI(title="Flappy Dodo", width=600, height=600)
 window.set_color(Color.green)
 app = WhaleEngine(window=window)
 renderer = Renderer2D()
+app.input = InputSystem()
+MouseSystem()
 ParentingSystem()
 BetterCollisionSystem2D()
-MouseSystem()
 SoundSystem()
+
+
 shapes = LoadShapes()
 music = LoadSounds().music
-app.input = InputSystem()
+
 game_on = False
 space = 625
 score = 0
@@ -199,14 +202,43 @@ def back():
         show_FPS_true_button.visible = False
         show_FPS_false_button.visible = False
 
+def music_on():
+    global music_on
+    if music_on_button.visible:
+        music_on = True
+        music_on_button.visible = False
+        music_off_button.visible = True
+
+def music_off():
+    global music_on
+    if music_off_button.visible:
+        music_on = False
+        music_off_button.visible = False
+        music_on_button.visible = True
+        music.stop()
+
+def show_FPS_true():
+    global show_FPS
+    if show_FPS_true_button.visible:
+        show_FPS = True
+        show_FPS_true_button.visible = False
+        show_FPS_false_button.visible = True
+
+def show_FPS_false():
+    global show_FPS
+    if show_FPS_false_button.visible:
+        show_FPS = False
+        show_FPS_false_button.visible = False
+        show_FPS_true_button.visible = True
+
 play_button = button(Texture("flappydodoassets/playbutton.png"),110, play)
 settings_button = button(Texture("flappydodoassets/settingsbutton.png"), 0, settings)
 exit_button = button(Texture("flappydodoassets/exitbutton.png"), -110, exit)
 back_button = button(Texture("flappydodoassets/backbutton.png"), 110, back)
-music_on_button = button(Texture("flappydodoassets/musiconbutton.png"), 0, none)
-music_off_button = button(Texture("flappydodoassets/musicoffbutton.png"), 0, none)
-show_FPS_true_button = button(Texture("flappydodoassets/showfpstruebutton.png"), -110, none)
-show_FPS_false_button = button(Texture("flappydodoassets/showfpsfalsebutton.png"), -110, none)
+music_on_button = button(Texture("flappydodoassets/musiconbutton.png"), 0, music_on)
+music_off_button = button(Texture("flappydodoassets/musicoffbutton.png"), 0, music_off)
+show_FPS_true_button = button(Texture("flappydodoassets/showfpstruebutton.png"), -110, show_FPS_true)
+show_FPS_false_button = button(Texture("flappydodoassets/showfpsfalsebutton.png"), -110, show_FPS_false)
 back_button.visible = False
 music_on_button.visible = False
 music_off_button.visible = False
@@ -222,7 +254,7 @@ def update(dt):
         window.set_title(f"Flappy Dodo - FPS: {round(get_FPS())}")
     else:
         window.set_title("Flappy Dodo")
-    if music_on and not music.playing:
+    if music_on and not music.is_playing:
         music.play()
     if not game_on:
         if app.input.key_pressed(Keys.ESCAPE):

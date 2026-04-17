@@ -39,7 +39,7 @@ class Button2D(Entity2D):
         from .engine import current_app
         if not hasattr(current_app, "BetterCollisionSystem2D"):
             raise RuntimeError("Button2D requires BetterCollisionSystem2D() when using MeshCollider2D.")
-        self.collider = MeshCollider2D(texture, density=density, position=position, layers=["mouse"])
+        self.collider = MeshCollider2D(texture, density=density, position=position, layers=["mouse"], visualize=False)
         ParentIn(self,self.collider,attributes={"x": "set", "y": "set"})
         self.onclick = onclick
         self.onpress = onpress
