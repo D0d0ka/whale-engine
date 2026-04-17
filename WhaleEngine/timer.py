@@ -2,14 +2,14 @@ from .plugin import Plugin
 from .helpers import none
 
 class TimerPlugin(Plugin):
-    def __init__(self, engine):
-        super().__init__(engine)
+    def __init__(self):
+        super().__init__()
         self.timers = []
         self.delays = []
-    def update(self, delta_time):
+    def update(self, dt):
         removing_timers = []
         for i in self.timers:
-            i.time -= delta_time
+            i.time -= dt
             if i.time <= 0:
                 i.over = True
                 removing_timers.append(i)
@@ -17,7 +17,7 @@ class TimerPlugin(Plugin):
             self.timers.remove(i)
         removing_delays = []
         for i in self.delays:
-            i['delay'] -= delta_time
+            i['delay'] -= dt
             if i['delay'] <= 0:
                 i['callback']()
                 removing_delays.append(i)
@@ -26,10 +26,16 @@ class TimerPlugin(Plugin):
 
 class Timer:
     def __init__(self, lenght):
-        self.time = lenght
+        self.time = self.lenght = lenght
         self.over = False
         from .engine import current_app
         current_app.TimerPlugin.timers.append(self)
+    def reset(self):
+        self.time = self.lenght
+        self.over = False
+        from .engine import current_app
+        if self not in current_app.TimerPlugin.timers:
+            current_app.TimerPlugin.timers.append(self)
 
 def delay(lenght=1, func=none):
     from .engine import current_app

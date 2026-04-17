@@ -1,5 +1,4 @@
 from .rarity import *
-from .timer import *
 
 def And(first,second):
     return first and second

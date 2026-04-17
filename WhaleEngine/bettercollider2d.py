@@ -7,6 +7,7 @@ from .utils2d import pixel_is_solid
 from .engine import current_app
 from .utils import layers_match
 from .parenting import ParentIn
+from .timer import Timer
 
 class QuadCollider2D:
     def __init__(self, w=100, h=100, *, position=(0, 0), rotation=0, layers=[0], visualize=False, visualition_color=Color.cyan, visualition_renderer=0):
@@ -101,8 +102,10 @@ class MeshCollider2D:
 
 class BetterCollisionSystem2D(Plugin):
     def __init__(self):
-        super().__init__(requirements=["ParentingSystem"],incompatibilities=["CircleCollisionSystem2D"])
+        super().__init__(requirements=["ParentingSystem", "TimerPlugin"],incompatibilities=["CircleCollisionSystem2D"])
         self.colliders = []
+        self.update_interval = 0.1
+        self.timer = Timer(self.update_interval)
     def add_quad(self, collider):
         self.colliders.append(collider)
     def add_mesh(self, collider):
@@ -203,6 +206,10 @@ class BetterCollisionSystem2D(Plugin):
             return mouse_system.x, mouse_system.y
         return mouse_system.get_position()
     def update(self, dt):
+        if not self.timer.over:
+            return
+        self.timer.lenght = self.update_interval
+        self.timer.reset()
         for collider in self.colliders:
             collider.colliding = False
         for first in self.colliders:

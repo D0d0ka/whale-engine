@@ -9,11 +9,11 @@ window.set_color(Color.green)
 app = WhaleEngine(window=window)
 renderer = Renderer2D()
 app.input = InputSystem()
+TimerPlugin()
 MouseSystem()
 ParentingSystem()
 BetterCollisionSystem2D()
 SoundSystem()
-
 
 shapes = LoadShapes()
 music = LoadSounds().music
@@ -25,13 +25,9 @@ score = 0
 obstacles = []
 coins = []
 
-timer_lenght = 0.2
-
 dodo = Entity2D(texture=shapes.dodo, scale=(-0.5,0.5), position=(-150,0))
 dodo_collider = QuadCollider2D(75,100, position=(-150, 0))
 ParentIn(dodo, dodo_collider, {"y": "set", "x": "set"})
-
-die_timer = timer(timer_lenght)
 
 speed = 100
 gravity = -1
@@ -78,19 +74,17 @@ class obstacle(Entity2D):
 
 class coin(Entity2D):
     def __init__(self, x):
-        global timer_lenght
         super().__init__(texture=shapes.circle, scale=(0.3, 0.3), position=(x, uniform(-250, 250)), update=True, color=Color.yellow)
         self.collider = MeshCollider2D(shape=shapes.circle, position=(x, self.y), scale=(0.3, 0.3))
         ParentIn(self, self.collider, {"x": "set", "y": "set"})
         dodo_collider.ignore(self.collider)
         self.start_x = x
         coins.append(self)
-        self.collision_check_timer = timer(timer_lenght)
     def update(self, dt):
         global game_on, speed, score
         if not game_on:
             return
-        if self.collision_check_timer.update(dt) and self.collider.colliding:
+        if self.collider.colliding:
             update_score(1)
             self.x += 800
         if self.x < -400:
@@ -246,6 +240,7 @@ show_FPS_true_button.visible = False
 show_FPS_false_button.visible = False
 
 def update(dt):
+    print(dt)
     global velocity, gravity_multiplier, game_on, gravity, speed, score, show_FPS, music_on
     FPS_counter(dt)
     window.set_width(600)
@@ -283,7 +278,7 @@ def update(dt):
         restart()
     if dodo.y > window.height/2:
         restart()
-    if die_timer.update(dt) and dodo_collider.colliding:
+    if dodo_collider.colliding:
         restart()
     speed += 0.5 * dt
 app.update = update
