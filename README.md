@@ -1,6 +1,6 @@
 # whale-engine
 
-Whale Engine is a OpenGL game engine for Python.
+Whale Engine is a game engine for Python.
 
 # developed by dodo_k
 
