@@ -3,9 +3,11 @@ python -m venv .venv
 
 # activate venv
 windows:
+
 .venv\Scripts\activate
 
 linux/macos:
+
 source .venv/bin/activate
 
 # you need to install theese
