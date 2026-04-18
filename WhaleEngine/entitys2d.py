@@ -9,7 +9,7 @@ from .utils2d import distance2D_points
 from .assets import LoadShapes
 
 class Entity2D:
-    def __init__(self, *,texture,color=Color.white,position=(0, 0),scale=(1, 1),rotation=0.0,update=False,renderer=0,visible=True):
+    def __init__(self, *,texture,color=Color.white,position=(0, 0),scale=(1, 1),rotation=0.0,update=False,renderer=0,visible=True, **kwargs):
         from .engine import current_app
         if type(texture) == str:
             texture = Texture(texture)
@@ -27,13 +27,15 @@ class Entity2D:
         self.entity_type = "Entity"
         self.parentings = []
         renderer.add(self)
+        for key, value in kwargs.items():
+            setattr(self, key, value)
     def get_position(self):
         return (self.x, self.y)
     def update(self,dt):
         pass
 
 class Button2D(Entity2D):
-    def __init__(self, onclick=none,onpress=none, *,density=16, texture, color=Color.white, position=(0, 0), renderer=0):
+    def __init__(self, onclick=none,onpress=none, *,density=16, texture, color=Color.white, position=(0, 0), renderer=0, **kwargs):
         from .bettercollider2d import MeshCollider2D
         super().__init__(texture=texture, color=color, position=position, update=True, renderer=renderer)
         from .engine import current_app
@@ -43,6 +45,8 @@ class Button2D(Entity2D):
         ParentIn(self,self.collider,attributes={"x": "set", "y": "set"})
         self.onclick = onclick
         self.onpress = onpress
+        for key, value in kwargs.items():
+            setattr(self, key, value)
     def update(self, dt):
         from .engine import current_app
         if self.collider.colliding and current_app.MouseSystem.left_pressed():
@@ -51,7 +55,7 @@ class Button2D(Entity2D):
             self.onpress()
 
 class Text2D(Entity2D):
-    def __init__(self, text, font_path="arial.ttf", font_size=32, color=Color.white, position=(0,0), renderer=0):
+    def __init__(self, text, font_path="arial.ttf", font_size=32, color=Color.white, position=(0,0), renderer=0, **kwargs):
         self.text = text
         self.font_path = font_path
         self.font_size = font_size
@@ -61,7 +65,8 @@ class Text2D(Entity2D):
         # Create texture from text
         self.texture = self.create_text_texture(text, font_path, font_size, color)
         super().__init__(texture=self.texture, color=color, position=position, update=False, renderer=renderer)
-
+        for key, value in kwargs.items():
+            setattr(self, key, value)
     def create_text_texture(self, text, font_path, font_size, color):
         # Load font
         font = ImageFont.truetype(font_path, font_size)
@@ -95,7 +100,7 @@ class Text2D(Entity2D):
         self.set_text(self.text)
 
 class Line2D():
-    def __init__(self, start=(0, 0), end=(0, 0), scale=1, color=Color.white, step=1, renderer=0):
+    def __init__(self, start=(0, 0), end=(0, 0), scale=1, color=Color.white, step=1, renderer=0, **kwargs):
         self.start_pos = start
         self.end_pos = end
         self.color = color
@@ -112,6 +117,8 @@ class Line2D():
         self.start = Entity2D(texture=self.shapes.dot, color=color, position=start, scale=(scale, scale), update=False, renderer=renderer)
         self.end = Entity2D(texture=self.shapes.dot, color=color, position=end, scale=(scale, scale), update=False, renderer=renderer)
         self.generate_parts()
+        for key, value in kwargs.items():
+            setattr(self, key, value)
     def generate_parts(self):
         for part in self.parts:
             destroy(part)

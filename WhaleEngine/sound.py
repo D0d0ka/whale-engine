@@ -3,6 +3,7 @@ import numpy as np
 import importlib
 import os
 import threading
+from .logging import logLn
 
 def _require_audio_module(module_name, package_name):
     try:
@@ -146,7 +147,7 @@ class SoundSystem(Plugin):
             sound.refresh_state()
 
 class Sound:
-    def __init__(self, name, path):
+    def __init__(self, name, path, **kwargs):
         from .engine import current_app
         if not os.path.isfile(path):
             raise ValueError(f"Sound file not found: {path}")
@@ -167,6 +168,9 @@ class Sound:
         self.frame_count = len(self.frames)
         self.volume = 1.0
         self.is_playing = False
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+        logLn(f"Sound loaded: {name} from {path}")
     def play(self, loops=0):
         self.sound_system._play_sound(self, loops=loops)
     def stop(self):

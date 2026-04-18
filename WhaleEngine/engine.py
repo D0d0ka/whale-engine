@@ -13,7 +13,7 @@ from .logging import set_logging_folder
 set_logging_folder("logs")
 
 class WhaleEngine:
-    def __init__(self, window=None):
+    def __init__(self, window=None, **kwargs):
         logLn("Whale engine starting.")
         global current_app          
         current_app = self
@@ -27,6 +27,9 @@ class WhaleEngine:
         self.last_render = perf_counter()
         self.clamping = False
         self.clamping_threshold = 0.1
+        self.on_app_close = None
+        for key, value in kwargs.items():
+            setattr(self, key, value)
         logLn("Whale engine loaded.")
     def run(self):
         logLn("Whale engine starting.")
@@ -53,12 +56,20 @@ class WhaleEngine:
                 i.render()
             self.window.swap()
             self.last_render = this_update
+        if self.on_app_close:
+            self.on_app_close()
         self.window.terminate()
     def close_app(self):
+        if self.on_app_close:
+            self.on_app_close()
         self.window.terminate()
     def exit(self):
+        if self.on_app_close:
+            self.on_app_close()
         self.window.terminate()
     def close(self):
+        if self.on_app_close:
+            self.on_app_close()
         self.window.terminate()
 
 # app

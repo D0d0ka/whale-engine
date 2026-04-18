@@ -10,7 +10,7 @@ from .engine import current_app
 from .destroy import destroy
 
 class CircleCollider2D:
-    def __init__(self,size,*,layers=[0],position=(0,0),visualize=False,visualition_color=Color.cyan,visualition_renderer=0):
+    def __init__(self,size,*,layers=[0],position=(0,0),visualize=False,visualition_color=Color.cyan,visualition_renderer=0, **kwargs):
         from .engine import current_app
         self.x, self.y = position
         self.size = size/2
@@ -29,6 +29,8 @@ class CircleCollider2D:
             self.visualition = Entity2D(texture=LoadShapes().circle,scale=(size/100,size/100),color=visualition_color,renderer=visualition_renderer)
             ParentIn(self,self.visualition)
         current_app.CircleCollisionSystem2D.add_circle(self)
+        for key, value in kwargs.items():
+            setattr(self, key, value)
     def visualize(self):
         if not self.visualized:
             self.visualition = Entity2D(texture=LoadShapes().circle,scale=(self.size/50,self.size/50),color=self.visualition_color,renderer=self.visualition_renderer)
@@ -44,7 +46,7 @@ class CircleCollider2D:
         self.ignores.append(collider)
 
 class MeshCircleCollider2D:
-    def __init__(self,shape='Texture("Path to your texture") without string',density=8,size=8,offset_x=50,offset_y=60,*,layers=[0],position=(0,0),visualize=False,visualition_color=Color.cyan,visualition_renderer=0,load_once=10):
+    def __init__(self,shape='Texture("Path to your texture") without string',density=8,size=8,offset_x=50,offset_y=60,*,layers=[0],position=(0,0),visualize=False,visualition_color=Color.cyan,visualition_renderer=0,load_once=10, **kwargs):
         from .engine import current_app
         self.x, self.y = position
         self.shape = shape
@@ -94,8 +96,8 @@ class MeshCircleCollider2D:
                     current_app.window.poll()
                     loaded = 0
             current_app.CircleCollisionSystem2D.add_mesh(self)
-    def get_position(self):
-        return (self.x, self.y)
+        for key, value in kwargs.items():
+            setattr(self, key, value)
     def ignore(self, collider):
         self.ignores.append(collider)
 

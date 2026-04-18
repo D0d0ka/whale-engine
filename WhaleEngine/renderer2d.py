@@ -1,11 +1,13 @@
 from .logging import logLn
 
 class Renderer2D:
-    def __init__(self):
+    def __init__(self, **kwargs):
         from .engine import current_app
         current_app.renderers.append(self)
         self.window = current_app.window
         self.entities = []
+        for key, value in kwargs.items():
+            setattr(self, key, value)
         logLn("Renderer 2d loaded.")
     def start(self):
         pass

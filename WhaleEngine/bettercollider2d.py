@@ -10,7 +10,7 @@ from .parenting import ParentIn
 from .timer import Timer
 
 class QuadCollider2D:
-    def __init__(self, w=100, h=100, *, position=(0, 0), rotation=0, layers=[0], visualize=False, visualition_color=Color.cyan, visualition_renderer=0):
+    def __init__(self, w=100, h=100, *, position=(0, 0), rotation=0, layers=[0], visualize=False, visualition_color=Color.cyan, visualition_renderer=0, **kwargs):
         from .engine import current_app
         self.x = position[0]
         self.y = position[1]
@@ -29,13 +29,15 @@ class QuadCollider2D:
             self.visualition = Entity2D(texture=LoadShapes().square, scale=(w/100, h/100), rotation=rotation, color=visualition_color, renderer=visualition_renderer)
             ParentIn(self, self.visualition, attributes={"x": "set", "y": "set", "rotation": "set"})
         current_app.BetterCollisionSystem2D.add_quad(self)
+        for key, value in kwargs.items():
+            setattr(self, key, value)
     def get_position(self):
         return (self.x, self.y)
     def ignore(self, collider):
         self.ignores.append(collider)
 
 class MeshCollider2D:
-    def __init__(self, shape='Texture("Path to your texture") without string', density=16, *, position=(0, 0), scale=(1, 1), rotation=0, layers=[0], visualize=False, visualition_color=Color.cyan, visualition_renderer=0):
+    def __init__(self, shape='Texture("Path to your texture") without string', density=16, *, position=(0, 0), scale=(1, 1), rotation=0, layers=[0], visualize=False, visualition_color=Color.cyan, visualition_renderer=0, **kwargs):
         from .engine import current_app
         self.x, self.y = position
         self.scale_x, self.scale_y = scale
@@ -93,7 +95,8 @@ class MeshCollider2D:
             ParentIn(self, self.visualition, attributes={"x": "set", "y": "set", "rotation": "set", "scale_x": "set", "scale_y": "set"})
 
         current_app.BetterCollisionSystem2D.add_mesh(self)
-
+        for key, value in kwargs.items():
+            setattr(self, key, value)
     def get_position(self):
         return (self.x, self.y)
 
