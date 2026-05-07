@@ -16,6 +16,8 @@ WhaleEngine\parenting.py
 WhaleEngine\plugin.py
 WhaleEngine\raycast2d.py
 WhaleEngine\renderer2d.py
+WhaleEngine\shader.py
+WhaleEngine\shaders.py
 WhaleEngine\sound.py
 WhaleEngine\texture.py
 WhaleEngine\timer.py

@@ -1,6 +1,7 @@
 from WhaleEngine.logging import logLn
 import glfw
 from OpenGL.GL import *
+from OpenGL.GL import glUseProgram
 from PIL import Image
 from WhaleEngine.color import Color
 from WhaleEngine.keys import KeyAction, Keys, MouseButtons
@@ -144,6 +145,9 @@ class windowAPI:
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         for e in entities:
+            shader = getattr(e.texture, "shader", None)
+            if shader is not None:
+                shader.use()
             glBindTexture(GL_TEXTURE_2D, e.texture.id)
             glColor4f(e.color.r, e.color.g, e.color.b, e.color.a)
 
@@ -164,6 +168,7 @@ class windowAPI:
             glVertex2f(-w, h)
             glEnd()
             glPopMatrix()
+        glUseProgram(0)
         glColor4f(1, 1, 1, 1)
         glDisable(GL_BLEND)
         glDisable(GL_TEXTURE_2D)

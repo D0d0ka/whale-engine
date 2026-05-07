@@ -3,9 +3,10 @@ from .logging import logLn
 import os
 from .sound import Sound
 
+assets_dir = os.path.join(os.path.dirname(__file__), "assets")
+
 class LoadShapes:
     def __init__(self):
-        assets_dir = os.path.join(os.path.dirname(__file__), "assets")
         self.dodo = Texture(os.path.join(assets_dir, "textures", "dodo.png"))
         self.whale = Texture(os.path.join(assets_dir, "textures", "whale.png"))
         self.square = Texture(os.path.join(assets_dir, "shapes", "square.png"))
@@ -17,7 +18,6 @@ class LoadShapes:
 
 class LoadSounds:
     def __init__(self):
-        assets_dir = os.path.join(os.path.dirname(__file__), "assets")
         self.music = Sound("music", os.path.join(assets_dir, "music", "music.mp3"))
         self.sound = Sound("sound", os.path.join(assets_dir, "sounds", "wtf.mp3"))
         logLn("Sounds loaded.")
