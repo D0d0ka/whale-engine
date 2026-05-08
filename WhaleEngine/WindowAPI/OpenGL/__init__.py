@@ -148,6 +148,8 @@ class windowAPI:
             shader = getattr(e.texture, "shader", None)
             if shader is not None:
                 shader.use()
+            else:
+                glUseProgram(0)
             glBindTexture(GL_TEXTURE_2D, e.texture.id)
             glColor4f(e.color.r, e.color.g, e.color.b, e.color.a)
 

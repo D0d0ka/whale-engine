@@ -61,6 +61,7 @@ examples\errorhandling.py
 examples\flappydodo.py
 examples\lines.py
 examples\powertest.py
+examples\shader.py
 examples\sound.py
 examples\text.py
 examples\visualizecollider.py

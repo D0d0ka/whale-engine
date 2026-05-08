@@ -104,14 +104,20 @@ class MeshCollider2D:
         self.ignores.append(collider)
 
 class BetterCollisionSystem2D(Plugin):
-    def __init__(self):
+    def __init__(self, update_interval=0.1):
         super().__init__(requirements=["ParentingSystem", "TimerPlugin"],incompatibilities=["CircleCollisionSystem2D"])
         self.colliders = []
-        self.update_interval = 0.1
+        self.update_interval = update_interval
         self.timer = Timer(self.update_interval)
     def add_quad(self, collider):
         self.colliders.append(collider)
     def add_mesh(self, collider):
+        # Precompute the convex hull of local_points once so _get_mesh_polygon
+        # only needs to transform the (much smaller) hull vertices each frame.
+        if len(collider.local_points) >= 3:
+            collider.hull_points = self._convex_hull(collider.local_points)
+        else:
+            collider.hull_points = list(collider.local_points)
         self.colliders.append(collider)
     def _rotate_point(self, x, y, rotation):
         angle = math.radians(rotation)
@@ -145,15 +151,16 @@ class BetterCollisionSystem2D(Plugin):
             upper.append(point)
         return lower[:-1] + upper[:-1]
     def _get_mesh_polygon(self, mesh):
+        # Use the precomputed hull (fewer points); fall back to local_points if missing.
+        source = getattr(mesh, "hull_points", mesh.local_points)
         transformed = []
-        for px, py in mesh.local_points:
+        rotation = getattr(mesh, "rotation", 0)
+        for px, py in source:
             sx = px * mesh.scale_x
             sy = py * mesh.scale_y
-            rx, ry = self._rotate_point(sx, sy, getattr(mesh, "rotation", 0))
+            rx, ry = self._rotate_point(sx, sy, rotation)
             transformed.append((mesh.x + rx, mesh.y + ry))
-        if len(transformed) < 3:
-            return transformed
-        return self._convex_hull(transformed)
+        return transformed
     def _get_polygon(self, collider):
         if getattr(collider, "type", "") == "quad collider":
             return self._get_quad_polygon(collider)
@@ -208,20 +215,39 @@ class BetterCollisionSystem2D(Plugin):
         if hasattr(mouse_system, "x") and hasattr(mouse_system, "y"):
             return mouse_system.x, mouse_system.y
         return mouse_system.get_position()
+    def _get_aabb(self, polygon):
+        if not polygon:
+            return (0, 0, 0, 0)
+        xs = [p[0] for p in polygon]
+        ys = [p[1] for p in polygon]
+        return (min(xs), min(ys), max(xs), max(ys))
+    def _aabbs_overlap(self, a, b):
+        return a[0] <= b[2] and a[2] >= b[0] and a[1] <= b[3] and a[3] >= b[1]
     def update(self, dt):
         if not self.timer.over:
             return
         self.timer.lenght = self.update_interval
         self.timer.reset()
+
+        # Compute each polygon and AABB exactly once per cycle.
+        polygon_cache = {}
+        aabb_cache = {}
+        for collider in self.colliders:
+            poly = self._get_polygon(collider)
+            polygon_cache[id(collider)] = poly
+            aabb_cache[id(collider)] = self._get_aabb(poly)
+
         for collider in self.colliders:
             collider.colliding = False
         for first in self.colliders:
-            first_polygon = self._get_polygon(first)
+            first_id = id(first)
+            first_polygon = polygon_cache[first_id]
             if "mouse" in first.layers:
                 mouse_x, mouse_y = self._mouse_world_position()
                 if self._point_in_polygon(mouse_x, mouse_y, first_polygon):
                     first.colliding = True
                     continue
+            first_aabb = aabb_cache[first_id]
             for second in self.colliders:
                 if first == second:
                     continue
@@ -229,7 +255,9 @@ class BetterCollisionSystem2D(Plugin):
                     continue
                 if not layers_match(first, second):
                     continue
-                second_polygon = self._get_polygon(second)
-                if self._polygons_intersect(first_polygon, second_polygon):
+                # Broadphase: skip expensive SAT if bounding boxes don't overlap.
+                if not self._aabbs_overlap(first_aabb, aabb_cache[id(second)]):
+                    continue
+                if self._polygons_intersect(first_polygon, polygon_cache[id(second)]):
                     first.colliding = True
                     break

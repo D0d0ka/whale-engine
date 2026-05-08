@@ -240,7 +240,7 @@ show_FPS_true_button.visible = False
 show_FPS_false_button.visible = False
 
 def update(dt):
-    print(dt)
+    #print(dt)
     global velocity, gravity_multiplier, game_on, gravity, speed, score, show_FPS, music_on
     FPS_counter(dt)
     window.set_width(600)
