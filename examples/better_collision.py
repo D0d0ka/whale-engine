@@ -6,9 +6,11 @@ window = windowAPI(title="Better Collision System")
 app = WhaleEngine(window=window)
 render = Renderer2D()
 shapes = LoadShapes()
+
 ParentingSystem()
-BetterCollisionSystem2D()
 MouseSystem()
+TimerPlugin()
+BetterCollisionSystem2D()
 
 base_quad = QuadCollider2D(
     w=220,

@@ -8,7 +8,7 @@ app = WhaleEngine(window=window)
 renderer = Renderer2D()
 
 tex = LoadShapes().dodo
-tex.shader = normal
+tex.shader = invert
 
 Entity2D(texture=tex)
 

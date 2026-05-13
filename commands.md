@@ -19,5 +19,8 @@ python -m pip install -r requirements/openGLrequirements.txt
 # if you wan't to use Vulcan then you need to install this:
 python -m pip install -r requirements/vulcanrequirements.txt
 
+# if you wan't to use WebGL then you need to install this:
+python -m pip install -r requirements/webGLrequirements.txt
+
 # to save requirements (development)
 pip freeze > requirements.txt

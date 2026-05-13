@@ -12,36 +12,36 @@ folder = "WhaleEngine"
 logLn(f"Scanning folder: {folder}", "agent")
 
 with open("agent.txt", "w") as f:
-    f.write("All files in the WhaleEngine package code:\n")
+    f.write("All files in the WhaleEngine package code:")
     for root, dirs, files in os.walk(folder):
         for file in files:
             for i in allowed_extensions:
                 if file.endswith(i):
                     logLn(f"Found file: {os.path.join(root, file)}", "agent")
-                    f.write(os.path.join(root, file) + "\n")
+                    f.write("\n"+os.path.join(root, file))
 
 folder = "requirements"
 logLn(f"Scanning folder: {folder}", "agent")
 
 with open("agent.txt", "a") as f:
-    f.write("All files in the requirements folder:\n")
+    f.write("\n\nAll files in the requirements folder:")
     for root, dirs, files in os.walk(folder):
         for file in files:
             for i in allowed_extensions:
                 if file.endswith(i):
                     logLn(f"Found file: {os.path.join(root, file)}", "agent")
-                    f.write(os.path.join(root, file) + "\n")
+                    f.write("\n"+os.path.join(root, file))
 
 folder = "examples"
 logLn(f"Scanning folder: {folder}", "agent")
 
 with open("agent.txt", "a") as f:
-    f.write("All files in the examples folder:\n")
+    f.write("\n\nAll files in the examples folder:")
     for root, dirs, files in os.walk(folder):
         for file in files:
             for i in allowed_extensions:
                 if file.endswith(i):
                     logLn(f"Found file: {os.path.join(root, file)}", "agent")
-                    f.write(os.path.join(root, file) + "\n")
+                    f.write("\n"+os.path.join(root, file))
 
 logLn("Agent finished scanning.", "agent")

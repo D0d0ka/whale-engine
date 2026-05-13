@@ -9,6 +9,8 @@ render = Renderer2D()
 app.input = InputSystem()
 shapes = LoadShapes()
 
+#4 / 0
+
 def update(dt):
     if app.input.key(Keys.ESCAPE):
         30 / 0 # crash app for testing error handling

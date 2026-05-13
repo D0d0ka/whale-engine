@@ -1,4 +1,4 @@
-from .errorlogging import setup_global_error_handler
+from .errorlogging import setup_global_error_handler, controlledrun
 from .logging import logLn
 setup_global_error_handler()
 logLn("Global error handler set up.", "error logger")
@@ -8,9 +8,12 @@ from traceback import format_exc
 #from .window import Window
 from .renderer2d import Renderer2D
 
-# while developing this engine: I'll log everithing.
+# while developing this engine: I'll log everything.
 from .logging import set_logging_folder
 set_logging_folder("logs")
+
+# TODO: add threading support to the engine, and make sure the error logging works across threads as well.
+#import threading
 
 class WhaleEngine:
     def __init__(self, window=None, **kwargs):
@@ -28,8 +31,14 @@ class WhaleEngine:
         self.clamping = False
         self.clamping_threshold = 0.1
         self.on_app_close = None
+        self.running = False
+        self.exit = self.close = self.close_app
         for key, value in kwargs.items():
-            setattr(self, key, value)
+            if key == "safemode":
+                from .errorlogging import set_mode
+                set_mode(value)
+            else:
+                setattr(self, key, value)
         logLn("Whale engine loaded.")
     def run(self):
         logLn("Whale engine starting.")
@@ -38,6 +47,7 @@ class WhaleEngine:
         for i in self.renderers:
             i.start()
         logLn("Whale engine started")
+        self.running = True
         while not self.window.should_close():
             this_update = perf_counter()
             dt = this_update-self.last_render
@@ -47,27 +57,21 @@ class WhaleEngine:
             self.window.poll()
             self.window.clear()
             for i in self.plugins:
-                self.plugins[i].update(dt)
+                controlledrun(self.plugins[i].update, dt)
             if self.update != None:
-                self.update(dt)
+                controlledrun(self.update, dt)
             for i in self.renderers:
-                i.update(dt)
-                i.update_entitys(dt)
-                i.render()
+                controlledrun(i.update, dt)
+                controlledrun(i.update_entitys, dt)
+                controlledrun(i.render)
             self.window.swap()
             self.last_render = this_update
         if self.on_app_close:
             self.on_app_close()
         self.window.terminate()
+        self.running = False
     def close_app(self):
-        if self.on_app_close:
-            self.on_app_close()
-        self.window.terminate()
-    def exit(self):
-        if self.on_app_close:
-            self.on_app_close()
-        self.window.terminate()
-    def close(self):
+        self.running = False
         if self.on_app_close:
             self.on_app_close()
         self.window.terminate()

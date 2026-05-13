@@ -9,6 +9,7 @@ class LoadShapes:
     def __init__(self):
         self.dodo = Texture(os.path.join(assets_dir, "textures", "dodo.png"))
         self.whale = Texture(os.path.join(assets_dir, "textures", "whale.png"))
+        self.old_whale = Texture(os.path.join(assets_dir, "textures", "old_whale.png"))
         self.square = Texture(os.path.join(assets_dir, "shapes", "square.png"))
         self.circle = Texture(os.path.join(assets_dir, "shapes", "circle.png"))
         self.triangle = Texture(os.path.join(assets_dir, "shapes", "triangle.png"))

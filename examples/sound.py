@@ -3,11 +3,12 @@ from WhaleEngine.WindowAPI.OpenGL import windowAPI
 
 window = windowAPI(title="sound test", width=800, height=600)
 app = WhaleEngine(window=window)
-render = Renderer2D()
+renderer = Renderer2D()
 MouseSystem()
 SoundSystem()
-BetterCollisionSystem2D()
+TimerPlugin()
 ParentingSystem()
+BetterCollisionSystem2D()
 
 #this is how you load sounds and music
 #music = Sound("music", "assets/music/music.mp3")
@@ -20,7 +21,7 @@ sound = sounds.sound
 
 shapes = LoadShapes()
 
-entity = Button2D(texture=shapes.square, color=Color.white, onclick=lambda: sound.play())
+entity = Button2D(texture=shapes.square, color=Color.white, onclick=sound.play)
 
 def update(dt):
     if not music.is_playing:
