@@ -4,6 +4,8 @@ Whale Engine is a game engine for Python.
 
 # developed by dodo_k
 
+# NOTE: This readme was created by AI and isn't accurate to current version of WhaleEngine
+
 ## Status
 
 Active development project.
@@ -312,4 +314,3 @@ app.run()
 
 - The package currently uses the filename `entitys2d.py` internally; imports are already exposed through `from WhaleEngine import *`.
 - API is still evolving.
-- This readme was created by AI
