@@ -225,6 +225,7 @@ def show_FPS_false():
         show_FPS_false_button.visible = False
         show_FPS_true_button.visible = True
 
+# buttons don't work for some reason
 play_button = button(Texture("flappydodoassets/playbutton.png"),110, play)
 settings_button = button(Texture("flappydodoassets/settingsbutton.png"), 0, settings)
 exit_button = button(Texture("flappydodoassets/exitbutton.png"), -110, exit)

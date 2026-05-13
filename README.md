@@ -321,3 +321,11 @@ app.run()
 
 - The package currently uses the filename `entitys2d.py` internally; imports are already exposed through `from WhaleEngine import *`.
 - API is still evolving.
+
+## Screenshots
+
+<img src="screenshots/flappydodo.png" width="500">
+<img src="screenshots/boom.png" width="500">
+<img src="screenshots/dodosmove.png" width="500">
+<img src="screenshots/whalemoving.png" width="500">
+<img src="screenshots/shaders.png" width="500">
