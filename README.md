@@ -1,5 +1,7 @@
 # whale-engine
 
+![Dodo](WhaleEngine/assets/textures/dodo.png)
+
 Whale Engine is a game engine for Python.
 
 # developed by dodo_k
