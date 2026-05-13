@@ -1,7 +1,7 @@
 # whale-engine
 
-![Dodo](WhaleEngine/assets/textures/whale.png)
-![Dodo](WhaleEngine/assets/textures/dodo.png)
+<img src="WhaleEngine/assets/textures/whale.png" width="100">
+<img src="WhaleEngine/assets/textures/dodo.png" width="100">
 
 Whale Engine is a game engine for Python.
 
