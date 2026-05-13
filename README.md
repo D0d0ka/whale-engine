@@ -1,7 +1,9 @@
 # whale-engine
 
-<img src="WhaleEngine/assets/textures/whale.png" width="100">
-<img src="WhaleEngine/assets/textures/dodo.png" width="100">
+<p align="left">
+  <img src="WhaleEngine/assets/textures/whale.png" width="250">
+  <img src="WhaleEngine/assets/textures/dodo.png" width="250">
+</p>
 
 Whale Engine is a game engine for Python.
 
