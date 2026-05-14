@@ -201,14 +201,50 @@ class windowAPI:
             glfw.KEY_RIGHT_CONTROL: Keys.RIGHT_CTRL,
             glfw.KEY_LEFT_ALT: Keys.LEFT_ALT,
             glfw.KEY_RIGHT_ALT: Keys.RIGHT_ALT,
+            glfw.KEY_INSERT: Keys.INSERT,
+            glfw.KEY_HOME: Keys.HOME,
+            glfw.KEY_PAGE_UP: Keys.PAGE_UP,
+            glfw.KEY_DELETE: Keys.DELETE,
+            glfw.KEY_END: Keys.END,
+            glfw.KEY_PAGE_DOWN: Keys.PAGE_DOWN,
+            glfw.KEY_F1: Keys.F1,
+            glfw.KEY_F2: Keys.F2,
+            glfw.KEY_F3: Keys.F3,
+            glfw.KEY_F4: Keys.F4,
+            glfw.KEY_F5: Keys.F5,
+            glfw.KEY_F6: Keys.F6,
+            glfw.KEY_F7: Keys.F7,
+            glfw.KEY_F8: Keys.F8,
+            glfw.KEY_F9: Keys.F9,
+            glfw.KEY_F10: Keys.F10,
+            glfw.KEY_F11: Keys.F11,
+            glfw.KEY_F12: Keys.F12,
+            glfw.KEY_0: Keys.NUMBER_0,
+            glfw.KEY_1: Keys.NUMBER_1,
+            glfw.KEY_2: Keys.NUMBER_2,
+            glfw.KEY_3: Keys.NUMBER_3,
+            glfw.KEY_4: Keys.NUMBER_4,
+            glfw.KEY_5: Keys.NUMBER_5,
+            glfw.KEY_6: Keys.NUMBER_6,
+            glfw.KEY_7: Keys.NUMBER_7,
+            glfw.KEY_8: Keys.NUMBER_8,
+            glfw.KEY_9: Keys.NUMBER_9,
+            glfw.KEY_KP_0: Keys.NUMPAD_0,
+            glfw.KEY_KP_1: Keys.NUMPAD_1,
+            glfw.KEY_KP_2: Keys.NUMPAD_2,
+            glfw.KEY_KP_3: Keys.NUMPAD_3,
+            glfw.KEY_KP_4: Keys.NUMPAD_4,
+            glfw.KEY_KP_5: Keys.NUMPAD_5,
+            glfw.KEY_KP_6: Keys.NUMPAD_6,
+            glfw.KEY_KP_7: Keys.NUMPAD_7,
+            glfw.KEY_KP_8: Keys.NUMPAD_8,
+            glfw.KEY_KP_9: Keys.NUMPAD_9,
         }
         if key in named_keys:
             return named_keys[key]
-
         # Letters map to lowercase single-char keys.
         if glfw.KEY_A <= key <= glfw.KEY_Z:
             return chr(ord("a") + (key - glfw.KEY_A))
-
         return f"key_{key}"
 
     def _on_key(self, window, key, scancode, action, mods):

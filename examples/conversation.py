@@ -8,8 +8,6 @@ conversation = ConversationRenderer()
 conversation.add_message("Hello, how are you?")
 app.input = InputSystem()
 
-shapes = LoadShapes()
-
 def update(dt):
     if app.input.key_pressed(Keys.E):
         conversation.add_message("I'm fine, thank you!")

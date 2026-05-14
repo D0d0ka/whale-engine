@@ -10,8 +10,9 @@ ParentingSystem()
 CircleCollisionSystem2D()
 
 shapes = LoadShapes()
+textures = LoadTextures()
 
-shape = shapes.dodo
+shape = textures.dodo
 
 dodo = Entity2D(
     texture=shape,

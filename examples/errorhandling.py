@@ -7,13 +7,19 @@ window = windowAPI(title="error handling test", width=800, height=600)
 app = WhaleEngine(window=window)
 render = Renderer2D()
 app.input = InputSystem()
-shapes = LoadShapes()
 
 #4 / 0
 
 def update(dt):
     if app.input.key(Keys.ESCAPE):
-        30 / 0 # crash app for testing error handling
+        app.close()
+    if app.input.key(Keys.NUMBER_1) or app.input.key(Keys.NUMPAD_1):
+        5/0
+    elif app.input.key(Keys.NUMBER_2) or app.input.key(Keys.NUMPAD_2):
+        8/0
+    elif app.input.key(Keys.NUMBER_3) or app.input.key(Keys.NUMPAD_3):
+        1/0
+    4/0 # crash app for testing error handling
 app.update = update
 
 app.run()

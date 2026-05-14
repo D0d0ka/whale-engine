@@ -6,6 +6,7 @@ window = windowAPI(title="Better Collision System")
 app = WhaleEngine(window=window)
 render = Renderer2D()
 shapes = LoadShapes()
+textures = LoadTextures()
 
 ParentingSystem()
 MouseSystem()
@@ -41,7 +42,7 @@ mouse_quad = QuadCollider2D(
 )
 
 mesh = MeshCollider2D(
-    shape=shapes.whale,
+    shape=textures.whale,
     density=22,
     position=(0, -170),
     scale=(0.35, 0.35),

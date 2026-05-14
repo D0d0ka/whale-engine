@@ -16,6 +16,7 @@ BetterCollisionSystem2D()
 SoundSystem()
 
 shapes = LoadShapes()
+textures = LoadTextures()
 music = LoadSounds().music
 
 game_on = False
@@ -25,7 +26,7 @@ score = 0
 obstacles = []
 coins = []
 
-dodo = Entity2D(texture=shapes.dodo, scale=(-0.5,0.5), position=(-150,0))
+dodo = Entity2D(texture=textures.dodo, scale=(-0.5,0.5), position=(-150,0))
 dodo_collider = QuadCollider2D(75,100, position=(-150, 0))
 ParentIn(dodo, dodo_collider, {"y": "set", "x": "set"})
 

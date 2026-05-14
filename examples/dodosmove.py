@@ -10,12 +10,13 @@ window = windowAPI(title="Dodos moving demo")
 app = WhaleEngine(window=window)
 renderer = Renderer2D()
 app.window.set_color(Color.white)
+textures = LoadTextures()
 shapes = LoadShapes()
 app.input = InputSystem()
 
 class dodoentity(Entity2D):
     def __init__(self, position=(0,0),range=100,speed=100,player=False):
-        super().__init__(texture=shapes.dodo,position=position,update=True,scale=(0.5,0.5))
+        super().__init__(texture=textures.dodo,position=position,update=True,scale=(0.5,0.5))
         self.speed = speed
         self.range = range
         self.way = -1

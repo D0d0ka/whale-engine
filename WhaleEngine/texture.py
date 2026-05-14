@@ -1,8 +1,7 @@
 from PIL import Image
-from .shaders import normal
 
 class Texture:
-    def __init__(self, path, shader=normal):
+    def __init__(self, path, shader=None):
         self.path = path
         self.shader = shader
         img = Image.open(path).convert("RGBA")
@@ -14,7 +13,7 @@ class Texture:
     def from_image(cls, image, path="<memory>", shader=None):
         tex = cls.__new__(cls)
         tex.path = path
-        tex.shader = shader if shader is not None else normal
+        tex.shader = shader
         img = image.convert("RGBA")
         tex.w, tex.h = img.size
         from .engine import current_app

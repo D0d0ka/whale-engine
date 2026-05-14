@@ -19,6 +19,8 @@ def update(dt):
     button1.x += dt*10
     if app.input.key_pressed(Keys.E):
         destroy(button1)
+    if app.input.key_pressed(Keys.ESCAPE):
+        app.exit()
 app.update = update
 
 app.run()

@@ -5,7 +5,6 @@ window = windowAPI(800, 600, "Text")
 app = WhaleEngine(window=window)
 renderer = Renderer2D()
 app.input = InputSystem()
-shapes = LoadShapes()
 
 text = Text2D("dodo")
 

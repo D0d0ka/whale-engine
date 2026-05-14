@@ -7,6 +7,7 @@ app = WhaleEngine(window=window)
 app.clamping = False
 render = Renderer2D()
 shapes = LoadShapes()
+textures = LoadTextures()
 
 entitys = []
 
@@ -17,9 +18,10 @@ def on_app_close():
 app.on_app_close = on_app_close
 
 objects = 100
+object_texture = textures.dodo
 
 for i in range(objects):
-    entitys.append(Entity2D(texture=shapes.dodo, position=(randint(-400, 400), randint(-300, 300)), rot_dt=randint(-10, 10), x_dt=randint(-10, 10), y_dt=randint(-10, 10)))
+    entitys.append(Entity2D(texture=object_texture, position=(randint(-400, 400), randint(-300, 300)), rot_dt=randint(-10, 10), x_dt=randint(-10, 10), y_dt=randint(-10, 10)))
 
 def update(dt):
     global AVG_FPS

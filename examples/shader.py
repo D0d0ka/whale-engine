@@ -7,7 +7,10 @@ window.set_color(Color.white)
 app = WhaleEngine(window=window)
 renderer = Renderer2D()
 
-tex = LoadShapes().dodo
+shapes = LoadShapes()
+textures = LoadTextures()
+
+tex = textures.dodo
 tex.shader = invert
 
 Entity2D(texture=tex)
