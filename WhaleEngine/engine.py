@@ -4,8 +4,6 @@ setup_global_error_handler()
 logLn("Global error handler set up.", "error logger")
 
 from time import perf_counter
-from traceback import format_exc
-#from .window import Window
 from .renderer2d import Renderer2D
 
 # while developing this engine: I'll log everything.

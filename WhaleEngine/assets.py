@@ -1,7 +1,8 @@
 from .texture import Texture
 from .logging import logLn
-import os
 from .sound import Sound
+
+import os
 
 assets_dir = os.path.join(os.path.dirname(__file__), "assets")
 

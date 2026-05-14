@@ -1,13 +1,13 @@
-import sys
-import math
-import glfw
-import numpy as np
-
 from WhaleEngine.logging import logLn
 from WhaleEngine.color import Color
 from WhaleEngine.keys import KeyAction, Keys, MouseButtons
 
 from vulkan import *
+
+import sys
+import math
+import glfw
+import numpy as np
 
 # KHR procedure names are loaded dynamically via vkGet*ProcAddr at runtime.
 vkGetPhysicalDeviceSurfaceSupportKHR = None

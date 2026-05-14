@@ -1,11 +1,11 @@
-from .engine import current_app
 from .logging import logLn
 from .renderer2d import Renderer2D
 from .color import Color
 from .entitys2d import Entity2D
-from PIL import Image, ImageDraw, ImageFont
 from .entitys2d import Text2D
 from .assets import LoadShapes
+
+from PIL import Image, ImageDraw, ImageFont
 
 class ConversationRenderer(Renderer2D):
     def __init__(self,text_color=Color.white,backround_color=Color.black,font_path="arial.ttf"):

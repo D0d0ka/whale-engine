@@ -1,5 +1,3 @@
-import math
-from PIL import Image
 from .plugin import Plugin
 from .color import Color
 from .assets import LoadShapes
@@ -9,6 +7,9 @@ from .utils import layers_match
 from .parenting import ParentIn
 from .timer import Timer
 from .logging import logLn
+
+import math
+from PIL import Image
 
 import threading
 import time

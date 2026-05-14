@@ -1,6 +1,7 @@
+from .logging import logLn
+
 import sys
 import traceback
-from .logging import logLn
 
 def set_mode(mode):
     global safe_mode

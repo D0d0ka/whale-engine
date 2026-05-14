@@ -1,4 +1,5 @@
 from .shader import shader
+
 import os
 
 _shaders_dir = os.path.join(os.path.dirname(__file__), "assets", "shaders")

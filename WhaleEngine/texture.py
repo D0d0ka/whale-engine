@@ -1,5 +1,6 @@
-from PIL import Image
 from .logging import logLn
+
+from PIL import Image
 import os
 
 class Texture:

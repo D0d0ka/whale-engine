@@ -1,11 +1,11 @@
 presset = """from WhaleEngine import *
+from WhaleEngine.WindowAPI.OpenGL import windowAPI
 
-app = WhaleEngine(title="Whale engine app")
+window = windowAPI(title="Whale engine app")
+app = WhaleEngine(window=window)
 render = Renderer2D()
 #app.input = InputSystem()
-shapes = LoadShapes()
-
-#entity = Entity2D(texture=shapes.square)
+#shapes = LoadShapes() #use built in shapes and textures
 
 def update(dt):
     #if app.input.key(Keys.SPACE):

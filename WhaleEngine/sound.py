@@ -1,9 +1,10 @@
 from .plugin import Plugin
+from .logging import logLn
+
 import numpy as np
 import importlib
 import os
 import threading
-from .logging import logLn
 
 def _require_audio_module(module_name, package_name):
     try:

@@ -1,10 +1,12 @@
 from WhaleEngine.logging import logLn
-import glfw
+from WhaleEngine.color import Color
+from WhaleEngine.keys import KeyAction, Keys, MouseButtons
+
 from OpenGL.GL import *
 from OpenGL.GL import glUseProgram
 from PIL import Image
-from WhaleEngine.color import Color
-from WhaleEngine.keys import KeyAction, Keys, MouseButtons
+
+import glfw
 import sys
 
 class windowAPI:
