@@ -12,3 +12,10 @@ def safe_uniform(a, b):
         return uniform(b, a)
     else:
         raise ValueError(f"Invalid range for uniform: a={a}, b={b}")
+
+class Range:
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
+    def safe_uniform(self):
+        return safe_uniform(self.a, self.b)

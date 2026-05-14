@@ -10,6 +10,10 @@ linux/macos:
 
 source .venv/bin/activate
 
+# upgrade pip
+
+python.exe -m pip install --upgrade pip
+
 # you need to install theese
 python -m pip install -r requirements/mainrequirements.txt
 
