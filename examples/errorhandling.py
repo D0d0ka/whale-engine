@@ -10,6 +10,8 @@ app.input = InputSystem()
 
 #4 / 0
 
+Entity2D(texture="assdgdfgdsrgetrygrt")# this will cause an error because the texture doesn't exist, so app replaces it with missing texture
+
 def update(dt):
     if app.input.key(Keys.ESCAPE):
         app.close()

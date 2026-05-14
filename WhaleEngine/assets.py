@@ -11,6 +11,8 @@ class LoadShapes:
         self.circle = Texture(os.path.join(assets_dir, "shapes", "circle.png"))
         self.triangle = Texture(os.path.join(assets_dir, "shapes", "triangle.png"))
         self.dot = Texture(os.path.join(assets_dir, "shapes", "dot.png"))
+        self.star = Texture(os.path.join(assets_dir, "shapes", "star.png"))
+        self.arrow = Texture(os.path.join(assets_dir, "shapes", "arrow.png"))
         logLn("Shapes loaded.")
 
 class LoadTextures:
@@ -19,6 +21,7 @@ class LoadTextures:
         self.whale = Texture(os.path.join(assets_dir, "textures", "whale.png"))
         self.old_whale = Texture(os.path.join(assets_dir, "textures", "old_whale.png"))
         self.grid = Texture(os.path.join(assets_dir, "textures", "grid.png"))
+        self.missing_texture = Texture(os.path.join(assets_dir, "textures", "missing_texture.png"))
         logLn("Textures loaded.")
 
 class LoadSounds:
