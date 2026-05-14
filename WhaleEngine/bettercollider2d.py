@@ -8,6 +8,10 @@ from .engine import current_app
 from .utils import layers_match
 from .parenting import ParentIn
 from .timer import Timer
+from .logging import logLn
+
+import threading
+import time
 
 class QuadCollider2D:
     def __init__(self, w=100, h=100, *, position=(0, 0), rotation=0, layers=[0], visualize=False, visualition_color=Color.cyan, visualition_renderer=0, **kwargs):
@@ -50,22 +54,18 @@ class MeshCollider2D:
         self.type = "mesh collider"
         self.visualize = visualize
         self.visualition = None
-
         self.shape = shape
         if shape == 'Texture("Path to your texture") without string':
             self.shape = LoadShapes().square
-
         self.local_points = []
         img = Image.open(self.shape.path).convert("RGBA")
         pixels = img.load()
         w, h = img.size
         self.w = w * self.scale_x
         self.h = h * self.scale_y
-
         density = max(1, int(density))
         step_x = max(1, int(w / density))
         step_y = max(1, int(h / density))
-
         for py in range(0, h, step_y):
             for px in range(0, w, step_x):
                 r, g, b, a = pixels[px, py]
@@ -74,7 +74,6 @@ class MeshCollider2D:
                 local_x = px - w / 2
                 local_y = h / 2 - py
                 self.local_points.append((local_x, local_y))
-
         if len(self.local_points) == 0:
             self.local_points = [
                 (-w / 2, -h / 2),
@@ -82,7 +81,6 @@ class MeshCollider2D:
                 ( w / 2,  h / 2),
                 (-w / 2,  h / 2),
             ]
-
         if visualize:
             from .entitys2d import Entity2D
             self.visualition = Entity2D(
@@ -93,22 +91,28 @@ class MeshCollider2D:
                 renderer=visualition_renderer
             )
             ParentIn(self, self.visualition, attributes={"x": "set", "y": "set", "rotation": "set", "scale_x": "set", "scale_y": "set"})
-
         current_app.BetterCollisionSystem2D.add_mesh(self)
         for key, value in kwargs.items():
             setattr(self, key, value)
     def get_position(self):
         return (self.x, self.y)
-
     def ignore(self, collider):
         self.ignores.append(collider)
 
 class BetterCollisionSystem2D(Plugin):
-    def __init__(self, update_interval=0.1):
+    def __init__(self, update_interval=0.1, threaded=False):
         super().__init__(requirements=["ParentingSystem", "TimerPlugin"],incompatibilities=["CircleCollisionSystem2D"])
         self.colliders = []
         self.update_interval = update_interval
         self.timer = Timer(self.update_interval)
+        self.threaded = threaded
+        if threaded:
+            def _threaded_update():
+                time.sleep(0.1)
+                logLn("BetterCollisionSystem2D threaded update started.")
+                while True:
+                    self.update(0, running_in_thread=True)
+            threading.Thread(target=_threaded_update, daemon=True).start()
     def add_quad(self, collider):
         self.colliders.append(collider)
     def add_mesh(self, collider):
@@ -223,20 +227,19 @@ class BetterCollisionSystem2D(Plugin):
         return (min(xs), min(ys), max(xs), max(ys))
     def _aabbs_overlap(self, a, b):
         return a[0] <= b[2] and a[2] >= b[0] and a[1] <= b[3] and a[3] >= b[1]
-    def update(self, dt):
+    def update(self, dt, running_in_thread=False):
+        if self.threaded and not running_in_thread:
+            return
         if not self.timer.over:
             return
         self.timer.lenght = self.update_interval
         self.timer.reset()
-
-        # Compute each polygon and AABB exactly once per cycle.
         polygon_cache = {}
         aabb_cache = {}
         for collider in self.colliders:
             poly = self._get_polygon(collider)
             polygon_cache[id(collider)] = poly
             aabb_cache[id(collider)] = self._get_aabb(poly)
-
         for collider in self.colliders:
             collider.colliding = False
         for first in self.colliders:
@@ -255,7 +258,6 @@ class BetterCollisionSystem2D(Plugin):
                     continue
                 if not layers_match(first, second):
                     continue
-                # Broadphase: skip expensive SAT if bounding boxes don't overlap.
                 if not self._aabbs_overlap(first_aabb, aabb_cache[id(second)]):
                     continue
                 if self._polygons_intersect(first_polygon, polygon_cache[id(second)]):
