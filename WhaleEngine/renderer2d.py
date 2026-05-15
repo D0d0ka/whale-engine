@@ -1,24 +1,32 @@
 from .logging import logLn
 
+
 class Renderer2D:
     def __init__(self, **kwargs):
         from .engine import current_app
+
         current_app.renderers.append(self)
         self.window = current_app.window
         self.entities = []
         for key, value in kwargs.items():
             setattr(self, key, value)
         logLn("Renderer 2d loaded.")
+
     def start(self):
         pass
-    def update(self,dt):
+
+    def update(self, dt):
         pass
+
     def add(self, entity):
         self.entities.append(entity)
-    def update_entitys(self,dt):
+
+    def update_entitys(self, dt):
         for i in self.entities:
             if i.do_update:
                 i.update(dt)
+
     def render(self):
         visible_entities = [entity for entity in self.entities if getattr(entity, "visible", True)]
-        self.window.render_2d_entities(visible_entities)
+        if hasattr(self.window, "render_2d_entities"):
+            self.window.render_2d_entities(visible_entities)

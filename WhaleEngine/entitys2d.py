@@ -10,11 +10,12 @@ from .assets import LoadShapes
 from PIL import Image, ImageDraw, ImageFont
 
 class Entity2D:
-    def __init__(self, *,texture,color=Color.white,position=(0, 0),scale=(1, 1),rotation=0.0,update=False,renderer=0,visible=True, **kwargs):
+    def __init__(self, *,texture,color=Color.white,position=(0, 0),scale=(1, 1),rotation=0.0,update=False,renderer=0,visible=True,shader=None, **kwargs):
         from .engine import current_app
         if type(texture) == str:
             texture = Texture(texture)
         self.texture = texture
+        self.shader = shader
         self.x, self.y = position
         self.w, self.h = texture.w, texture.h
         self.scale_x, self.scale_y = scale

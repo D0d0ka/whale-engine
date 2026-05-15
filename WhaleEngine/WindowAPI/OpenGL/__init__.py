@@ -4,42 +4,130 @@ from WhaleEngine.keys import KeyAction, Keys, MouseButtons
 
 from .shader import *
 
-from OpenGL.GL import *
-from OpenGL.GL import glUseProgram
-from PIL import Image
+from OpenGL.GL import (
+    GL_BLEND,
+    GL_CLAMP_TO_EDGE,
+    GL_COLOR_BUFFER_BIT,
+    GL_ARRAY_BUFFER,
+    GL_FLOAT,
+    GL_LINEAR,
+    GL_RGBA,
+    GL_ONE_MINUS_SRC_ALPHA,
+    GL_SRC_ALPHA,
+    GL_STATIC_DRAW,
+    GL_TEXTURE0,
+    GL_TEXTURE_2D,
+    GL_TEXTURE_MAG_FILTER,
+    GL_TEXTURE_MIN_FILTER,
+    GL_TEXTURE_WRAP_S,
+    GL_TEXTURE_WRAP_T,
+    GL_TRIANGLES,
+    GL_UNPACK_ALIGNMENT,
+    GL_UNSIGNED_BYTE,
+    glActiveTexture,
+    glBindBuffer,
+    glBindTexture,
+    glBindVertexArray,
+    glBlendFunc,
+    glClear,
+    glClearColor,
+    glBufferData,
+    glDrawArrays,
+    glEnable,
+    glEnableVertexAttribArray,
+    glGenBuffers,
+    glGenTextures,
+    glGenVertexArrays,
+    glPixelStorei,
+    glTexImage2D,
+    glTexParameteri,
+    glVertexAttribPointer,
+    glViewport,
+)
 
+import ctypes
+import math
+import os
 import glfw
 import sys
+from PIL import Image
+from typing import Any, Callable, Dict, List
+
+
+def _orthographic_projection(left, right, bottom, top, near_plane=-1.0, far_plane=1.0):
+    rl = right - left
+    tb = top - bottom
+    fn = far_plane - near_plane
+    return (
+        2.0 / rl, 0.0, 0.0, 0.0,
+        0.0, 2.0 / tb, 0.0, 0.0,
+        0.0, 0.0, -2.0 / fn, 0.0,
+        -(right + left) / rl, -(top + bottom) / tb, -(far_plane + near_plane) / fn, 1.0,
+    )
+
+
+def _sprite_model_matrix(x, y, rotation_degrees, width, height):
+    radians = math.radians(rotation_degrees)
+    cos_theta = math.cos(radians)
+    sin_theta = math.sin(radians)
+    return (
+        cos_theta * width, sin_theta * width, 0.0, 0.0,
+        -sin_theta * height, cos_theta * height, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        x, y, 0.0, 1.0,
+    )
 
 class windowAPI:
-    def __init__(self, width=800, height=600, title="Whale Engine (OpenGL)", color=Color(0.1, 0.1, 0.1, 1)):
+    def __init__(self, width=800, height=600, title="Whale Engine (OpenGL)", color=Color(0.1, 0.1, 0.1, 1), vsync=True):
         if not glfw.init():
             logLn("GLFW initialization failed.")
             sys.exit(1)
         self.width = width
         self.height = height
         self.title = title
-        glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_ANY_PROFILE)
+        self._terminated = False
+        glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
+        glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
+        glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
+        glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, glfw.TRUE)
         self.handle = glfw.create_window(width, height, title, None, None)
         if not self.handle:
             glfw.terminate()
             logLn("Window creation failed.")
             sys.exit(1)
         glfw.make_context_current(self.handle)
-        glfw.swap_interval(1)
-        self.color = self._color = color
-        glClearColor(color.r, color.g, color.b, color.a)
+        self.set_vsync(vsync)
+        self._color = color
+        self.set_color(color)
         glfw.set_framebuffer_size_callback(self.handle, self._resize)
         glfw.set_key_callback(self.handle, self._on_key)
-        self.keys = {}
-        self.key_callbacks = []
-        self.setup_2d()
+        self.keys: Dict[str, bool] = {}
+        self.key_callbacks: List[Callable[..., Any]] = []
+        self._projection_matrix = None
+        self._projection_size = None
+        self._bound_shader = None
+        self._bound_texture_id = None
+        self._quad_vao = None
+        self._quad_vbo = None
+        framebuffer_width, framebuffer_height = glfw.get_framebuffer_size(self.handle)
+        self.width = max(1, framebuffer_width)
+        self.height = max(1, framebuffer_height)
+        glViewport(0, 0, self.width, self.height)
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        self._setup_quad_mesh()
+        self.default_shader = self._load_default_shader()
         logLn("Window loaded.")
+    @property
+    def color(self):
+        return self._color
+    @color.setter
+    def color(self, value):
+        self.set_color(value)
     def set_size(self, width, height):
         self.width = width
         self.height = height
         glfw.set_window_size(self.handle, width, height)
-        self.setup_2d()
     def set_width(self, width):
         self.set_size(width, self.height)
     def set_height(self, height):
@@ -50,18 +138,16 @@ class windowAPI:
     def set_color(self, color):
         self._color = color
         glClearColor(color.r, color.g, color.b, color.a)
-    def setup_2d(self):
-        hw = self.width / 2
-        hh = self.height / 2
-        glViewport(0, 0, self.width, self.height)
-        glMatrixMode(GL_PROJECTION)
-        glLoadIdentity()
-        glOrtho(-hw, hw, -hh, hh, -1, 1)
-        glMatrixMode(GL_MODELVIEW)
-        glLoadIdentity()
+    def set_vsync(self, enabled=True):
+        glfw.swap_interval(1 if enabled else 0)
+    def request_close(self):
+        glfw.set_window_should_close(self.handle, True)
+    def is_key_down(self, key):
+        return self.keys.get(self.normalize_key(key), False)
     def _resize(self, window, w, h):
-        self.width, self.height = w, h
-        self.setup_2d()
+        self.width = max(1, w)
+        self.height = max(1, h)
+        glViewport(0, 0, self.width, self.height)
     def clear(self):
         glClear(GL_COLOR_BUFFER_BIT)
     def poll(self):
@@ -71,15 +157,26 @@ class windowAPI:
     def should_close(self):
         return glfw.window_should_close(self.handle)
     def terminate(self):
+        if self._terminated:
+            return
+        self._terminated = True
         logLn("App closed.")
         glfw.terminate()
         sys.exit()
+    def __enter__(self):
+        return self
+    def __exit__(self, exc_type, exc, tb):
+        self.terminate()
+        return False
     def normalize_key(self, key):
         if isinstance(key, str):
             return key
         return self._key_name_from_native(key)
     def set_key_callback(self, callback):
         self.key_callbacks.append(callback)
+    def remove_key_callback(self, callback):
+        if callback in self.key_callbacks:
+            self.key_callbacks.remove(callback)
     def get_cursor_pos(self):
         return glfw.get_cursor_pos(self.handle)
     def _normalize_mouse_button(self, button):
@@ -95,14 +192,61 @@ class windowAPI:
     def is_mouse_button_down(self, button):
         native_button = self._normalize_mouse_button(button)
         return glfw.get_mouse_button(self.handle, native_button) == glfw.PRESS
+
+    def _load_default_shader(self):
+        from WhaleEngine.assets import assets_dir
+
+        shaders_dir = os.path.join(assets_dir, "shaders", "openGL")
+        vertex_path = os.path.join(shaders_dir, "normal.vsh")
+        fragment_path = os.path.join(shaders_dir, "normal.fsh")
+        return Shader.from_file(fragment_path, vertex_path)
+
+    def _setup_quad_mesh(self):
+        vertices = (
+            -0.5, -0.5, 0.0, 0.0,
+             0.5, -0.5, 1.0, 0.0,
+             0.5,  0.5, 1.0, 1.0,
+            -0.5, -0.5, 0.0, 0.0,
+             0.5,  0.5, 1.0, 1.0,
+            -0.5,  0.5, 0.0, 1.0,
+        )
+        vertex_data = (ctypes.c_float * len(vertices))(*vertices)
+        stride = 4 * ctypes.sizeof(ctypes.c_float)
+        texcoord_offset = 2 * ctypes.sizeof(ctypes.c_float)
+
+        self._quad_vao = glGenVertexArrays(1)
+        self._quad_vbo = glGenBuffers(1)
+
+        glBindVertexArray(self._quad_vao)
+        glBindBuffer(GL_ARRAY_BUFFER, self._quad_vbo)
+        glBufferData(GL_ARRAY_BUFFER, ctypes.sizeof(vertex_data), vertex_data, GL_STATIC_DRAW)
+        glEnableVertexAttribArray(0)
+        glVertexAttribPointer(0, 2, GL_FLOAT, False, stride, ctypes.c_void_p(0))
+        glEnableVertexAttribArray(1)
+        glVertexAttribPointer(1, 2, GL_FLOAT, False, stride, ctypes.c_void_p(texcoord_offset))
+        glBindBuffer(GL_ARRAY_BUFFER, 0)
+        glBindVertexArray(0)
+
+    def _update_projection_matrix(self):
+        size = (max(1, self.width), max(1, self.height))
+        if self._projection_size == size:
+            return
+        half_width = size[0] / 2.0
+        half_height = size[1] / 2.0
+        self._projection_matrix = _orthographic_projection(-half_width, half_width, -half_height, half_height)
+        self._projection_size = size
+
     def create_texture_from_image(self, image):
         img = image.convert("RGBA").transpose(Image.FLIP_TOP_BOTTOM)
         width, height = img.size
         data = img.tobytes()
         tex_id = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, tex_id)
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
         glTexImage2D(
             GL_TEXTURE_2D,
             0,
@@ -114,40 +258,58 @@ class windowAPI:
             GL_UNSIGNED_BYTE,
             data,
         )
+        glBindTexture(GL_TEXTURE_2D, 0)
         return tex_id
+
+    def bind_texture(self, texture_id, slot=0):
+        glActiveTexture(GL_TEXTURE0 + slot)
+        glBindTexture(GL_TEXTURE_2D, texture_id)
+
     def render_2d_entities(self, entities):
-        glEnable(GL_TEXTURE_2D)
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        for e in entities:
-            shader = getattr(e.texture, "shader", None)
-            if shader is not None:
+        self._update_projection_matrix()
+        glBindVertexArray(self._quad_vao)
+        bound_shader = None
+        bound_texture_id = None
+        for entity in entities:
+            texture = getattr(entity, "texture", None)
+            texture_id = getattr(texture, "id", None)
+            if texture_id is None:
+                continue
+
+            shader = getattr(entity, "shader", None) or self.default_shader
+            if shader is not bound_shader:
                 shader.use()
+                shader.set_mat4("uProjection", self._projection_matrix)
+                shader.set_int("uTexture", 0)
+                shader.set_int("u_texture", 0)
+                bound_shader = shader
+
+            color = getattr(entity, "color", None)
+            if color is None:
+                color_value = (1.0, 1.0, 1.0, 1.0)
             else:
-                glUseProgram(0)
-            glBindTexture(GL_TEXTURE_2D, e.texture.id)
-            glColor4f(e.color.r, e.color.g, e.color.b, e.color.a)
-            glPushMatrix()
-            glTranslatef(e.x, e.y, 0)
-            glRotatef(e.rotation, 0, 0, 1)
-            glScalef(e.scale_x, e.scale_y, 1)
-            w = e.w / 2
-            h = e.h / 2
-            glBegin(GL_QUADS)
-            glTexCoord2f(0, 0)
-            glVertex2f(-w, -h)
-            glTexCoord2f(1, 0)
-            glVertex2f(w, -h)
-            glTexCoord2f(1, 1)
-            glVertex2f(w, h)
-            glTexCoord2f(0, 1)
-            glVertex2f(-w, h)
-            glEnd()
-            glPopMatrix()
-        glUseProgram(0)
-        glColor4f(1, 1, 1, 1)
-        glDisable(GL_BLEND)
-        glDisable(GL_TEXTURE_2D)
+                color_value = (color.r, color.g, color.b, color.a)
+            shader.set_vec4("uColor", color_value)
+            shader.set_mat4(
+                "uModel",
+                _sprite_model_matrix(
+                    entity.x,
+                    entity.y,
+                    entity.rotation,
+                    entity.w * entity.scale_x,
+                    entity.h * entity.scale_y,
+                ),
+            )
+
+            if texture_id != bound_texture_id:
+                glActiveTexture(GL_TEXTURE0)
+                glBindTexture(GL_TEXTURE_2D, texture_id)
+                bound_texture_id = texture_id
+
+            glDrawArrays(GL_TRIANGLES, 0, 6)
+
+        glBindVertexArray(0)
+        glBindTexture(GL_TEXTURE_2D, 0)
     def _action_name_from_native(self, action):
         if action == glfw.PRESS:
             return KeyAction.PRESS

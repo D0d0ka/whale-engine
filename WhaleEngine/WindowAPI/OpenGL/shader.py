@@ -7,11 +7,12 @@ def _load_default_vertex():
     with open(path) as f:
         return f.read()
 
-class shader:
+class Shader:
     def __init__(self, fragment_code, vertex_code=None):
         self.fragment_code = fragment_code
         self._vertex_code = vertex_code
         self._program = None
+        self._uniform_locations = {}
 
     @property
     def vertex_code(self):
@@ -37,32 +38,69 @@ class shader:
         glShaderSource(vert, self.vertex_code)
         glCompileShader(vert)
         if not glGetShaderiv(vert, GL_COMPILE_STATUS):
-            logLn("Vertex shader compile error: " + glGetShaderInfoLog(vert).decode())
+            raise RuntimeError("Vertex shader compile error: " + glGetShaderInfoLog(vert).decode())
 
         frag = glCreateShader(GL_FRAGMENT_SHADER)
         glShaderSource(frag, self.fragment_code)
         glCompileShader(frag)
         if not glGetShaderiv(frag, GL_COMPILE_STATUS):
-            logLn("Fragment shader compile error: " + glGetShaderInfoLog(frag).decode())
+            raise RuntimeError("Fragment shader compile error: " + glGetShaderInfoLog(frag).decode())
 
         prog = glCreateProgram()
         glAttachShader(prog, vert)
         glAttachShader(prog, frag)
         glLinkProgram(prog)
         if not glGetProgramiv(prog, GL_LINK_STATUS):
-            logLn("Shader link error: " + glGetProgramInfoLog(prog).decode())
+            raise RuntimeError("Shader link error: " + glGetProgramInfoLog(prog).decode())
         glDeleteShader(vert)
         glDeleteShader(frag)
         self._program = prog
         return prog
 
     def use(self):
-        from OpenGL.GL import glUseProgram, glUniform1i, glGetUniformLocation
+        from OpenGL.GL import glUseProgram
         prog = self._compile()
         glUseProgram(prog)
-        loc = glGetUniformLocation(prog, "u_texture")
-        if loc != -1:
-            glUniform1i(loc, 0)
+        return prog
+
+    @property
+    def program(self):
+        return self._compile()
+
+    def _get_uniform_location(self, name):
+        from OpenGL.GL import glGetUniformLocation
+
+        if name not in self._uniform_locations:
+            self._uniform_locations[name] = glGetUniformLocation(self.program, name)
+        return self._uniform_locations[name]
+
+    def set_mat4(self, name, value):
+        from OpenGL.GL import glUniformMatrix4fv, GL_FALSE
+
+        location = self._get_uniform_location(name)
+        if location != -1:
+            glUniformMatrix4fv(location, 1, GL_FALSE, value)
+
+    def set_vec4(self, name, value):
+        from OpenGL.GL import glUniform4f
+
+        location = self._get_uniform_location(name)
+        if location != -1:
+            glUniform4f(location, value[0], value[1], value[2], value[3])
+
+    def set_int(self, name, value):
+        from OpenGL.GL import glUniform1i
+
+        location = self._get_uniform_location(name)
+        if location != -1:
+            glUniform1i(location, value)
+
+    def set_float(self, name, value):
+        from OpenGL.GL import glUniform1f
+
+        location = self._get_uniform_location(name)
+        if location != -1:
+            glUniform1f(location, value)
 
     @classmethod
     def from_file(cls, path, vertex_path=None):
@@ -73,3 +111,6 @@ class shader:
             with open(vertex_path) as f:
                 vert_code = f.read()
         return cls(frag_code, vert_code)
+
+
+shader = Shader

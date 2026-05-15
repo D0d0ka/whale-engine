@@ -11,8 +11,7 @@ shapes = LoadShapes()
 textures = LoadTextures()
 
 tex = textures.dodo
-tex.shader = invert
 
-Entity2D(texture=tex)
+Entity2D(texture=tex, shader=invert)
 
 app.run()

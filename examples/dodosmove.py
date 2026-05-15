@@ -40,11 +40,17 @@ square = Entity2D(texture=shapes.square,color=Color.red,position=(0,-200))
 circle = Entity2D(texture=shapes.circle,color=Color.cyan,position=(100,-200))
 triangle = Entity2D(texture=shapes.triangle,color=Color.yellow,position=(-100,-200),rotation=180)
 
+def on_app_close():
+    summarize_FPS(print_summary=True) #for logging
+app.on_app_close = on_app_close
+
 def update(dt):
     FPS_counter(dt,0.05)
     if app.input.key_pressed(Keys.ESCAPE):
         summarize_FPS(print_summary=True) #for logging
         app.close_app()
 app.update = update
+
+
 
 app.run()

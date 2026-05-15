@@ -1,6 +1,14 @@
-#version 120
+#version 330 core
+
+layout (location = 0) in vec2 aPosition;
+layout (location = 1) in vec2 aTexCoord;
+
+uniform mat4 uProjection;
+uniform mat4 uModel;
+
+out vec2 vTexCoord;
+
 void main() {
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-    gl_TexCoord[0] = gl_MultiTexCoord0;
-    gl_FrontColor = gl_Color;
+    vTexCoord = aTexCoord;
+    gl_Position = uProjection * uModel * vec4(aPosition, 0.0, 1.0);
 }
