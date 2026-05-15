@@ -1,0 +1,1 @@
+# Currently here are none, but in the future there might be some WebGL specific requirements.
