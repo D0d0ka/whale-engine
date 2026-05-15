@@ -1,11 +1,12 @@
 from WhaleEngine import *
-from WhaleEngine.WindowAPI.OpenGL import windowAPI # from WhaleEngine.WindowAPI.Vulkan import windowAPI
+from WhaleEngine.WindowAPI.OpenGL import windowAPI # from WhaleEngine.WindowAPI.Vulkan import windowAPI # from WhaleEngine.WindowAPI.WebGL import windowAPI
 
 window = windowAPI(title="Whale engine app")
 app = WhaleEngine(window=window)
 renderer = Renderer2D()
 #app.input = InputSystem()
-#shapes = LoadShapes() #use built in shapes and textures
+#shapes = LoadShapes() #use built in shapes
+#textures = LoadTextures() #use built textures
 
 def update(dt):
     #if app.input.key(Keys.SPACE):

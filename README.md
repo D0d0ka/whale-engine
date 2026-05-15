@@ -76,6 +76,20 @@ Run:
 python AppBase.py
 ```
 
+## Rendering backends
+
+When using WebGL backend, WhaleEngine starts a local HTTP server, opens a browser page, and renders into the page canvas (the window is controlled by your Python app loop).
+
+WebGL options example:
+
+```python
+from WhaleEngine.WindowAPI.WebGL import windowAPI
+
+window = windowAPI(title="Whale web app", target_fps=60)
+print(window.url)       # Full page view
+print(window.embed_url) # Iframe-friendly view (?embed=1)
+```
+
 ## Important runtime notes
 
 - `WhaleEngine(...)` creates window + engine core.

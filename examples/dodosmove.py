@@ -1,7 +1,7 @@
 from WhaleEngine import *
 from WhaleEngine.helpers.fpscounter import FPS_counter, summarize_FPS
 from WhaleEngine.assets import LoadShapes
-from WhaleEngine.WindowAPI.OpenGL import windowAPI
+from WhaleEngine.WindowAPI.WebGL import windowAPI
 
 #set_logging_file("log.log")
 
@@ -50,7 +50,5 @@ def update(dt):
         summarize_FPS(print_summary=True) #for logging
         app.close_app()
 app.update = update
-
-
 
 app.run()
