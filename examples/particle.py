@@ -3,7 +3,7 @@ from WhaleEngine.WindowAPI.OpenGL import windowAPI # from WhaleEngine.WindowAPI.
 from WhaleEngine.particlesystem2d import *
 from WhaleEngine.helpers.fpscounter import *
 
-window = windowAPI(title="Whale engine app")
+window = windowAPI(title="Particle System Demo", width=800, height=600)
 app = WhaleEngine(window=window)
 renderer = Renderer2D()
 app.input = InputSystem()
@@ -33,7 +33,7 @@ spawner = ParticleSpawner2d(test_particle_type, x=0, y=0, spawn_rate=100, render
 
 def update(dt):
     FPS_counter(dt)
-    window.set_title(f"Whale Engine - FPS: {round(get_FPS())}")
+    window.set_title(f"Particle System Demo - FPS: {round(get_FPS())}")
     if app.input.key_pressed(Keys.SPACE):
         spawner.active = not spawner.active
     if app.input.key_pressed(Keys.ESCAPE):
