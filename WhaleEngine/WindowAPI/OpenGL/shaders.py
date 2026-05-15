@@ -1,8 +1,9 @@
 from .shader import shader
+from WhaleEngine.assets import assets_dir
 
 import os
 
-_shaders_dir = os.path.join(os.path.dirname(__file__), "assets", "shaders")
+_shaders_dir = os.path.join(assets_dir, "shaders", "openGL")
 
 defeault_vertex_shader_path = _shaders_dir + "/normal.vsh"
 

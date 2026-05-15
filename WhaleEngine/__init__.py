@@ -16,7 +16,5 @@ from .utils2d import *
 from .helpers.presset import *
 from .keys import *
 from .timer import *
-from .shader import shader
-from .shaders import normal
 
 logLn("Loaded standard build", "python")

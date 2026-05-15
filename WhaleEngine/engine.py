@@ -31,6 +31,7 @@ class WhaleEngine:
         self.on_app_close = None
         self.running = False
         self.exit = self.close = self.close_app
+        #self.last_values = {"window_width": window.width, "window_height": window.height, "window_title": window.title, "window_color": window.color}
         for key, value in kwargs.items():
             if key == "safemode":
                 from .errorlogging import set_mode
