@@ -54,6 +54,7 @@ class windowAPI:
         self.key_callbacks = []
 
         self._framebuffer_resized = False
+        self._terminated = False
         self._pending_entities = []
         self._next_texture_id = 1
         self._textures = {}
@@ -83,6 +84,14 @@ class windowAPI:
         self.title = title
         glfw.set_window_title(self.handle, title)
 
+    @property
+    def color(self):
+        return self._color
+
+    @color.setter
+    def color(self, value):
+        self.set_color(value)
+
     def set_color(self, color):
         self._color = color
 
@@ -109,11 +118,24 @@ class windowAPI:
     def should_close(self):
         return glfw.window_should_close(self.handle)
 
+    def request_close(self):
+        glfw.set_window_should_close(self.handle, True)
+
     def terminate(self):
+        if self._terminated:
+            return
+        self._terminated = True
         self._cleanup()
         logLn("App closed.")
         glfw.terminate()
         sys.exit()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        self.terminate()
+        return False
 
     def normalize_key(self, key):
         if isinstance(key, str):
@@ -122,6 +144,13 @@ class windowAPI:
 
     def set_key_callback(self, callback):
         self.key_callbacks.append(callback)
+
+    def remove_key_callback(self, callback):
+        if callback in self.key_callbacks:
+            self.key_callbacks.remove(callback)
+
+    def is_key_down(self, key):
+        return self.keys.get(self.normalize_key(key), False)
 
     def get_cursor_pos(self):
         return glfw.get_cursor_pos(self.handle)
@@ -185,6 +214,44 @@ class windowAPI:
             glfw.KEY_RIGHT_CONTROL: Keys.RIGHT_CTRL,
             glfw.KEY_LEFT_ALT: Keys.LEFT_ALT,
             glfw.KEY_RIGHT_ALT: Keys.RIGHT_ALT,
+            glfw.KEY_INSERT: Keys.INSERT,
+            glfw.KEY_HOME: Keys.HOME,
+            glfw.KEY_PAGE_UP: Keys.PAGE_UP,
+            glfw.KEY_DELETE: Keys.DELETE,
+            glfw.KEY_END: Keys.END,
+            glfw.KEY_PAGE_DOWN: Keys.PAGE_DOWN,
+            glfw.KEY_F1: Keys.F1,
+            glfw.KEY_F2: Keys.F2,
+            glfw.KEY_F3: Keys.F3,
+            glfw.KEY_F4: Keys.F4,
+            glfw.KEY_F5: Keys.F5,
+            glfw.KEY_F6: Keys.F6,
+            glfw.KEY_F7: Keys.F7,
+            glfw.KEY_F8: Keys.F8,
+            glfw.KEY_F9: Keys.F9,
+            glfw.KEY_F10: Keys.F10,
+            glfw.KEY_F11: Keys.F11,
+            glfw.KEY_F12: Keys.F12,
+            glfw.KEY_0: Keys.NUMBER_0,
+            glfw.KEY_1: Keys.NUMBER_1,
+            glfw.KEY_2: Keys.NUMBER_2,
+            glfw.KEY_3: Keys.NUMBER_3,
+            glfw.KEY_4: Keys.NUMBER_4,
+            glfw.KEY_5: Keys.NUMBER_5,
+            glfw.KEY_6: Keys.NUMBER_6,
+            glfw.KEY_7: Keys.NUMBER_7,
+            glfw.KEY_8: Keys.NUMBER_8,
+            glfw.KEY_9: Keys.NUMBER_9,
+            glfw.KEY_KP_0: Keys.NUMPAD_0,
+            glfw.KEY_KP_1: Keys.NUMPAD_1,
+            glfw.KEY_KP_2: Keys.NUMPAD_2,
+            glfw.KEY_KP_3: Keys.NUMPAD_3,
+            glfw.KEY_KP_4: Keys.NUMPAD_4,
+            glfw.KEY_KP_5: Keys.NUMPAD_5,
+            glfw.KEY_KP_6: Keys.NUMPAD_6,
+            glfw.KEY_KP_7: Keys.NUMPAD_7,
+            glfw.KEY_KP_8: Keys.NUMPAD_8,
+            glfw.KEY_KP_9: Keys.NUMPAD_9,
         }
         if key in named_keys:
             return named_keys[key]
@@ -207,9 +274,9 @@ class windowAPI:
             callback(window, key_name, scancode, action_name, mods)
 
     def _resize(self, window, w, h):
-        ww, hh = glfw.get_window_size(self.handle)
-        self.width = ww if ww > 0 else w
-        self.height = hh if hh > 0 else h
+        fw, fh = glfw.get_framebuffer_size(self.handle)
+        self.width = fw if fw > 0 else w
+        self.height = fh if fh > 0 else h
         self._framebuffer_resized = True
 
     # Vulkan setup
@@ -1097,57 +1164,6 @@ class windowAPI:
         except Exception:
             pass
         return VK_SUCCESS
-
-    def _parse_acquire_result(self, acquire_result):
-        known = {VK_SUCCESS, VK_SUBOPTIMAL_KHR, VK_ERROR_OUT_OF_DATE_KHR}
-
-        def _to_int(value):
-            try:
-                return int(value)
-            except Exception:
-                return None
-
-        if isinstance(acquire_result, tuple):
-            if len(acquire_result) >= 2:
-                first_raw, second_raw = acquire_result[0], acquire_result[1]
-                first = _to_int(first_raw)
-                second = _to_int(second_raw)
-
-                # Common binding shape: (VkResult, image_index)
-                if first in known:
-                    if first == VK_ERROR_OUT_OF_DATE_KHR:
-                        return first, None
-                    if second is not None and 0 <= second < len(self.command_buffers):
-                        return first, second
-
-                # Alternate shape: (image_index, VkResult)
-                if second in known:
-                    if second == VK_ERROR_OUT_OF_DATE_KHR:
-                        return second, None
-                    if first is not None and 0 <= first < len(self.command_buffers):
-                        return second, first
-
-            # Fallback: return first tuple member that looks like a valid image index.
-            for value in acquire_result:
-                parsed = _to_int(value)
-                if parsed is not None and 0 <= parsed < len(self.command_buffers):
-                    return VK_SUCCESS, parsed
-
-            raise RuntimeError(f"Could not parse Vulkan image index from acquire result: {acquire_result!r}")
-
-        parsed = _to_int(acquire_result)
-        if parsed is None:
-            raise RuntimeError(f"Unexpected Vulkan acquire result type: {type(acquire_result)}")
-
-        if parsed in known:
-            if parsed == VK_ERROR_OUT_OF_DATE_KHR:
-                return parsed, None
-            raise RuntimeError(f"Acquire returned result={parsed} without image index.")
-
-        if 0 <= parsed < len(self.command_buffers):
-            return VK_SUCCESS, parsed
-
-        raise RuntimeError(f"Acquire returned unexpected scalar value: {parsed}")
 
     def _recreate_swapchain(self):
         w, h = glfw.get_framebuffer_size(self.handle)
