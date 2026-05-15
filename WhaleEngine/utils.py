@@ -14,8 +14,10 @@ def safe_uniform(a, b):
         raise ValueError(f"Invalid range for uniform: a={a}, b={b}")
 
 class Range:
-    def __init__(self, a, b):
+    def __init__(self, a, b="same"):
         self.a = a
         self.b = b
+        if b == "same":
+            self.b = a
     def safe_uniform(self):
         return safe_uniform(self.a, self.b)

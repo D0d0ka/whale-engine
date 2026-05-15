@@ -27,7 +27,7 @@ class CircleCollider2D:
         self.visualition_color = visualition_color
         self.visualition_renderer = visualition_renderer
         if visualize == True:
-            self.visualition = Entity2D(texture=LoadShapes().circle,scale=(size/100,size/100),color=visualition_color,renderer=visualition_renderer)
+            self.visualition = Entity2D(texture=current_app.CircleCollisionSystem2D.circle,scale=(size/100,size/100),color=visualition_color,renderer=visualition_renderer)
             ParentIn(self,self.visualition)
         current_app.CircleCollisionSystem2D.add_circle(self)
         for key, value in kwargs.items():
@@ -107,6 +107,7 @@ class CircleCollisionSystem2D(Plugin):
         super().__init__(requirements=["ParentingSystem"], incompatibilities=["BetterCollisionSystem2D"])
         self.circle_colliders = []
         self.mesh_colliders = []
+        self.circle = LoadShapes().circle
     def add_circle(self, collider): 
         self.circle_colliders.append(collider)
     def add_mesh(self, collider):

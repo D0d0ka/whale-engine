@@ -3,7 +3,7 @@ from WhaleEngine.WindowAPI.OpenGL import windowAPI # from WhaleEngine.WindowAPI.
 
 window = windowAPI(title="Whale engine app")
 app = WhaleEngine(window=window)
-render = Renderer2D()
+renderer = Renderer2D()
 #app.input = InputSystem()
 #shapes = LoadShapes() #use built in shapes and textures
 
