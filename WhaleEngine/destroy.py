@@ -1,6 +1,6 @@
 def destroy(entity):
     from .engine import current_app
-    if entity.entity_type == "Entity":
+    if entity.entity_type == "Entity 2D":
         if entity in entity.renderer.entities:
             entity.renderer.entities.remove(entity)
         for i in list(entity.parentings):
@@ -32,10 +32,13 @@ def destroy(entity):
             destroy(i)
         if hasattr(current_app, "BetterCollisionSystem") and entity in current_app.BetterCollisionSystem2D.colliders:
             current_app.BetterCollisionSystem2D.colliders.remove(entity)
-    elif entity.entity_type == "Line":
+    elif entity.entity_type == "Line 2D":
         for part in entity.parts:
             destroy(part)
         destroy(entity.start)
         destroy(entity.end)
+    elif entity.entity_type == "Particle Spawner 2D":
+        if entity in current_app.ParticleSystem2dPlugin.particle_spawners:
+            current_app.ParticleSystem2dPlugin.particle_spawners.remove(entity)
     else:
         raise ValueError(f"Unknown entity type: {entity.entity_type}")

@@ -23,6 +23,7 @@ class CircleCollider2D:
         self.type = "circle collider"
         self.owner = None
         self.visualize = self.visualized = visualize
+        self.enabled = True
         self.visualition = None
         self.visualition_color = visualition_color
         self.visualition_renderer = visualition_renderer
@@ -59,6 +60,7 @@ class MeshCircleCollider2D:
         self.parentings = []
         self.ignores = []
         self.entity_type = "Mesh circle Collider"
+        self.enabled = True
         self.type = "mesh collider"
         self.visualize = visualize
         self.dots = []
@@ -119,7 +121,11 @@ class CircleCollisionSystem2D(Plugin):
         for c in self.mesh_colliders:
             c.colliding = False
         for first in self.circle_colliders:
+            if not first.enabled:
+                continue
             for second in self.circle_colliders:
+                if not second.enabled:
+                    continue
                 if "mouse" in first.layers:
                     if distance2D(first,current_app.MouseSystem) < first.size:
                         first.colliding = True
@@ -136,7 +142,16 @@ class CircleCollisionSystem2D(Plugin):
                     first.colliding = True
                     break
         for mesh in self.mesh_colliders:
+            if not mesh.enabled:
+                for i in mesh.dots:
+                    i.enabled = False
+                continue
+            else:
+                for i in mesh.dots:
+                    i.enabled = True
             for i in mesh.dots:
+                if not i.enabled:
+                    continue
                 if i.colliding:
                     mesh.colliding = True
                     break

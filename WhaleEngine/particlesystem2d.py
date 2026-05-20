@@ -87,5 +87,6 @@ class ParticleSpawner2d:
         self.spawn_timer = Timer(1/spawn_rate)
         self.active = True
         self.renderer = renderer
+        self.entity_type = "Particle Spawner 2D"
         from .engine import current_app
         current_app.ParticleSystem2dPlugin.particle_spawners.append(self)

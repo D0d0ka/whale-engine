@@ -91,6 +91,8 @@ def raycast2d(start=(0, 0), end=(0, 0), layers=None):
     if hasattr(current_app, "CircleCollisionSystem2D"):
         for collider in current_app.CircleCollisionSystem2D.circle_colliders:
             target = collider.owner if getattr(collider, "owner", None) is not None else collider
+            if not target.enabled:
+                continue
             if not layers_match_filter(target):
                 continue
             hit = _segment_circle_intersection(x1, y1, x2, y2, collider.x, collider.y, collider.size)
@@ -98,6 +100,8 @@ def raycast2d(start=(0, 0), end=(0, 0), layers=None):
 
     if hasattr(current_app, "BetterCollisionSystem2D"):
         for collider in current_app.BetterCollisionSystem2D.colliders:
+            if not collider.enabled:
+                continue
             if not layers_match_filter(collider):
                 continue
             polygon = current_app.BetterCollisionSystem2D._get_polygon(collider)

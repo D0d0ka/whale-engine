@@ -29,6 +29,7 @@ class QuadCollider2D:
         self.entity_type = "Quad Collider"
         self.type = "quad collider"
         self.visualize = visualize
+        self.enabled = True
         if visualize:
             from .entitys2d import Entity2D
             self.visualition = Entity2D(texture=LoadShapes().square, scale=(w/100, h/100), rotation=rotation, color=visualition_color, renderer=visualition_renderer)
@@ -56,6 +57,7 @@ class MeshCollider2D:
         self.visualize = visualize
         self.visualition = None
         self.shape = shape
+        self.enabled = True
         if shape == 'Texture("Path to your texture") without string':
             self.shape = LoadShapes().square
         self.local_points = []
@@ -238,12 +240,16 @@ class BetterCollisionSystem2D(Plugin):
         polygon_cache = {}
         aabb_cache = {}
         for collider in self.colliders:
+            if not collider.enabled:
+                continue
             poly = self._get_polygon(collider)
             polygon_cache[id(collider)] = poly
             aabb_cache[id(collider)] = self._get_aabb(poly)
         for collider in self.colliders:
             collider.colliding = False
         for first in self.colliders:
+            if not first.enabled:
+                continue
             first_id = id(first)
             first_polygon = polygon_cache[first_id]
             if "mouse" in first.layers:
@@ -253,6 +259,8 @@ class BetterCollisionSystem2D(Plugin):
                     continue
             first_aabb = aabb_cache[first_id]
             for second in self.colliders:
+                if not second.enabled:
+                    continue
                 if first == second:
                     continue
                 if second in first.ignores:

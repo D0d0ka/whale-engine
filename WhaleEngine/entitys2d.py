@@ -26,7 +26,7 @@ class Entity2D:
         if type(renderer) == int:
             renderer = current_app.renderers[renderer]
         self.renderer = renderer
-        self.entity_type = "Entity"
+        self.entity_type = "Entity 2D"
         self.parentings = []
         renderer.add(self)
         for key, value in kwargs.items():
@@ -63,7 +63,6 @@ class Text2D(Entity2D):
         self.font_size = font_size
         self.color = color
         self.line_spacing = 4
-
         # Create texture from text
         self.texture = self.create_text_texture(text, font_path, font_size, color)
         super().__init__(texture=self.texture, color=color, position=position, update=False, renderer=renderer)
@@ -108,7 +107,7 @@ class Line2D():
         self.color = color
         self.scale = scale
         self.step = step
-        self.entity_type = "Line"
+        self.entity_type = "Line 2D"
         self.parts = []
         if type(renderer) == int:
             renderer = current_app.renderers[renderer]
