@@ -1,5 +1,5 @@
 from WhaleEngine import *
-from WhaleEngine.WindowAPI.OpenGL import windowAPI
+from WhaleEngine.WindowAPI.WebGL import windowAPI
 
 window = windowAPI(title="sound test", width=800, height=600)
 app = WhaleEngine(window=window)
@@ -21,7 +21,7 @@ sound = sounds.sound
 
 shapes = LoadShapes()
 
-entity = Button2D(texture=shapes.square, color=Color.white, onclick=sound.play)
+entity = Button2D(texture=shapes.square, color=Color.red, onclick=sound.play)
 
 def update(dt):
     if not music.is_playing:
