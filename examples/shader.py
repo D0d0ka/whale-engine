@@ -1,6 +1,5 @@
 from WhaleEngine import *
-from WhaleEngine.WindowAPI.OpenGL import *
-from WhaleEngine.WindowAPI.OpenGL.shaders import normal, grayscale, invert, sepia, vignette, outline, brighten
+from WhaleEngine.WindowAPI.WebGL import *
 
 window = windowAPI(800, 600, "Shader test")
 window.set_color(Color.white)
@@ -12,6 +11,8 @@ textures = LoadTextures()
 
 tex = textures.dodo
 
-Entity2D(texture=tex, shader=invert)
+e = Entity2D(texture=tex, shader=invert)
+
+logLn(e.shader)
 
 app.run()

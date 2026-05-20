@@ -3,6 +3,7 @@ from WhaleEngine.color import Color
 from WhaleEngine.keys import KeyAction, Keys, MouseButtons
 
 from .shader import *
+from .shaders import *
 
 from OpenGL.GL import (
     GL_BLEND,
@@ -265,7 +266,7 @@ class windowAPI:
         glActiveTexture(GL_TEXTURE0 + slot)
         glBindTexture(GL_TEXTURE_2D, texture_id)
 
-    def render_2d_entities(self, entities):
+    def render_2d_entities(self, entities, camera):
         self._update_projection_matrix()
         glBindVertexArray(self._quad_vao)
         bound_shader = None
@@ -293,8 +294,8 @@ class windowAPI:
             shader.set_mat4(
                 "uModel",
                 _sprite_model_matrix(
-                    entity.x,
-                    entity.y,
+                    entity.x-camera.x,
+                    entity.y-camera.y,
                     entity.rotation,
                     entity.w * entity.scale_x,
                     entity.h * entity.scale_y,

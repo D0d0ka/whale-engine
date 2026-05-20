@@ -1,12 +1,10 @@
-#version 330 core
-
-layout (location = 0) in vec2 aPosition;
-layout (location = 1) in vec2 aTexCoord;
+attribute vec2 aPosition;
+attribute vec2 aTexCoord;
 
 uniform mat4 uProjection;
 uniform mat4 uModel;
 
-out vec2 vTexCoord;
+varying vec2 vTexCoord;
 
 void main() {
     vTexCoord = aTexCoord;

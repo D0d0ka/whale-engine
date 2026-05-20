@@ -3,6 +3,9 @@ from WhaleEngine.logging import *
 
 #set_logging_file("agent.log")
 
+#def logLn(message, role="agent"): # I accidentaly broke WhaleEngine's code and was too lazy to replace all logLNs with print, so I made this function to log messages to the console and to a file at the same time. It is not the most efficient way to do it, but it works.
+#    print(f"<{role}> {message}")
+
 allowed_extensions = [".py", ".png", ".mp3", ".txt"]
 
 logLn("Agent started. Scanning WhaleEngine package for python files.", "agent")

@@ -112,5 +112,4 @@ class Shader:
                 vert_code = f.read()
         return cls(frag_code, vert_code)
 
-
 shader = Shader

@@ -12,7 +12,10 @@ from urllib.parse import parse_qs, urlparse
 from WhaleEngine.color import Color
 from WhaleEngine.keys import KeyAction, Keys, MouseButtons
 from WhaleEngine.logging import logLn
-
+# --- WebGL shader system ---
+from .shader import shader
+from .shaders import *
+# Usage: webgl_shader_normal['fragment'], webgl_shader_normal['vertex']
 
 def _map_browser_key(raw_key):
 	mapping = {
@@ -100,7 +103,7 @@ class windowAPI:
 
 	@color.setter
 	def color(self, value):
-		self.set_color(value)
+			self.set_color(value)
 
 	def set_size(self, width, height):
 		with self._lock:
@@ -214,7 +217,7 @@ class windowAPI:
 			self._pending_texture_ids.add(texture_id)
 		return texture_id
 
-	def render_2d_entities(self, entities):
+	def render_2d_entities(self, entities, camera):
 		serialized = []
 		for entity in entities:
 			texture = getattr(entity, "texture", None)
@@ -226,17 +229,20 @@ class windowAPI:
 				color_value = (1.0, 1.0, 1.0, 1.0)
 			else:
 				color_value = (color.r, color.g, color.b, color.a)
+			shader = getattr(entity, "shader", None)
+			shader_frag = shader.get("fragment") if isinstance(shader, dict) else None
 			serialized.append(
 				{
 					"texture_id": texture_id,
-					"x": float(getattr(entity, "x", 0.0)),
-					"y": float(getattr(entity, "y", 0.0)),
+					"x": float(getattr(entity, "x", 0.0)) - camera.x,
+					"y": float(getattr(entity, "y", 0.0)) - camera.y,
 					"w": float(getattr(entity, "w", 1.0)),
 					"h": float(getattr(entity, "h", 1.0)),
 					"scale_x": float(getattr(entity, "scale_x", 1.0)),
 					"scale_y": float(getattr(entity, "scale_y", 1.0)),
 					"rotation": float(getattr(entity, "rotation", 0.0)),
 					"color": [float(c) for c in color_value],
+					"shader_frag": shader_frag,
 				}
 			)
 		with self._lock:

@@ -73,15 +73,38 @@ function createProgram(vs, fs) {
   return program;
 }
 
-const program = createProgram(vertexSource, fragmentSource);
-const aPosition = gl.getAttribLocation(program, "aPosition");
-const aTexCoord = gl.getAttribLocation(program, "aTexCoord");
-const uResolution = gl.getUniformLocation(program, "uResolution");
-const uTranslation = gl.getUniformLocation(program, "uTranslation");
-const uSize = gl.getUniformLocation(program, "uSize");
-const uRotation = gl.getUniformLocation(program, "uRotation");
-const uColor = gl.getUniformLocation(program, "uColor");
-const uTexture = gl.getUniformLocation(program, "uTexture");
+const programCache = new Map();
+
+function getOrCreateProgram(fragSource) {
+  if (programCache.has(fragSource)) {
+    return programCache.get(fragSource);
+  }
+  const prog = createProgram(vertexSource, fragSource);
+  const locs = {
+    program: prog,
+    aPosition: gl.getAttribLocation(prog, "aPosition"),
+    aTexCoord: gl.getAttribLocation(prog, "aTexCoord"),
+    uResolution: gl.getUniformLocation(prog, "uResolution"),
+    uTranslation: gl.getUniformLocation(prog, "uTranslation"),
+    uSize: gl.getUniformLocation(prog, "uSize"),
+    uRotation: gl.getUniformLocation(prog, "uRotation"),
+    uColor: gl.getUniformLocation(prog, "uColor"),
+    uTexture: gl.getUniformLocation(prog, "uTexture"),
+  };
+  programCache.set(fragSource, locs);
+  return locs;
+}
+
+const defaultProgramLocs = getOrCreateProgram(fragmentSource);
+const { program } = defaultProgramLocs;
+const aPosition = defaultProgramLocs.aPosition;
+const aTexCoord = defaultProgramLocs.aTexCoord;
+const uResolution = defaultProgramLocs.uResolution;
+const uTranslation = defaultProgramLocs.uTranslation;
+const uSize = defaultProgramLocs.uSize;
+const uRotation = defaultProgramLocs.uRotation;
+const uColor = defaultProgramLocs.uColor;
+const uTexture = defaultProgramLocs.uTexture;
 
 const quadData = new Float32Array([
   -0.5, -0.5, 0.0, 0.0,
@@ -208,6 +231,21 @@ function drawFrame(state) {
       continue;
     }
 
+    const locs = entity.shader_frag
+      ? getOrCreateProgram(entity.shader_frag)
+      : defaultProgramLocs;
+
+    gl.useProgram(locs.program);
+
+    // rebind vertex attributes for this program
+    gl.enableVertexAttribArray(locs.aPosition);
+    gl.vertexAttribPointer(locs.aPosition, 2, gl.FLOAT, false, stride, 0);
+    gl.enableVertexAttribArray(locs.aTexCoord);
+    gl.vertexAttribPointer(locs.aTexCoord, 2, gl.FLOAT, false, stride, 2 * Float32Array.BYTES_PER_ELEMENT);
+
+    gl.uniform2f(locs.uResolution, canvas.width, canvas.height);
+    gl.uniform1i(locs.uTexture, 0);
+
     const w = Number(entity.w || 1) * Number(entity.scale_x || 1);
     const h = Number(entity.h || 1) * Number(entity.scale_y || 1);
     const x = Number(entity.x || 0);
@@ -217,10 +255,10 @@ function drawFrame(state) {
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.uniform2f(uTranslation, x, y);
-    gl.uniform2f(uSize, w, h);
-    gl.uniform1f(uRotation, radians);
-    gl.uniform4f(uColor, color[0], color[1], color[2], color[3]);
+    gl.uniform2f(locs.uTranslation, x, y);
+    gl.uniform2f(locs.uSize, w, h);
+    gl.uniform1f(locs.uRotation, radians);
+    gl.uniform4f(locs.uColor, color[0], color[1], color[2], color[3]);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   }
 }

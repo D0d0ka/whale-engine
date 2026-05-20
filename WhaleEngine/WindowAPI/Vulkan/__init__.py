@@ -183,7 +183,7 @@ class windowAPI:
         }
         return tex_id
 
-    def render_2d_entities(self, entities):
+    def render_2d_entities(self, entities, camera): #camera does not work yet
         # Native render loop is active; 2D draw path can consume this queue incrementally.
         self._pending_entities = entities
 
