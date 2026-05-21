@@ -32,7 +32,7 @@ class QuadCollider2D:
         self.enabled = True
         if visualize:
             from .entitys2d import Entity2D
-            self.visualition = Entity2D(texture=LoadShapes().square, scale=(w/100, h/100), rotation=rotation, color=visualition_color, renderer=visualition_renderer)
+            self.visualition = Entity2D(texture=LoadShapes().square, scale=(w/100, h/100), rotation=rotation, color=visualition_color, renderer=visualition_renderer, position=position)
             ParentIn(self, self.visualition, attributes={"x": "set", "y": "set", "rotation": "set"})
         current_app.BetterCollisionSystem2D.add_quad(self)
         for key, value in kwargs.items():
@@ -91,7 +91,8 @@ class MeshCollider2D:
                 scale=(self.scale_x, self.scale_y),
                 rotation=self.rotation,
                 color=visualition_color,
-                renderer=visualition_renderer
+                renderer=visualition_renderer,
+                position=position
             )
             ParentIn(self, self.visualition, attributes={"x": "set", "y": "set", "rotation": "set", "scale_x": "set", "scale_y": "set"})
         current_app.BetterCollisionSystem2D.add_mesh(self)
