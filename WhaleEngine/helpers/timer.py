@@ -1,3 +1,7 @@
+from WhaleEngine.logging import logLn
+
+logLn("This is deprecated, use TimerPlugin instead.", "warning")
+
 class timer:
     def __init__(self, time):
         self.time = time
