@@ -70,6 +70,8 @@ class WhaleEngine:
         self.window.terminate()
         self.running = False
     def close_app(self):
+        if self.on_app_close:
+            self.on_app_close()
         self.running = False
         if self.on_app_close:
             self.on_app_close()

@@ -199,7 +199,7 @@ def settings():
 
 def exit_on_button():
     if exit_button.visible:
-        on_exit(True)
+        app.close()
 
 def back():
     if back_button.visible:
@@ -277,7 +277,7 @@ def update(dt):
         music.play()
     if not game_on:
         if app.input.key_pressed(Keys.ESCAPE):
-            on_exit(True)
+            app.close() # can be app.close, app.exit, app.close_app, they all do the same thing.
         for i in jump_keys:
             if app.input.key_pressed(i):
                 start_game()
@@ -305,13 +305,11 @@ def update(dt):
         restart()
     speed += 0.5 * dt
 app.update = update
-def on_exit(close=False):
+
+def on_exit():
     global highscore, music_on, show_FPS
     summarize_FPS(print_summary=True)
     save.write({"highscore": highscore, "music_on": music_on, "show_FPS": show_FPS})
-    if close:
-        app.close() # can be app.close, app.exit, app.close_app, they all do the same thing.
-
 app.on_app_close = on_exit
 
 app.run()

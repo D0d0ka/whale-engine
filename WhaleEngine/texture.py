@@ -15,14 +15,11 @@ class Texture:
             self.path = os.path.join(assets_dir, "textures", "missing_texture.png")
             image = Image.open(self.path).convert("RGBA")
         self._set_image(image)
-
     def _set_image(self, image):
         self.image = image.convert("RGBA")
         self.w, self.h = self.image.size
         from .engine import current_app
-
         self.id = current_app.window.create_texture_from_image(self.image)
-
     def bind(self, slot=0):
         from .engine import current_app
         bind_texture = getattr(current_app.window, "bind_texture", None)
