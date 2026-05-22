@@ -254,10 +254,12 @@ class BetterCollisionSystem2D(Plugin):
             first_id = id(first)
             first_polygon = polygon_cache[first_id]
             if "mouse" in first.layers:
+                if len(first.layers) > 1:
+                    raise RuntimeError("Colliders with 'mouse' layer cannot have other layers")
                 mouse_x, mouse_y = self._mouse_world_position()
                 if self._point_in_polygon(mouse_x, mouse_y, first_polygon):
                     first.colliding = True
-                    continue
+                continue
             first_aabb = aabb_cache[first_id]
             for second in self.colliders:
                 if not second.enabled:

@@ -3,16 +3,18 @@ from WhaleEngine.helpers.fpscounter import *
 from WhaleEngine.WindowAPI.OpenGL import windowAPI
 from random import uniform
 from WhaleEngine.helpers import *
+from WhaleEngine.helpers.json_save import json_save
 
 window = windowAPI(title="Flappy Dodo", width=600, height=600)
 window.set_color(Color.green)
 app = WhaleEngine(window=window)
 renderer = Renderer2D()
 app.input = InputSystem()
+
+ParentingSystem()
 TimerPlugin()
 MouseSystem()
-ParentingSystem()
-BetterCollisionSystem2D()
+BetterCollisionSystem2D(update_interval=0)
 SoundSystem()
 
 shapes = LoadShapes()
@@ -27,7 +29,7 @@ obstacles = []
 coins = []
 
 dodo = Entity2D(texture=textures.dodo, scale=(-0.5,0.5), position=(-150,0))
-dodo_collider = QuadCollider2D(75,100, position=(-150, 0))
+dodo_collider = QuadCollider2D(75,100, position=(-150, 0), visualize=False)
 ParentIn(dodo, dodo_collider, {"y": "set", "x": "set"})
 
 speed = 100
@@ -40,8 +42,12 @@ jump_keys = [Keys.SPACE, Keys.W, Keys.UP, Keys.N]
 particles = []
 spawn_particle = rarity(10)
 
-music_on = False
-show_FPS = True
+save = json_save("flappydodosave.json", backup_content={"highscore": 0, "music_on": True, "show_FPS": True})
+data = save.read()
+
+highscore = data["highscore"]
+music_on = data["music_on"]
+show_FPS = data["show_FPS"]
 
 class obstacle(Entity2D):
     def __init__(self, x):
@@ -50,9 +56,9 @@ class obstacle(Entity2D):
         ParentIn(self, self.top, {"x": "set", "y": "add"})
         self.start_x = x
         obstacles.append(self)
-        self.collider = MeshCollider2D(shape=shapes.square, position=(x, -space), scale=(1, 10))
+        self.collider = MeshCollider2D(shape=shapes.square, position=(x, -space), scale=(1, 10), visualize=False)
         ParentIn(self, self.collider, {"x": "set", "y": "set"})
-        self.top_collider = MeshCollider2D(shape=shapes.square, position=(x, space), scale=(1, 10))
+        self.top_collider = MeshCollider2D(shape=shapes.square, position=(x, space), scale=(1, 10), visualize=False)
         ParentIn(self.top, self.top_collider, {"x": "set", "y": "set"})
         self.y = uniform(-space-200, -space+200)
         self.gave_score = False
@@ -76,7 +82,7 @@ class obstacle(Entity2D):
 class coin(Entity2D):
     def __init__(self, x):
         super().__init__(texture=shapes.circle, scale=(0.3, 0.3), position=(x, uniform(-250, 250)), update=True, color=Color.yellow)
-        self.collider = MeshCollider2D(shape=shapes.circle, position=(x, self.y), scale=(0.3, 0.3))
+        self.collider = MeshCollider2D(shape=shapes.circle, position=(x, self.y), scale=(0.3, 0.3), visualize=False)
         ParentIn(self, self.collider, {"x": "set", "y": "set"})
         dodo_collider.ignore(self.collider)
         self.start_x = x
@@ -101,15 +107,17 @@ for i in range(2):
     obstacle(x)
     coin(x+200)
     x += 400
-score_display = Text2D(text="Score: 0", position=(-200, 250), color=Color.white)
+score_display = Text2D(text=f"Score: 0\nHighscore: {highscore}", position=(-200, 250), color=Color.white)
 
 def update_score(plus):
-    global score, score_display
+    global score, score_display, highscore
     score += plus
-    score_display.set_text(f"Score: {score}")
+    if score > highscore:
+        highscore = score
+    score_display.set_text(f"Score: {score}\nHighscore: {highscore}")
 
 def restart():
-    global velocity, gravity_multiplier, game_on, gravity, speed
+    global velocity, gravity_multiplier, game_on, gravity, speed, score
     for i in obstacles:
         i.restart()
     dodo.y = 0
@@ -144,14 +152,20 @@ class particle(Entity2D):
             particles.remove(self)
 
 class button(Button2D):
-    def __init__(self,texture, y, onclick, color=Color.white):
+    def __init__(self, texture, y, onclick, color=Color.white):
         super().__init__(texture=texture, position=(0, y), color=color, onclick=onclick)
+    def update(self, dt):
+        super().update(dt)
+        if self.collider.colliding:
+            self.color = Color.gray
+        else:
+            self.color = Color.white
 
 def start_game():
     global game_on, score
     game_on = True
     score = 0
-    score_display.set_text(f"Score: 0")
+    score_display.set_text(f"Score: 0\nHighscore: {highscore}")
     play_button.visible = False
     settings_button.visible = False
     exit_button.visible = False
@@ -168,23 +182,24 @@ def play():
 def settings():
     global music_on
     if settings_button.visible:
-        play_button.visible = False
-        settings_button.visible = False
-        exit_button.visible = False
-        back_button.visible = True
-        if music_on:
-            music_on_button.visible = True
-        else:
-            music_off_button.visible = True
-        if show_FPS:
-            show_FPS_true_button.visible = True
-        else:
-            show_FPS_false_button.visible = True
+        def show():
+            play_button.visible = False
+            settings_button.visible = False
+            exit_button.visible = False
+            back_button.visible = True
+            if music_on:
+                music_on_button.visible = True
+            else:
+                music_off_button.visible = True
+            if show_FPS:
+                show_FPS_true_button.visible = True
+            else:
+                show_FPS_false_button.visible = True
+        delay(0.1, show)
 
-def exit():
+def exit_on_button():
     if exit_button.visible:
-        summarize_FPS(print_summary=True)
-        app.close()
+        on_exit(True)
 
 def back():
     if back_button.visible:
@@ -197,42 +212,49 @@ def back():
         show_FPS_true_button.visible = False
         show_FPS_false_button.visible = False
 
-def music_on():
+def on_music_on():
     global music_on
     if music_on_button.visible:
-        music_on = True
+        music_on = False
         music_on_button.visible = False
-        music_off_button.visible = True
+        def show():
+            music_off_button.visible = True
+            music.stop()
+        delay(0.1, show)
 
-def music_off():
+def on_music_off():
     global music_on
     if music_off_button.visible:
-        music_on = False
+        music_on = True
         music_off_button.visible = False
-        music_on_button.visible = True
-        music.stop()
+        def show():
+            music_on_button.visible = True
+        delay(0.1, show)
 
 def show_FPS_true():
     global show_FPS
     if show_FPS_true_button.visible:
-        show_FPS = True
+        show_FPS = False
         show_FPS_true_button.visible = False
-        show_FPS_false_button.visible = True
+        def show():
+            show_FPS_false_button.visible = True
+        delay(0.1, show)
 
 def show_FPS_false():
     global show_FPS
     if show_FPS_false_button.visible:
-        show_FPS = False
+        show_FPS = True
         show_FPS_false_button.visible = False
-        show_FPS_true_button.visible = True
+        def show():        
+            show_FPS_true_button.visible = True
+        delay(0.1, show)
 
-# buttons don't work for some reason
 play_button = button(Texture("flappydodoassets/playbutton.png"),110, play)
 settings_button = button(Texture("flappydodoassets/settingsbutton.png"), 0, settings)
-exit_button = button(Texture("flappydodoassets/exitbutton.png"), -110, exit)
+exit_button = button(Texture("flappydodoassets/exitbutton.png"), -110, exit_on_button)
 back_button = button(Texture("flappydodoassets/backbutton.png"), 110, back)
-music_on_button = button(Texture("flappydodoassets/musiconbutton.png"), 0, music_on)
-music_off_button = button(Texture("flappydodoassets/musicoffbutton.png"), 0, music_off)
+music_on_button = button(Texture("flappydodoassets/musiconbutton.png"), 0, on_music_on)
+music_off_button = button(Texture("flappydodoassets/musicoffbutton.png"), 0, on_music_off)
 show_FPS_true_button = button(Texture("flappydodoassets/showfpstruebutton.png"), -110, show_FPS_true)
 show_FPS_false_button = button(Texture("flappydodoassets/showfpsfalsebutton.png"), -110, show_FPS_false)
 back_button.visible = False
@@ -255,8 +277,7 @@ def update(dt):
         music.play()
     if not game_on:
         if app.input.key_pressed(Keys.ESCAPE):
-            summarize_FPS(print_summary=True)
-            app.close() # can be app.close, app.exit, app.close_app, they all do the same thing.
+            on_exit(True)
         for i in jump_keys:
             if app.input.key_pressed(i):
                 start_game()
@@ -284,5 +305,13 @@ def update(dt):
         restart()
     speed += 0.5 * dt
 app.update = update
+def on_exit(close=False):
+    global highscore, music_on, show_FPS
+    summarize_FPS(print_summary=True)
+    save.write({"highscore": highscore, "music_on": music_on, "show_FPS": show_FPS})
+    if close:
+        app.close() # can be app.close, app.exit, app.close_app, they all do the same thing.
+
+app.on_app_close = on_exit
 
 app.run()

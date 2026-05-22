@@ -37,19 +37,22 @@ class Entity2D:
         pass
 
 class Button2D(Entity2D):
-    def __init__(self, onclick=none,onpress=none, *,density=16, texture, color=Color.white, position=(0, 0), renderer=0, **kwargs):
+    def __init__(self, onclick=none,onpress=none, *,density=16, texture , color=Color.white, position=(0, 0), renderer=0, **kwargs):
         from .bettercollider2d import MeshCollider2D
         super().__init__(texture=texture, color=color, position=position, update=True, renderer=renderer)
         from .engine import current_app
         if not hasattr(current_app, "BetterCollisionSystem2D"):
-            raise RuntimeError("Button2D requires BetterCollisionSystem2D() when using MeshCollider2D.")
-        self.collider = MeshCollider2D(texture, density=density, position=position, layers=["mouse"], visualize=False)
+            raise RuntimeError("Button2D requires BetterCollisionSystem2D()")
+        self.collider = MeshCollider2D(texture, density=density, position=position, layers=["mouse"], visualize=False, renderer=renderer)
         ParentIn(self,self.collider,attributes={"x": "set", "y": "set"})
         self.onclick = onclick
         self.onpress = onpress
+        self.enabled = True
         for key, value in kwargs.items():
             setattr(self, key, value)
     def update(self, dt):
+        if not self.enabled:
+            return
         from .engine import current_app
         if self.collider.colliding and current_app.MouseSystem.left_pressed():
             self.onclick()

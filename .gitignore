@@ -5,3 +5,5 @@ logs/
 .venv/
 agent.txt
 test.py
+cheatsheets/
+flappydodosave.json
