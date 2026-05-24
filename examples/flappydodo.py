@@ -307,8 +307,10 @@ def update(dt):
 app.update = update
 
 def on_exit():
-    global highscore, music_on, show_FPS
+    global highscore, music_on, show_FPS, score
     summarize_FPS(print_summary=True)
+    if score > highscore:
+        highscore = score
     save.write({"highscore": highscore, "music_on": music_on, "show_FPS": show_FPS})
 app.on_app_close = on_exit
 

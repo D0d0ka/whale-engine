@@ -46,7 +46,6 @@ class SoundSystem(Plugin):
         self._stream = None
         self._active_playbacks = []
         self._lock = threading.Lock()
-
     def _ensure_stream(self):
         if self._stream is not None:
             return
@@ -61,7 +60,6 @@ class SoundSystem(Plugin):
             self._stream.start()
         except Exception as error:
             raise RuntimeError(f"Failed to start audio output stream: {error}")
-
     def _audio_callback(self, outdata, frames, time_info, status):
         del time_info
         if status:
@@ -96,7 +94,6 @@ class SoundSystem(Plugin):
             if finished:
                 self._active_playbacks = [item for item in self._active_playbacks if item not in finished]
         np.clip(outdata, -1.0, 1.0, out=outdata)
-
     def _play_sound(self, sound, loops=0):
         loops = int(loops)
         with self._lock:
@@ -108,18 +105,15 @@ class SoundSystem(Plugin):
             })
             sound.is_playing = True
         self._ensure_stream()
-
     def _stop_sound(self, sound):
         with self._lock:
             self._active_playbacks = [item for item in self._active_playbacks if item["sound"] is not sound]
             sound.is_playing = False
-
     def _update_sound_volume(self, sound):
         with self._lock:
             for playback in self._active_playbacks:
                 if playback["sound"] is sound:
                     playback["volume"] = sound.volume
-
     def load_sound(self, name, path):
         self.sounds[name] = Sound(name, path, self)
         return self.sounds[name]
