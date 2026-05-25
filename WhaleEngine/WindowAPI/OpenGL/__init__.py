@@ -49,6 +49,7 @@ from OpenGL.GL import (
 import ctypes
 import math
 import os
+import time
 import glfw
 import sys
 from PIL import Image
@@ -105,7 +106,7 @@ def _sprite_model_matrix(x, y, rotation_degrees, width, height):
     )
 
 class windowAPI:
-    def __init__(self, width=800, height=600, title="Whale Engine (OpenGL)", color=Color(0.1, 0.1, 0.1, 1), vsync=True):
+    def __init__(self, width=800, height=600, title="Whale Engine (OpenGL)", color=Color(0.1, 0.1, 0.1, 1), vsync=True, target_fps=None):
         if not glfw.init():
             logLn("GLFW initialization failed.")
             sys.exit(1)
@@ -144,6 +145,10 @@ class windowAPI:
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         self._setup_quad_mesh()
         self.default_shader = self._load_default_shader()
+        self._target_fps = target_fps
+        self._last_frame_time = time.perf_counter()
+        if target_fps is not None:
+            self.set_vsync(False)
         logLn("Window loaded.")
     @property
     def color(self):
@@ -167,6 +172,18 @@ class windowAPI:
         glClearColor(color.r, color.g, color.b, color.a)
     def set_vsync(self, enabled=True):
         glfw.swap_interval(1 if enabled else 0)
+    def set_target_fps(self, fps):
+        self._target_fps = fps
+        if fps is not None:
+            # Disable vsync so swap_buffers doesn't block — we handle timing ourselves.
+            self.set_vsync(False)
+    def _precise_sleep_until(self, deadline):
+        """Hybrid sleep+spin to hit `deadline` (perf_counter) with ~0.1ms accuracy."""
+        remaining = deadline - time.perf_counter()
+        if remaining > 0.002:
+            time.sleep(remaining - 0.002)
+        while time.perf_counter() < deadline:
+            pass
     def request_close(self):
         glfw.set_window_should_close(self.handle, True)
     def is_key_down(self, key):
@@ -181,6 +198,13 @@ class windowAPI:
         glfw.poll_events()
     def swap(self):
         glfw.swap_buffers(self.handle)
+        if self._target_fps is not None and self._target_fps > 0:
+            deadline = self._last_frame_time + 1.0 / self._target_fps
+            self._precise_sleep_until(deadline)
+            # Use expected deadline (not actual) to prevent cumulative drift.
+            self._last_frame_time = deadline
+        else:
+            self._last_frame_time = time.perf_counter()
     def should_close(self):
         return glfw.window_should_close(self.handle)
     def terminate(self):

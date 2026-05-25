@@ -135,16 +135,27 @@ class windowAPI:
 	def clear(self):
 		return
 
+	def set_target_fps(self, fps):
+		self._target_fps = max(1, int(fps))
+		self._frame_duration = 1.0 / float(self._target_fps)
+
+	@staticmethod
+	def _precise_sleep_until(deadline):
+		"""Hybrid sleep+spin to hit `deadline` (perf_counter) with ~0.1ms accuracy."""
+		remaining = deadline - perf_counter()
+		if remaining > 0.002:
+			sleep(remaining - 0.002)
+		while perf_counter() < deadline:
+			pass
+
 	def swap(self):
-		# Keep Python update loop in sync with a realistic present cadence.
-		now = perf_counter()
-		elapsed = now - self._last_swap
-		remaining = self._frame_duration - elapsed
-		if remaining > 0:
-			sleep(remaining)
+		# Deadline-based timing prevents cumulative drift.
+		deadline = self._last_swap + self._frame_duration
+		self._precise_sleep_until(deadline)
 		with self._lock:
 			self._frame_id += 1
-		self._last_swap = perf_counter()
+		# Use expected deadline (not actual) to prevent drift.
+		self._last_swap = deadline
 
 	def should_close(self):
 		with self._lock:
@@ -339,6 +350,8 @@ class windowAPI:
 					return self._write_file(os.path.join(web_root, "index.html"), "text/html; charset=utf-8")
 				if parsed.path == "/app.js":
 					return self._write_file(os.path.join(web_root, "app.js"), "application/javascript; charset=utf-8")
+				if parsed.path == "/style.css":
+					return self._write_file(os.path.join(web_root, "style.css"), "text/css; charset=utf-8")
 				if parsed.path == "/state":
 					full_textures = query.get("full_textures", ["0"])[0] == "1"
 					return self._write_json(api._make_state_payload(full_textures=full_textures))

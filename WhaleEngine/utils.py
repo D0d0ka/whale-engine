@@ -21,3 +21,7 @@ class Range:
             self.b = a
     def safe_uniform(self):
         return safe_uniform(self.a, self.b)
+    def is_in_range(self, value):
+        return min(self.a, self.b) <= value <= max(self.a, self.b)
+    def do_overlap(self, other):
+        return self.is_in_range(other.a) or self.is_in_range(other.b) or other.is_in_range(self.a) or other.is_in_range(self.b)

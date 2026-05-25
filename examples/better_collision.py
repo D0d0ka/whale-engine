@@ -55,47 +55,38 @@ destroyed = False
 
 def update(dt):
     global destroyed, mouse_quad
-
     mesh.x += randint(-50, 50)
     mesh.y += randint(-50, 50)
     rotating_quad.x += randint(-50, 50)
     rotating_quad.y += randint(-50, 50)
     base_quad.x += randint(-50, 50)
     base_quad.y += randint(-50, 50)
-
     rotating_quad.rotation += 70 * dt
     mesh.rotation -= 55 * dt
-
     if not destroyed:
         mouse_quad.x = app.MouseSystem.x
         mouse_quad.y = app.MouseSystem.y
         mouse_quad.rotation += 120 * dt
-
     if base_quad.colliding:
         base_quad.visualition.color = Color.green
     else:
         base_quad.visualition.color = Color.cyan
-
     if rotating_quad.colliding:
         rotating_quad.visualition.color = Color.magenta
     else:
         rotating_quad.visualition.color = Color.yellow
-
     if mesh.colliding:
         mesh.visualition.color = Color.blue
     else:
         mesh.visualition.color = Color.green
-
     if not destroyed and mouse_quad.colliding:
         mouse_quad.visualition.color = Color.white
     elif not destroyed:
         mouse_quad.visualition.color = Color.red
-
     if app.MouseSystem.left_pressed() and not destroyed:
         destroy(mouse_quad)
         destroyed = True
         print("mouse quad destroyed (left click)")
-
     if app.MouseSystem.right_pressed() and destroyed:
         mouse_quad = QuadCollider2D(
             w=120,
@@ -108,7 +99,6 @@ def update(dt):
         )
         destroyed = False
         print("mouse quad respawned (right click)")
-
 app.update = update
 
 app.run()

@@ -45,5 +45,8 @@ def update(dt):
     if app.input.key_pressed(Keys.E):
         destroy(spawner)
 app.update = update
+def on_app_close():
+    summarize_FPS(print_summary=True)
+app.on_app_close = on_app_close
 
 app.run()

@@ -1,11 +1,11 @@
 from WhaleEngine import *
 from WhaleEngine.helpers.fpscounter import FPS_counter, summarize_FPS
 from WhaleEngine.assets import LoadShapes
-from WhaleEngine.WindowAPI.WebGL import windowAPI
+from WhaleEngine.WindowAPI.OpenGL import windowAPI
 
 #set_logging_file("log.log")
 
-window = windowAPI(title="Dodos moving demo")
+window = windowAPI(title="Dodos moving demo",target_fps=120)
 
 app = WhaleEngine(window=window)
 renderer = Renderer2D()

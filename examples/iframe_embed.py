@@ -5,10 +5,8 @@ import webbrowser
 from WhaleEngine import *
 from WhaleEngine.WindowAPI.WebGL import windowAPI
 
-
 ENGINE_PORT = 8765
 HOST_PORT = 8766
-
 
 def build_iframe_page(embed_url):
     return f"""<!doctype html>
@@ -84,7 +82,6 @@ def build_iframe_page(embed_url):
 </html>
 """
 
-
 class IframeHostHandler(BaseHTTPRequestHandler):
     page_html = ""
 
@@ -104,7 +101,6 @@ class IframeHostHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         return
 
-
 window = windowAPI(
     title="WhaleEngine iframe demo",
     port=ENGINE_PORT,
@@ -120,14 +116,12 @@ textures = LoadTextures()
 whale = Entity2D(texture=textures.whale, position=(-200, 0), scale=(0.65, 0.65), renderer=renderer)
 dodo = Entity2D(texture=textures.dodo, position=(200, 0), scale=(0.55, 0.55), renderer=renderer)
 
-
 def update(dt):
     whale.x += 120 * dt
     if whale.x > 320:
         whale.x = -320
 
     dodo.rotation += 90 * dt
-
 
 app.update = update
 
@@ -141,11 +135,9 @@ print(f"Iframe host: {host_url}")
 print(f"Engine embed: {window.embed_url}")
 webbrowser.open(host_url)
 
-
 def on_app_close():
     iframe_host.shutdown()
     iframe_host.server_close()
-
 
 app.on_app_close = on_app_close
 app.run()

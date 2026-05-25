@@ -5,7 +5,7 @@ from random import uniform
 from WhaleEngine.helpers import *
 from WhaleEngine.helpers.json_save import json_save
 
-window = windowAPI(title="Flappy Dodo", width=600, height=600)
+window = windowAPI(title="Flappy Dodo", width=600, height=600, target_fps=float('inf'))
 window.set_color(Color.green)
 app = WhaleEngine(window=window)
 renderer = Renderer2D()
@@ -40,7 +40,7 @@ gravity_multiplier = 5
 jump_keys = [Keys.SPACE, Keys.W, Keys.UP, Keys.N]
 
 particles = []
-spawn_particle = rarity(10)
+spawn_particle = Timer(0.1)
 
 save = json_save("flappydodosave.json", backup_content={"highscore": 0, "music_on": True, "show_FPS": True})
 data = save.read()
@@ -288,10 +288,11 @@ def update(dt):
     if app.input.key_pressed(Keys.R):
         restart()
         start_game()
-    if spawn_particle.generate()[0]:
+    if spawn_particle.over:
+        spawn_particle.reset()
         particle((dodo.x-15, dodo.y-(47.5*-gravity)))
-    velocity += gravity * gravity_multiplier
-    dodo.y += velocity * dt
+    velocity += gravity * gravity_multiplier * dt
+    dodo.y += velocity * dt * 50
     for i in jump_keys:
         if app.input.key_pressed(i) or app.MouseSystem.left_pressed():
             gravity *= -1

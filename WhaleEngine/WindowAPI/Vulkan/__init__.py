@@ -6,6 +6,7 @@ from vulkan import *
 
 import sys
 import math
+import time
 import glfw
 import numpy as np
 
@@ -29,6 +30,7 @@ class windowAPI:
         height=600,
         title="Whale Engine (Vulkan)",
         color=Color(0.1, 0.1, 0.1, 1),
+        target_fps=None,
     ):
         if not glfw.init():
             logLn("GLFW initialization failed.")
@@ -66,6 +68,8 @@ class windowAPI:
         self._max_frames_in_flight = 1
         self._current_frame = 0
 
+        self._target_fps = target_fps
+        self._last_frame_time = time.perf_counter()
         self._create_vulkan_context()
         logLn("Vulkan window loaded.")
 
@@ -96,6 +100,17 @@ class windowAPI:
     def set_color(self, color):
         self._color = color
 
+    def set_target_fps(self, fps):
+        self._target_fps = fps
+
+    def _precise_sleep_until(self, deadline):
+        """Hybrid sleep+spin to hit `deadline` (perf_counter) with ~0.1ms accuracy."""
+        remaining = deadline - time.perf_counter()
+        if remaining > 0.002:
+            time.sleep(remaining - 0.002)
+        while time.perf_counter() < deadline:
+            pass
+
     def poll(self):
         glfw.poll_events()
 
@@ -112,9 +127,14 @@ class windowAPI:
             logLn("Vulkan device lost, attempting renderer recovery.", "error logger")
             self._recover_vulkan_renderer()
         except Exception as exc:
-            # Keep app alive on transient Vulkan issues and attempt to rebuild context.
             logLn(f"Vulkan draw error: {exc}", "error logger")
             self._recover_vulkan_renderer()
+        if self._target_fps is not None and self._target_fps > 0:
+            deadline = self._last_frame_time + 1.0 / self._target_fps
+            self._precise_sleep_until(deadline)
+            self._last_frame_time = deadline
+        else:
+            self._last_frame_time = time.perf_counter()
 
     def should_close(self):
         return glfw.window_should_close(self.handle)

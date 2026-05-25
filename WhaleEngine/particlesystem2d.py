@@ -39,6 +39,7 @@ class ParticleSystem2dPlugin(Plugin):
 
 class ParticleType2d:
     def __init__(self, texture, lifetime: Range = Range(0, 0), x_speed: Range = Range(0, 0), y_speed: Range = Range(0, 0), rotation: Range = Range(0, 0), scale_x: Range = Range(1, 1), scale_y: Range = Range(1, 1), rotation_speed: Range = Range(0, 0), scale_speed: Range = Range(0, 0), color_r: Range = Range(255), color_g: Range = Range(255), color_b: Range = Range(255), color_a: Range = Range(1, 1), color_r_speed: Range = Range(0, 0), color_g_speed: Range = Range(0, 0), color_b_speed: Range = Range(0, 0), color_a_speed: Range = Range(0, 0)):
+        self.type = "Particle Type 2D"
         self.texture = texture
         if type(texture) == str:
             self.texture = Texture(texture)
