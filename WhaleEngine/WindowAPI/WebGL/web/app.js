@@ -16,6 +16,9 @@ uniform vec2 uResolution;
 uniform vec2 uTranslation;
 uniform vec2 uSize;
 uniform float uRotation;
+uniform vec2 uCameraPos;
+uniform float uCameraZoom;
+uniform float uCameraRotation;
 varying vec2 vTexCoord;
 
 void main() {
@@ -27,9 +30,17 @@ void main() {
     scaled.x * s + scaled.y * c
   );
   vec2 world = rotated + uTranslation;
+  vec2 camOffset = world - uCameraPos;
+  float camC = cos(-uCameraRotation);
+  float camS = sin(-uCameraRotation);
+  vec2 camRotated = vec2(
+    camOffset.x * camC - camOffset.y * camS,
+    camOffset.x * camS + camOffset.y * camC
+  );
+  vec2 camTransformed = camRotated * uCameraZoom;
   vec2 clip = vec2(
-    world.x / (uResolution.x * 0.5),
-    world.y / (uResolution.y * 0.5)
+    camTransformed.x / (uResolution.x * 0.5),
+    camTransformed.y / (uResolution.y * 0.5)
   );
   gl_Position = vec4(clip, 0.0, 1.0);
   vTexCoord = aTexCoord;
@@ -90,6 +101,9 @@ function getOrCreateProgram(fragSource) {
     uRotation: gl.getUniformLocation(prog, "uRotation"),
     uColor: gl.getUniformLocation(prog, "uColor"),
     uTexture: gl.getUniformLocation(prog, "uTexture"),
+    uCameraPos: gl.getUniformLocation(prog, "uCameraPos"),
+    uCameraZoom: gl.getUniformLocation(prog, "uCameraZoom"),
+    uCameraRotation: gl.getUniformLocation(prog, "uCameraRotation"),
   };
   programCache.set(fragSource, locs);
   return locs;
@@ -225,6 +239,11 @@ function drawFrame(state) {
   }
 
   const entities = Array.isArray(state.entities) ? state.entities : [];
+  const cam = state.camera || { x: 0, y: 0, zoom: 1, rotation: 0 };
+  const camX = Number(cam.x || 0);
+  const camY = Number(cam.y || 0);
+  const camZoom = Number(cam.zoom != null ? cam.zoom : 1);
+  const camRotRad = (Number(cam.rotation || 0) * Math.PI) / 180;
   for (const entity of entities) {
     const texture = textureCache.get(entity.texture_id);
     if (!texture) {
@@ -245,6 +264,9 @@ function drawFrame(state) {
 
     gl.uniform2f(locs.uResolution, canvas.width, canvas.height);
     gl.uniform1i(locs.uTexture, 0);
+    gl.uniform2f(locs.uCameraPos, camX, camY);
+    gl.uniform1f(locs.uCameraZoom, camZoom);
+    gl.uniform1f(locs.uCameraRotation, camRotRad);
 
     const w = Number(entity.w || 1) * Number(entity.scale_x || 1);
     const h = Number(entity.h || 1) * Number(entity.scale_y || 1);

@@ -56,6 +56,7 @@ class windowAPI:
         self._framebuffer_resized = False
         self._terminated = False
         self._pending_entities = []
+        self._camera = None
         self._next_texture_id = 1
         self._textures = {}
         self._recovering = False
@@ -155,6 +156,9 @@ class windowAPI:
     def get_cursor_pos(self):
         return glfw.get_cursor_pos(self.handle)
 
+    def set_cursor_pos(self, x, y):
+        glfw.set_cursor_pos(self.handle, x, y)
+
     def _normalize_mouse_button(self, button):
         if button == MouseButtons.LEFT:
             return glfw.MOUSE_BUTTON_LEFT
@@ -183,9 +187,9 @@ class windowAPI:
         }
         return tex_id
 
-    def render_2d_entities(self, entities, camera): #camera does not work yet
-        # Native render loop is active; 2D draw path can consume this queue incrementally.
+    def render_2d_entities(self, entities, camera):
         self._pending_entities = entities
+        self._camera = camera
 
     # Input helpers
     def _action_name_from_native(self, action):
@@ -851,6 +855,17 @@ class windowAPI:
         wx = (xs / fbw) * ww - (ww * 0.5)
         wy = (wh * 0.5) - (ys / fbh) * wh
 
+        camera = self._camera
+        if camera is not None:
+            zoom = float(camera.zoom)
+            rot_rad = math.radians(float(camera.rotation))
+            c = math.cos(rot_rad)
+            s = math.sin(rot_rad)
+            wx_raw = wx / max(1e-6, zoom)
+            wy_raw = wy / max(1e-6, zoom)
+            wx = wx_raw * c - wy_raw * s + float(camera.x)
+            wy = wx_raw * s + wy_raw * c + float(camera.y)
+
         inv_w = 1.0 / max(1.0, (2.0 * half_w))
         inv_h = 1.0 / max(1.0, (2.0 * half_h))
 
@@ -908,17 +923,62 @@ class windowAPI:
     def _world_to_screen(self, x, y):
         ww = float(max(1, self.width))
         wh = float(max(1, self.height))
-        sx = ((float(x) + (ww * 0.5)) / ww) * float(self._fb_width)
-        sy = (((wh * 0.5) - float(y)) / wh) * float(self._fb_height)
+        camera = self._camera
+        if camera is not None:
+            rot_rad = math.radians(float(camera.rotation))
+            zoom = float(camera.zoom)
+            dx = float(x) - float(camera.x)
+            dy = float(y) - float(camera.y)
+            c = math.cos(-rot_rad)
+            s = math.sin(-rot_rad)
+            tx = dx * c - dy * s
+            ty = dx * s + dy * c
+            tx *= zoom
+            ty *= zoom
+        else:
+            tx = float(x)
+            ty = float(y)
+        sx = ((tx + (ww * 0.5)) / ww) * float(self._fb_width)
+        sy = (((wh * 0.5) - ty) / wh) * float(self._fb_height)
         return sx, sy
+
+    def _screen_to_world(self, sx, sy):
+        ww = float(max(1, self.width))
+        wh = float(max(1, self.height))
+        tx = (float(sx) / float(max(1, self._fb_width))) * ww - (ww * 0.5)
+        ty = (wh * 0.5) - ((float(sy) / float(max(1, self._fb_height))) * wh)
+        camera = self._camera
+        if camera is not None:
+            rot_rad = math.radians(float(camera.rotation))
+            zoom = float(camera.zoom)
+            tx /= max(1e-6, zoom)
+            ty /= max(1e-6, zoom)
+            c = math.cos(rot_rad)
+            s = math.sin(rot_rad)
+            wx = tx * c - ty * s + float(camera.x)
+            wy = tx * s + ty * c + float(camera.y)
+        else:
+            wx = tx
+            wy = ty
+        return wx, wy
 
     def _screen_to_world_x(self, sx):
         ww = float(max(1, self.width))
-        return (float(sx) / float(max(1, self._fb_width))) * ww - (ww * 0.5)
+        tx = (float(sx) / float(max(1, self._fb_width))) * ww - (ww * 0.5)
+        camera = self._camera
+        if camera is not None:
+            tx /= max(1e-6, float(camera.zoom))
+            tx += float(camera.x)
+        return tx
 
     def _screen_to_world_y(self, sy):
         wh = float(max(1, self.height))
-        return (wh * 0.5) - ((float(sy) / float(max(1, self._fb_height))) * wh)
+        ty = (wh * 0.5) - ((float(sy) / float(max(1, self._fb_height))) * wh)
+        camera = self._camera
+        if camera is not None:
+            ty /= max(1e-6, float(camera.zoom))
+            ty += float(camera.y)
+        return ty
 
     def _draw_entity_software(self, entity):
         texture_info = self._textures.get(getattr(entity.texture, "id", None))
@@ -976,9 +1036,8 @@ class windowAPI:
         flip_v = float(entity.scale_y) < 0.0
 
         for py in range(min_y, max_y + 1):
-            wy = self._screen_to_world_y(py + 0.5)
             for px in range(min_x, max_x + 1):
-                wx = self._screen_to_world_x(px + 0.5)
+                wx, wy = self._screen_to_world(px + 0.5, py + 0.5)
 
                 dx = wx - float(entity.x)
                 dy = wy - float(entity.y)

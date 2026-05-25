@@ -1,5 +1,5 @@
 from .logging import logLn
-
+from .camera2d import camera2d
 
 class Renderer2D:
     def __init__(self, **kwargs):
@@ -10,11 +10,7 @@ class Renderer2D:
         for key, value in kwargs.items():
             setattr(self, key, value)
         logLn("Renderer 2d loaded.")
-        class camera:
-            def __init__(self, x=0, y=0, zoom=1):
-                self.x = x
-                self.y = y
-        self.camera = camera()
+        self.camera = camera2d()
     def start(self):
         pass
     def update(self, dt):

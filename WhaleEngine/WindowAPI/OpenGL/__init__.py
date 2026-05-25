@@ -67,6 +67,32 @@ def _orthographic_projection(left, right, bottom, top, near_plane=-1.0, far_plan
     )
 
 
+def _camera_view_matrix(camera):
+    z = float(camera.zoom)
+    rot_rad = math.radians(float(camera.rotation))
+    cr = math.cos(rot_rad)
+    sr = math.sin(rot_rad)
+    cx = float(camera.x)
+    cy = float(camera.y)
+    return (
+        z * cr, -z * sr, 0.0, 0.0,
+        z * sr,  z * cr, 0.0, 0.0,
+        0.0,     0.0,    1.0, 0.0,
+        z * (-cx * cr - cy * sr), z * (cx * sr - cy * cr), 0.0, 1.0,
+    )
+
+
+def _mat4_multiply(a, b):
+    result = [0.0] * 16
+    for col in range(4):
+        for row in range(4):
+            val = 0.0
+            for k in range(4):
+                val += a[k * 4 + row] * b[col * 4 + k]
+            result[col * 4 + row] = val
+    return tuple(result)
+
+
 def _sprite_model_matrix(x, y, rotation_degrees, width, height):
     radians = math.radians(rotation_degrees)
     cos_theta = math.cos(radians)
@@ -180,6 +206,8 @@ class windowAPI:
             self.key_callbacks.remove(callback)
     def get_cursor_pos(self):
         return glfw.get_cursor_pos(self.handle)
+    def set_cursor_pos(self, x, y):
+        glfw.set_cursor_pos(self.handle, x, y)
     def _normalize_mouse_button(self, button):
         if button == MouseButtons.LEFT:
             return glfw.MOUSE_BUTTON_LEFT
@@ -268,6 +296,8 @@ class windowAPI:
 
     def render_2d_entities(self, entities, camera):
         self._update_projection_matrix()
+        view = _camera_view_matrix(camera)
+        proj_view = _mat4_multiply(self._projection_matrix, view)
         glBindVertexArray(self._quad_vao)
         bound_shader = None
         bound_texture_id = None
@@ -280,7 +310,7 @@ class windowAPI:
             shader = getattr(entity, "shader", None) or self.default_shader
             if shader is not bound_shader:
                 shader.use()
-                shader.set_mat4("uProjection", self._projection_matrix)
+                shader.set_mat4("uProjection", proj_view)
                 shader.set_int("uTexture", 0)
                 shader.set_int("u_texture", 0)
                 bound_shader = shader
@@ -294,8 +324,8 @@ class windowAPI:
             shader.set_mat4(
                 "uModel",
                 _sprite_model_matrix(
-                    entity.x-camera.x,
-                    entity.y-camera.y,
+                    entity.x,
+                    entity.y,
                     entity.rotation,
                     entity.w * entity.scale_x,
                     entity.h * entity.scale_y,

@@ -83,6 +83,7 @@ class windowAPI:
 		self._terminated = False
 		self._should_close = False
 		self._pending_entities = []
+		self._pending_camera = {"x": 0.0, "y": 0.0, "zoom": 1.0, "rotation": 0.0}
 		self._next_texture_id = 1
 		self._textures = {}
 		self._frame_id = 0
@@ -192,6 +193,11 @@ class windowAPI:
 		with self._lock:
 			return (self._mouse_x, self._mouse_y)
 
+	def set_cursor_pos(self, x, y):
+		with self._lock:
+			self._mouse_x = x
+			self._mouse_y = y
+
 	def is_mouse_button_down(self, button):
 		if isinstance(button, str):
 			normalized = button.lower()
@@ -234,8 +240,8 @@ class windowAPI:
 			serialized.append(
 				{
 					"texture_id": texture_id,
-					"x": float(getattr(entity, "x", 0.0)) - camera.x,
-					"y": float(getattr(entity, "y", 0.0)) - camera.y,
+					"x": float(getattr(entity, "x", 0.0)),
+					"y": float(getattr(entity, "y", 0.0)),
 					"w": float(getattr(entity, "w", 1.0)),
 					"h": float(getattr(entity, "h", 1.0)),
 					"scale_x": float(getattr(entity, "scale_x", 1.0)),
@@ -247,6 +253,12 @@ class windowAPI:
 			)
 		with self._lock:
 			self._pending_entities = serialized
+			self._pending_camera = {
+				"x": float(camera.x),
+				"y": float(camera.y),
+				"zoom": float(camera.zoom),
+				"rotation": float(camera.rotation),
+			}
 
 	def _handle_input_update(self, payload):
 		events = payload.get("events", [])
@@ -294,6 +306,7 @@ class windowAPI:
 				"clear_color": [self._color.r, self._color.g, self._color.b, self._color.a],
 				"entities": list(self._pending_entities),
 				"textures": textures,
+				"camera": dict(self._pending_camera),
 			}
 
 	def _start_http_server(self):

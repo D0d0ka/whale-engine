@@ -26,9 +26,14 @@ class MouseSystem(Plugin):
         h = self.window.height
         self.x = (mx / w) * w - w / 2
         self.y = -(my / h) * h + h / 2
-
     def get_position(self):
-        return (self.wx, self.wy)
+        return (self.x, self.y)
+    def set_position(self, x, y):
+        w = self.window.width
+        h = self.window.height
+        wx = x + w / 2
+        wy = h / 2 - y
+        self.window.set_cursor_pos(wx, wy)
     def left_pressed(self):
         return self.left_down and not self.prev_left
     def right_pressed(self):
