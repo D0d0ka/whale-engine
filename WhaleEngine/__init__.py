@@ -16,4 +16,4 @@ from .utils2d import *
 from .keys import *
 from .timer import *
 
-logLn("Loaded standard build", "python")
+logLn("Loaded standard WhaleEngine build", "python")

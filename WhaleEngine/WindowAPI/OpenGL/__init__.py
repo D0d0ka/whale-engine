@@ -106,7 +106,7 @@ def _sprite_model_matrix(x, y, rotation_degrees, width, height):
     )
 
 class windowAPI:
-    def __init__(self, width=800, height=600, title="Whale Engine (OpenGL)", color=Color(0.1, 0.1, 0.1, 1), vsync=True, target_fps=None):
+    def __init__(self, title="Whale Engine (OpenGL)" ,width=800, height=600, color=Color(0.1, 0.1, 0.1, 1), vsync=True, target_fps=None):
         if not glfw.init():
             logLn("GLFW initialization failed.")
             sys.exit(1)

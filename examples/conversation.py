@@ -2,7 +2,7 @@ from WhaleEngine import *
 from WhaleEngine.conversationrenderer import ConversationRenderer
 from WhaleEngine.WindowAPI.OpenGL import windowAPI
 
-window = windowAPI(800, 600, "Conversation Example")
+window = windowAPI("Conversation Example",800, 600)
 app = WhaleEngine(window=window)
 conversation = ConversationRenderer()
 conversation.add_message("Hello, how are you?")

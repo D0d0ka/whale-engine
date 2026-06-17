@@ -26,9 +26,9 @@ vkDestroySurfaceKHR = None
 class windowAPI:
     def __init__(
         self,
+        title="Whale Engine (Vulkan)",
         width=800,
         height=600,
-        title="Whale Engine (Vulkan)",
         color=Color(0.1, 0.1, 0.1, 1),
         target_fps=None,
     ):

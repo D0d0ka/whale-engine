@@ -4,8 +4,11 @@ from PIL import Image
 import os
 
 class Texture:
-    def __init__(self, path):
+    def __init__(self, path, relative=True):
         self.path = path
+        if relative:
+            from .engine import current_app
+            self.path = os.path.join(current_app.path, path)
         self.id = None
         try:
             image = Image.open(path).convert("RGBA")

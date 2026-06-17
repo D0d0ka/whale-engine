@@ -52,9 +52,9 @@ def _map_browser_key(raw_key):
 class windowAPI:
 	def __init__(
 		self,
+		title="Whale Engine (WebGL)",
 		width=800,
 		height=600,
-		title="Whale Engine (WebGL)",
 		color=Color(0.1, 0.1, 0.1, 1),
 		host="127.0.0.1",
 		port=0,

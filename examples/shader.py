@@ -1,7 +1,7 @@
 from WhaleEngine import *
 from WhaleEngine.WindowAPI.WebGL import *
 
-window = windowAPI(800, 600, "Shader test")
+window = windowAPI("Shader test",800, 600)
 window.set_color(Color.white)
 app = WhaleEngine(window=window)
 renderer = Renderer2D()

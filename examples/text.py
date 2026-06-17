@@ -1,7 +1,7 @@
 from WhaleEngine import *
 from WhaleEngine.WindowAPI.OpenGL import windowAPI
 
-window = windowAPI(800, 600, "Text")
+window = windowAPI("Text",800, 600)
 app = WhaleEngine(window=window)
 renderer = Renderer2D()
 app.input = InputSystem()

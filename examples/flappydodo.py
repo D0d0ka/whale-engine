@@ -249,14 +249,14 @@ def show_FPS_false():
             show_FPS_true_button.visible = True
         delay(0.1, show)
 
-play_button = button(Texture("flappydodoassets/playbutton.png"),110, play)
-settings_button = button(Texture("flappydodoassets/settingsbutton.png"), 0, settings)
-exit_button = button(Texture("flappydodoassets/exitbutton.png"), -110, exit_on_button)
-back_button = button(Texture("flappydodoassets/backbutton.png"), 110, back)
-music_on_button = button(Texture("flappydodoassets/musiconbutton.png"), 0, on_music_on)
-music_off_button = button(Texture("flappydodoassets/musicoffbutton.png"), 0, on_music_off)
-show_FPS_true_button = button(Texture("flappydodoassets/showfpstruebutton.png"), -110, show_FPS_true)
-show_FPS_false_button = button(Texture("flappydodoassets/showfpsfalsebutton.png"), -110, show_FPS_false)
+play_button = button(Texture("flappydodoassets/textures/playbutton.png"),110, play)
+settings_button = button(Texture("flappydodoassets/textures/settingsbutton.png"), 0, settings)
+exit_button = button(Texture("flappydodoassets/textures/exitbutton.png"), -110, exit_on_button)
+back_button = button(Texture("flappydodoassets/textures/backbutton.png"), 110, back)
+music_on_button = button(Texture("flappydodoassets/textures/musiconbutton.png"), 0, on_music_on)
+music_off_button = button(Texture("flappydodoassets/textures/musicoffbutton.png"), 0, on_music_off)
+show_FPS_true_button = button(Texture("flappydodoassets/textures/showfpstruebutton.png"), -110, show_FPS_true)
+show_FPS_false_button = button(Texture("flappydodoassets/textures/showfpsfalsebutton.png"), -110, show_FPS_false)
 back_button.visible = False
 music_on_button.visible = False
 music_off_button.visible = False

@@ -11,7 +11,7 @@ class DodoPlugin(Plugin):
             print("Dodo!")
             self.timer.reset()
 
-window = windowAPI(800, 600, "Dodo Plugin example")
+window = windowAPI("Dodo Plugin example",800, 600)
 app = WhaleEngine(window=window)
 TimerPlugin()
 DodoPlugin(1)

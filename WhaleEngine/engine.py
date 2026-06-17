@@ -3,19 +3,28 @@ from .logging import logLn
 setup_global_error_handler()
 logLn("Global error handler set up.", "error logger")
 
-from time import perf_counter
 from .renderer2d import Renderer2D
 
 # while developing this engine: I'll log everything.
 from .logging import set_logging_folder
 set_logging_folder("logs")
 
+from time import perf_counter
+from pathlib import Path
+from sys import version
+import platform
+
 # TODO: add threading support to the engine, and make sure the error logging works across threads as well.
 #import threading
+
+logLn(f"Python version: {version}", "version")
+logLn(f"WhaleEngine version: 0.0.1 alpha", "version")
 
 class WhaleEngine:
     def __init__(self, window=None, **kwargs):
         logLn("Whale engine starting.")
+        self.os = platform.system()
+        logLn(self.os, "os")
         global current_app          
         current_app = self
         if window == None:
@@ -31,6 +40,13 @@ class WhaleEngine:
         self.on_app_close = None
         self.running = False
         self.exit = self.close = self.close_app
+        path = Path(__file__).resolve().parent
+        parts = path.parts
+        if parts.count("WhaleEngine") > 1:
+            idx = parts.index("WhaleEngine")
+            path = Path(*parts[:idx + 1])
+        self.path = str(path)
+        logLn(f"{self.path}","project")
         #self.last_values = {"window_width": window.width, "window_height": window.height, "window_title": window.title, "window_color": window.color}
         for key, value in kwargs.items():
             if key == "safemode":
