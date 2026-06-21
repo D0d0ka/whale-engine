@@ -19,9 +19,9 @@ class Renderer2D:
         self.entities.append(entity)
     def update_entitys(self, dt):
         for i in self.entities:
-            if i.do_update:
+            if i.do_update and i.enabled:
                 i.update(dt)
     def render(self):
-        visible_entities = [entity for entity in self.entities if getattr(entity, "visible", True)]
+        visible_entities = [entity for entity in self.entities if getattr(entity, "visible", True) and getattr(entity, "enabled", True)]
         if hasattr(self.window, "render_2d_entities"):
             self.window.render_2d_entities(visible_entities, self.camera)

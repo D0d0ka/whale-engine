@@ -9,3 +9,4 @@ test.py
 cheatsheets/
 flappydodosave.json
 output/
+.pytest_cache/

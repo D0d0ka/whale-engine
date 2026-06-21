@@ -12,7 +12,7 @@ renderer = Renderer2D()
 app.input = InputSystem()
 
 ParentingSystem()
-TimerPlugin()
+TimerSystem()
 MouseSystem()
 BetterCollisionSystem2D(update_interval=0)
 SoundSystem()

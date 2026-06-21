@@ -96,7 +96,7 @@ class windowAPI:
 		self._server_thread = None
 		self._start_http_server()
 		self.embed_url = f"{self.url}?embed=1"
-		logLn(f"WebGL window loaded at {self.url}")
+		logLn(f"WebGL window loaded at {self.url}", "window")
 
 	@property
 	def color(self):
@@ -174,7 +174,7 @@ class windowAPI:
 		if self._server_thread is not None:
 			self._server_thread.join(timeout=1.0)
 			self._server_thread = None
-		logLn("WebGL app closed.")
+		logLn("Window closed.", "window")
 
 	def __enter__(self):
 		return self

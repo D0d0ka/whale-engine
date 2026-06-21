@@ -6,7 +6,7 @@ app = WhaleEngine(window=window)
 renderer = Renderer2D()
 MouseSystem()
 SoundSystem()
-TimerPlugin()
+TimerSystem()
 ParentingSystem()
 BetterCollisionSystem2D()
 

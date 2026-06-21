@@ -8,7 +8,7 @@ shapes = LoadShapes()
 app.input = InputSystem()
 MouseSystem()
 ParentingSystem()
-TimerPlugin()
+TimerSystem()
 BetterCollisionSystem2D()
 
 def button1onclick():

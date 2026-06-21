@@ -282,9 +282,9 @@ cam.rotation = 0  # degrees
 ```
 
 ## Timer
-Requires `TimerPlugin`.
+Requires `TimerSystem`.
 ```python
-TimerPlugin()
+TimerSystem()
 ```
 usage:
 ```python
@@ -390,10 +390,10 @@ hit = raycast2d(start=(0, 0), end=(500, 0), layers=[0])  # filter by layer
 ```
 
 ## Particle System
-Requires `TimerPlugin` and `ParticleSystem2dPlugin`:
+Requires `TimerSystem` and `ParticleSystem2d`:
 ```python
-TimerPlugin()
-ParticleSystem2dPlugin()
+TimerSystem()
+ParticleSystem2d()
 ```
 Define a particle type:
 ```python
@@ -438,7 +438,7 @@ Base class for creating custom plugins.
 class MyPlugin(Plugin):
     def __init__(self):
         super().__init__(
-            requirements=["TimerPlugin"],  # plugins that must be loaded first
+            requirements=["TimerSystem"],  # plugins that must be loaded first
             incompatibilities=[]           # plugins that cannot be loaded at the same time
         )
     def update(self, dt):

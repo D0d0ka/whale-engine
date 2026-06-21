@@ -38,7 +38,7 @@ def destroy(entity):
         destroy(entity.start)
         destroy(entity.end)
     elif entity.entity_type == "Particle Spawner 2D":
-        if entity in current_app.ParticleSystem2dPlugin.particle_spawners:
-            current_app.ParticleSystem2dPlugin.particle_spawners.remove(entity)
+        if entity in current_app.ParticleSystem2d.particle_spawners:
+            current_app.ParticleSystem2d.particle_spawners.remove(entity)
     else:
         raise ValueError(f"Unknown entity type: {entity.entity_type}")

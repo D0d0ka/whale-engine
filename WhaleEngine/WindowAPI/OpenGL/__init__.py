@@ -149,7 +149,7 @@ class windowAPI:
         self._last_frame_time = time.perf_counter()
         if target_fps is not None:
             self.set_vsync(False)
-        logLn("Window loaded.")
+        logLn("OpenGL window loaded.", "window")
     @property
     def color(self):
         return self._color
@@ -211,7 +211,7 @@ class windowAPI:
         if self._terminated:
             return
         self._terminated = True
-        logLn("App closed.")
+        logLn("Window closed.", "window")
         glfw.terminate()
         sys.exit()
     def __enter__(self):

@@ -6,20 +6,16 @@ class Color:
         self.g = g
         self.b = b
         self.a = a
-
     @staticmethod
     def rgb(r, g, b):
         return Color(r/255, g/255, b/255, 1)
-
     @staticmethod
     def rgba(r, g, b, a):
         return Color(r/255, g/255, b/255, a)
-
     @staticmethod
     def hsv(h, s, v):
         r, g, b = colorsys.hsv_to_rgb(h, s, v)
         return Color(r, g, b, 1)
-
     @staticmethod
     def hex(hexcode):
         hexcode = hexcode.lstrip("#")

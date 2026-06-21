@@ -71,7 +71,7 @@ class windowAPI:
         self._target_fps = target_fps
         self._last_frame_time = time.perf_counter()
         self._create_vulkan_context()
-        logLn("Vulkan window loaded.")
+        logLn("Vulkan window loaded.", "window")
 
     # Public API parity
     def set_size(self, width, height):
@@ -147,7 +147,7 @@ class windowAPI:
             return
         self._terminated = True
         self._cleanup()
-        logLn("App closed.")
+        logLn("Window closed.", "window")
         glfw.terminate()
         sys.exit()
 

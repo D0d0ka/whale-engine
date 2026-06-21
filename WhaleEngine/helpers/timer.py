@@ -1,6 +1,6 @@
 from WhaleEngine.logging import logLn
 
-logLn("This is deprecated, use TimerPlugin instead.", "warning")
+logLn("This is deprecated, use TimerSystem instead.", "warning")
 
 class timer:
     def __init__(self, time):

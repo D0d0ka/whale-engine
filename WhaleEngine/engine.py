@@ -9,7 +9,7 @@ from .renderer2d import Renderer2D
 from .logging import set_logging_folder
 set_logging_folder("logs")
 
-from time import perf_counter
+from time import perf_counter, strftime, localtime
 from pathlib import Path
 from sys import version
 import platform
@@ -40,6 +40,7 @@ class WhaleEngine:
         self.on_app_close = None
         self.running = False
         self.exit = self.close = self.close_app
+        self.start_time = None
         path = Path(__file__).resolve().parent
         parts = path.parts
         if parts.count("WhaleEngine") > 1:
@@ -61,7 +62,8 @@ class WhaleEngine:
             self.renderers.append(Renderer2D())
         for i in self.renderers:
             i.start()
-        logLn("Whale engine started")
+        self.start_time = strftime("%Y-%m-%d %H:%M:%S", localtime())
+        logLn(f"Whale engine started at {self.start_time}.")
         self.running = True
         while not self.window.should_close():
             this_update = perf_counter()

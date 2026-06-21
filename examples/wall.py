@@ -6,7 +6,7 @@ app = WhaleEngine(window=window)
 renderer = Renderer2D()
 app.input = InputSystem()
 ParentingSystem()
-TimerPlugin()
+TimerSystem()
 BetterCollisionSystem2D(update_interval=0)
 shapes = LoadShapes() #use built in shapes
 textures = LoadTextures() #use built textures

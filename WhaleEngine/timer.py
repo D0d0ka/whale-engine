@@ -1,7 +1,7 @@
 from .plugin import Plugin
 from .helpers import none
 
-class TimerPlugin(Plugin):
+class TimerSystem(Plugin):
     def __init__(self):
         super().__init__()
         self.timers = []
@@ -29,14 +29,14 @@ class Timer:
         self.time = self.lenght = lenght
         self.over = False
         from .engine import current_app
-        current_app.TimerPlugin.timers.append(self)
+        current_app.TimerSystem.timers.append(self)
     def reset(self):
         self.time = self.lenght
         self.over = False
         from .engine import current_app
-        if self not in current_app.TimerPlugin.timers:
-            current_app.TimerPlugin.timers.append(self)
+        if self not in current_app.TimerSystem.timers:
+            current_app.TimerSystem.timers.append(self)
 
 def delay(lenght=1, func=none):
     from .engine import current_app
-    current_app.TimerPlugin.delays.append({'delay': lenght, 'callback': func})
+    current_app.TimerSystem.delays.append({'delay': lenght, 'callback': func})

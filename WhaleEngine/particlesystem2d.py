@@ -7,9 +7,9 @@ from .color import Color
 from .destroy import destroy
 from .timer import Timer
 
-class ParticleSystem2dPlugin(Plugin):
+class ParticleSystem2d(Plugin):
     def __init__(self):
-        super().__init__(requirements=["TimerPlugin"])
+        super().__init__(requirements=["TimerSystem"])
         self.particles = []
         self.particle_spawners = []
     def update(self, dt):
@@ -77,7 +77,7 @@ class Particle2d(Entity2D):
         self.color_b_speed = particle_type.color_b_speed.safe_uniform()
         self.color_a_speed = particle_type.color_a_speed.safe_uniform()
         from .engine import current_app
-        current_app.ParticleSystem2dPlugin.particles.append(self)
+        current_app.ParticleSystem2d.particles.append(self)
 
 class ParticleSpawner2d:
     def __init__(self, particle_type: ParticleType2d, x=0, y=0, spawn_rate=1, *, renderer=0):
@@ -90,4 +90,4 @@ class ParticleSpawner2d:
         self.renderer = renderer
         self.entity_type = "Particle Spawner 2D"
         from .engine import current_app
-        current_app.ParticleSystem2dPlugin.particle_spawners.append(self)
+        current_app.ParticleSystem2d.particle_spawners.append(self)

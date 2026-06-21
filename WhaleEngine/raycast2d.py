@@ -65,20 +65,16 @@ def raycast2d(start=(0, 0), end=(0, 0), layers=None):
     from .engine import current_app
     if current_app is None:
         return None
-
     x1, y1 = start
     x2, y2 = end
     if x1 == x2 and y1 == y2:
         return start
-
     closest_t = None
     hit_point = None
-
     def layers_match_filter(collider):
         if layers is None:
             return True
         return bool(set(getattr(collider, "layers", [])) & set(layers))
-
     def register_hit(hit):
         nonlocal closest_t, hit_point
         if hit is None:
@@ -87,7 +83,6 @@ def raycast2d(start=(0, 0), end=(0, 0), layers=None):
         if closest_t is None or t < closest_t:
             closest_t = t
             hit_point = (hx, hy)
-
     if hasattr(current_app, "CircleCollisionSystem2D"):
         for collider in current_app.CircleCollisionSystem2D.circle_colliders:
             target = collider.owner if getattr(collider, "owner", None) is not None else collider
@@ -97,7 +92,6 @@ def raycast2d(start=(0, 0), end=(0, 0), layers=None):
                 continue
             hit = _segment_circle_intersection(x1, y1, x2, y2, collider.x, collider.y, collider.size)
             register_hit(hit)
-
     if hasattr(current_app, "BetterCollisionSystem2D"):
         for collider in current_app.BetterCollisionSystem2D.colliders:
             if not collider.enabled:
@@ -112,10 +106,6 @@ def raycast2d(start=(0, 0), end=(0, 0), layers=None):
                 continue
             for i in range(len(polygon)):
                 j = (i + 1) % len(polygon)
-                edge_hit = _segment_segment_intersection(
-                    x1, y1, x2, y2,
-                    polygon[i][0], polygon[i][1],
-                    polygon[j][0], polygon[j][1]
-                )
+                edge_hit = _segment_segment_intersection(x1, y1, x2, y2,polygon[i][0], polygon[i][1],polygon[j][0], polygon[j][1])
                 register_hit(edge_hit)
     return hit_point

@@ -10,7 +10,7 @@ textures = LoadTextures()
 
 ParentingSystem()
 MouseSystem()
-TimerPlugin()
+TimerSystem()
 BetterCollisionSystem2D()
 
 base_quad = QuadCollider2D(

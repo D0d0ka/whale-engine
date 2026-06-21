@@ -105,7 +105,7 @@ class MeshCollider2D:
 
 class BetterCollisionSystem2D(Plugin):
     def __init__(self, update_interval=0.1, threaded=False):
-        super().__init__(requirements=["ParentingSystem", "TimerPlugin"],incompatibilities=["CircleCollisionSystem2D"])
+        super().__init__(requirements=["ParentingSystem", "TimerSystem"],incompatibilities=["CircleCollisionSystem2D"])
         self.colliders = []
         self.update_interval = update_interval
         self.timer = Timer(self.update_interval)

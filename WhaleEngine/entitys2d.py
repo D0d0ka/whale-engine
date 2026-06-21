@@ -10,7 +10,7 @@ from .assets import LoadShapes
 from PIL import Image, ImageDraw, ImageFont
 
 class Entity2D:
-    def __init__(self, *,texture,color=Color.white,position=(0, 0),scale=(1, 1),rotation=0.0,update=False,renderer=0,visible=True,shader=None, **kwargs):
+    def __init__(self, *,texture,color=Color.white,position=(0, 0),scale=(1, 1),rotation=0.0,update=False,renderer=0,visible=True,enabled=True,shader=None, **kwargs):
         from .engine import current_app
         if type(texture) == str:
             texture = Texture(texture)
@@ -22,6 +22,7 @@ class Entity2D:
         self.rotation = rotation
         self.do_update = update
         self.visible = visible
+        self.enabled = enabled
         self.color = color
         if type(renderer) == int:
             renderer = current_app.renderers[renderer]
@@ -37,7 +38,7 @@ class Entity2D:
         pass
 
 class Button2D(Entity2D):
-    def __init__(self, onclick=none,onpress=none, *,density=16, texture , color=Color.white, position=(0, 0), renderer=0, **kwargs):
+    def __init__(self, onclick=none,onpress=none, hover_color=Color.gray, *,density=16, texture , color=Color.white, position=(0, 0), renderer=0, **kwargs):
         from .bettercollider2d import MeshCollider2D
         super().__init__(texture=texture, color=color, position=position, update=True, renderer=renderer)
         from .engine import current_app
@@ -47,17 +48,25 @@ class Button2D(Entity2D):
         ParentIn(self,self.collider,attributes={"x": "set", "y": "set"})
         self.onclick = onclick
         self.onpress = onpress
-        self.enabled = True
+        self.hover_color = hover_color
+        self.original_color = color
+        self.pressed = False
         for key, value in kwargs.items():
             setattr(self, key, value)
     def update(self, dt):
-        if not self.enabled:
-            return
         from .engine import current_app
-        if self.collider.colliding and current_app.MouseSystem.left_pressed():
-            self.onclick()
-        if self.collider.colliding and current_app.MouseSystem.left_down:
-            self.onpress()
+        if self.collider.colliding:
+            mouse = current_app.MouseSystem
+            self.color = self.hover_color
+            if mouse.left_pressed() and self.collider.colliding:
+                self.onpress()
+                self.pressed = True
+            elif self.pressed and not mouse.left_down:
+                self.onclick()
+                self.pressed = False
+        else:
+            self.pressed = False
+            self.color = self.original_color
 
 class Text2D(Entity2D):
     def __init__(self, text, font_path="arial.ttf", font_size=32, color=Color.white, position=(0,0), renderer=0, **kwargs):

@@ -17,16 +17,12 @@ class InputSystem(Plugin):
             self.keys[key] = True
         elif action == KeyAction.RELEASE:
             self.keys[key] = False
-
     def key(self, k):
         return self.keys.get(self.window.normalize_key(k), False)
-    
     def key_pressed(self, k):
         return self.pressed_keys.get(self.window.normalize_key(k), False)
-
     def key_released(self, k):
         return self.released_keys.get(self.window.normalize_key(k), False)
-    
     def update(self,dt):
         self.pressed_keys = {}
         self.released_keys = {}

@@ -10,7 +10,7 @@ shapes = LoadShapes()
 ParentingSystem()
 app.mouse = MouseSystem()
 app.input = InputSystem()
-TimerPlugin()
+TimerSystem()
 SoundSystem()
 
 gunshot_sound = Sound("gunshot", assets_path+"sounds/gunshot.mp3")

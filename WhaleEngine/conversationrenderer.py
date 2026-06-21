@@ -21,13 +21,11 @@ class ConversationRenderer(Renderer2D):
         self._last_wrapped_text = None
         self._last_font_size = None
         logLn("Conversation renderer loaded.")
-
     def _load_font(self, font_size):
         try:
             return ImageFont.truetype(self.font_path, font_size)
         except:
             return ImageFont.load_default()
-
     def _break_word(self, word, font, max_width):
         pieces = []
         current = ""
@@ -41,7 +39,6 @@ class ConversationRenderer(Renderer2D):
         if current:
             pieces.append(current)
         return pieces if pieces else [word]
-
     def _wrap_text(self, text, font, max_width):
         if max_width <= 1:
             return text
@@ -77,14 +74,12 @@ class ConversationRenderer(Renderer2D):
                 wrapped_lines.append(current_line)
 
         return "\n".join(wrapped_lines)
-
     def _measure_text_height(self, text, font):
         safe_text = text if text else " "
         measure_img = Image.new("RGBA", (1, 1), (0,0,0,0))
         measure_draw = ImageDraw.Draw(measure_img)
         bbox = measure_draw.multiline_textbbox((0, 0), safe_text, font=font, spacing=4)
         return max(1, bbox[3] - bbox[1])
-
     def _fit_wrapped_text(self, text, max_width, max_height):
         selected_text = ""
         selected_size = self.min_font_size
