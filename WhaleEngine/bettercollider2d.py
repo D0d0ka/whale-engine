@@ -7,6 +7,7 @@ from .utils import layers_match
 from .parenting import ParentIn
 from .timer import Timer
 from .logging import logLn
+from .require import requirePlugin
 
 import math
 from PIL import Image
@@ -16,6 +17,7 @@ import time
 
 class QuadCollider2D:
     def __init__(self, w=100, h=100, *, position=(0, 0), rotation=0, layers=[0], visualize=False, visualition_color=Color.cyan, visualition_renderer=0, **kwargs):
+        requirePlugin("BetterCollisionSystem2D")
         from .engine import current_app
         self.x = position[0]
         self.y = position[1]
@@ -44,6 +46,7 @@ class QuadCollider2D:
 
 class MeshCollider2D:
     def __init__(self, shape='Texture("Path to your texture") without string', density=16, *, position=(0, 0), scale=(1, 1), rotation=0, layers=[0], visualize=False, visualition_color=Color.cyan, visualition_renderer=0, **kwargs):
+        requirePlugin("BetterCollisionSystem2D")
         from .engine import current_app
         self.x, self.y = position
         self.scale_x, self.scale_y = scale
@@ -104,7 +107,7 @@ class MeshCollider2D:
         self.ignores.append(collider)
 
 class BetterCollisionSystem2D(Plugin):
-    def __init__(self, update_interval=0.1, threaded=False):
+    def __init__(self, update_interval=0.1,* , threaded=False):
         super().__init__(requirements=["ParentingSystem", "TimerSystem"],incompatibilities=["CircleCollisionSystem2D"])
         self.colliders = []
         self.update_interval = update_interval

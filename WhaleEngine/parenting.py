@@ -1,4 +1,5 @@
 from .plugin import Plugin
+from .require import requirePlugin
 
 class ParentingSystem(Plugin):
     def __init__(self):
@@ -10,6 +11,7 @@ class ParentingSystem(Plugin):
 
 class ParentIn:
     def __init__(self, parent, child, attributes={"x": "set", "y": "set"}):
+        requirePlugin("ParentingSystem")
         from .engine import current_app
         self.parent = parent
         self.child = child

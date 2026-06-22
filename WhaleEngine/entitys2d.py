@@ -6,6 +6,7 @@ from .destroy import destroy
 from .parenting import ParentIn
 from .utils2d import distance2D_points
 from .assets import LoadShapes
+from .require import requirePlugin
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -42,10 +43,11 @@ class Button2D(Entity2D):
         from .bettercollider2d import MeshCollider2D
         super().__init__(texture=texture, color=color, position=position, update=True, renderer=renderer)
         from .engine import current_app
-        if not hasattr(current_app, "BetterCollisionSystem2D"):
-            raise RuntimeError("Button2D requires BetterCollisionSystem2D()")
+        requirePlugin("BetterCollisionSystem2D")
+        requirePlugin("ParentingSystem")
+        requirePlugin("MouseSystem")
         self.collider = MeshCollider2D(texture, density=density, position=position, layers=["mouse"], visualize=False, renderer=renderer)
-        ParentIn(self,self.collider,attributes={"x": "set", "y": "set"})
+        ParentIn(self,self.collider,attributes={"x": "set", "y": "set", "enabled": "set"})
         self.onclick = onclick
         self.onpress = onpress
         self.hover_color = hover_color

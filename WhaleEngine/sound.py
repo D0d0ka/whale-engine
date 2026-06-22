@@ -1,5 +1,6 @@
 from .plugin import Plugin
 from .logging import logLn
+from .require import requirePlugin
 
 import numpy as np
 import importlib
@@ -143,15 +144,13 @@ class SoundSystem(Plugin):
 
 class Sound:
     def __init__(self, name, path, **kwargs):
+        requirePlugin("SoundSystem")
         from .engine import current_app
         if not os.path.isfile(path):
             raise ValueError(f"Sound file not found: {path}")
         self.name = name
-        if hasattr(current_app, "SoundSystem") and current_app.SoundSystem is not None:
-            current_app.SoundSystem.sounds[name] = self
-            self.sound_system = current_app.SoundSystem
-        else:
-            raise RuntimeError("SoundSystem plugin is not available in the current application.")
+        current_app.SoundSystem.sounds[name] = self
+        self.sound_system = current_app.SoundSystem
         self.path = path
         try:
             frames, sample_rate = self.sound_system.sf.read(path, dtype="float32", always_2d=True)

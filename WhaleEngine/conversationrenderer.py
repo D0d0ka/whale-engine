@@ -42,37 +42,30 @@ class ConversationRenderer(Renderer2D):
     def _wrap_text(self, text, font, max_width):
         if max_width <= 1:
             return text
-
         wrapped_lines = []
         paragraphs = str(text).split("\n")
-
         for paragraph in paragraphs:
             words = paragraph.split()
             if not words:
                 wrapped_lines.append("")
                 continue
-
             current_line = ""
             for word in words:
                 candidate = word if not current_line else current_line + " " + word
                 if font.getlength(candidate) <= max_width:
                     current_line = candidate
                     continue
-
                 if current_line:
                     wrapped_lines.append(current_line)
                     current_line = ""
-
                 if font.getlength(word) <= max_width:
                     current_line = word
                 else:
                     pieces = self._break_word(word, font, max_width)
                     wrapped_lines.extend(pieces[:-1])
                     current_line = pieces[-1]
-
             if current_line:
                 wrapped_lines.append(current_line)
-
         return "\n".join(wrapped_lines)
     def _measure_text_height(self, text, font):
         safe_text = text if text else " "
@@ -83,7 +76,6 @@ class ConversationRenderer(Renderer2D):
     def _fit_wrapped_text(self, text, max_width, max_height):
         selected_text = ""
         selected_size = self.min_font_size
-
         for size in range(self.max_font_size, self.min_font_size - 1, -1):
             font = self._load_font(size)
             wrapped = self._wrap_text(text, font, max_width)
@@ -92,9 +84,7 @@ class ConversationRenderer(Renderer2D):
             selected_size = size
             if text_height <= max_height:
                 break
-
         return selected_text, selected_size
-
     def start(self): 
         from .engine import current_app
         self.backround = Entity2D(texture=LoadShapes().dot,renderer=self)
@@ -106,17 +96,14 @@ class ConversationRenderer(Renderer2D):
         self.backround.color = self.backround_color
         self.backround.x = 0
         self.backround.y = -current_app.window.height/2 + self.backround.scale_y/2
-
         max_text_width = max(1, self.backround.scale_x - self.padding_x * 2)
         max_text_height = max(1, self.backround.scale_y - self.padding_y * 2)
         wrapped_text, font_size = self._fit_wrapped_text(self.text, max_text_width, max_text_height)
-
         if wrapped_text != self._last_wrapped_text or font_size != self._last_font_size:
             self.text_entity.font_size = font_size
             self.text_entity.set_text(wrapped_text)
             self._last_wrapped_text = wrapped_text
             self._last_font_size = font_size
-
         self.text_entity.color = self.text_color
         self.text_entity.x = 0
         self.text_entity.y = self.backround.y

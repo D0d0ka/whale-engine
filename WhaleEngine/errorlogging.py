@@ -28,17 +28,19 @@ def controlledrun(func, *args, **kwargs):
             error_info = traceback.format_exc()
             if register_error(error_info):
                 logLn(error_info, "python")
-                logLn(f"Currently {len(errors)} unique exceptions logged.", "error logger")
+                logLn(f"Currently {len(errors)} unique exceptions logged.", "error handler")
         else:
             raise e
 
 def setup_global_error_handler():
     """Setup global exception handler to log all uncaught exceptions"""
     def global_exception_handler(exc_type, exc_value, exc_traceback):
-        logLn("Uncaught exception:", "error logger")
+        logLn("Uncaught exception:", "error handler")
         tb_lines = traceback.format_exception(exc_type, exc_value, exc_traceback)
         tb_str = "".join(tb_lines)
         logLn(tb_str, "python")
-        logLn("Exiting due to uncaught exception.")
+        logLn("Exiting due to uncaught exception.", "error handler")
+        from .engine import current_app
+        current_app.close_app()
         sys.exit(1)
     sys.excepthook = global_exception_handler

@@ -1,13 +1,13 @@
+from .logging import set_logging_folder
+set_logging_folder("logs")
+# while developing this engine: I'll log everything.
+
 from .errorlogging import setup_global_error_handler, controlledrun
 from .logging import logLn
 setup_global_error_handler()
 logLn("Global error handler set up.", "error logger")
 
 from .renderer2d import Renderer2D
-
-# while developing this engine: I'll log everything.
-from .logging import set_logging_folder
-set_logging_folder("logs")
 
 from time import perf_counter, strftime, localtime
 from pathlib import Path
@@ -62,8 +62,8 @@ class WhaleEngine:
             self.renderers.append(Renderer2D())
         for i in self.renderers:
             i.start()
-        self.start_time = strftime("%Y-%m-%d %H:%M:%S", localtime())
-        logLn(f"Whale engine started at {self.start_time}.")
+        self.start_time_str, self.start_time = strftime("%Y-%m-%d %H:%M:%S", localtime()), perf_counter()
+        logLn(f"Whale engine started at {self.start_time_str}.")
         self.running = True
         while not self.window.should_close():
             this_update = perf_counter()
@@ -83,16 +83,13 @@ class WhaleEngine:
                 controlledrun(i.render)
             self.window.swap()
             self.last_render = this_update
-        if self.on_app_close:
-            self.on_app_close()
-        self.window.terminate()
-        self.running = False
+        self.close_app()
     def close_app(self):
-        if self.on_app_close:
-            self.on_app_close()
         self.running = False
         if self.on_app_close:
-            self.on_app_close()
+            controlledrun(self.on_app_close)
+        stoptime = strftime("%Y-%m-%d %H:%M:%S", localtime())
+        logLn(f"Whale engine stopped at {stoptime}. Total runtime: {round(perf_counter() - self.start_time, 2)} seconds.")
         self.window.terminate()
 
 # app

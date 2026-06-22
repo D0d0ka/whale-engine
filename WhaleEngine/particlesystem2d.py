@@ -6,6 +6,7 @@ from .entitys2d import Entity2D
 from .color import Color
 from .destroy import destroy
 from .timer import Timer
+from .require import requirePlugin
 
 class ParticleSystem2d(Plugin):
     def __init__(self):
@@ -63,6 +64,7 @@ class ParticleType2d:
 
 class Particle2d(Entity2D):
     def __init__(self, particle_type: ParticleType2d, x=0, y=0, *, renderer=0):
+        requirePlugin("ParticleSystem2d")
         super().__init__(texture=particle_type.texture, position=(x, y),scale=(particle_type.scale_x.safe_uniform(), particle_type.scale_y.safe_uniform()), color=Color.rgba(particle_type.color_r.safe_uniform(), particle_type.color_g.safe_uniform(), particle_type.color_b.safe_uniform(), particle_type.color_a.safe_uniform()),renderer=renderer)
         self.particle_type = particle_type
         self.lifetime = Timer(particle_type.lifetime.safe_uniform())
@@ -81,6 +83,7 @@ class Particle2d(Entity2D):
 
 class ParticleSpawner2d:
     def __init__(self, particle_type: ParticleType2d, x=0, y=0, spawn_rate=1, *, renderer=0):
+        requirePlugin("ParticleSystem2d")
         self.particle_type = particle_type
         self.x = x
         self.y = y
