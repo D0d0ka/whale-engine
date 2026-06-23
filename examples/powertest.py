@@ -2,6 +2,7 @@ from WhaleEngine import *
 from WhaleEngine.WindowAPI.OpenGL import windowAPI
 from WhaleEngine.helpers.fpscounter import *
 from random import randint
+#from WhaleEngine.betterrenderer2d import BetterRenderer2D
 
 window = windowAPI(title="powertest", width=800, height=600, target_fps=float('inf'))
 app = WhaleEngine(window=window)
@@ -16,7 +17,7 @@ def on_app_close():
     summarize_FPS(print_summary=True)
 app.on_app_close = on_app_close
 
-objects = 10000
+objects = 1000
 object_texture = textures.dodo
 
 for i in range(objects):

@@ -1,14 +1,17 @@
 from WhaleEngine.logging import logLn
 from WhaleEngine.color import Color
 from WhaleEngine.keys import KeyAction, Keys, MouseButtons
+from WhaleEngine.helpers import default
 
 from vulkan import *
 
 import sys
 import math
+import os
 import time
 import glfw
 import numpy as np
+from PIL import Image
 
 # KHR procedure names are loaded dynamically via vkGet*ProcAddr at runtime.
 vkGetPhysicalDeviceSurfaceSupportKHR = None
@@ -23,6 +26,37 @@ vkDestroySwapchainKHR = None
 vkDestroySurfaceKHR = None
 
 
+def _glfw_icons_from_file(path):
+    imgs = []
+    ico = Image.open(path)
+    if hasattr(ico, 'ico') and hasattr(ico.ico, 'sizes'):
+        for size in ico.ico.sizes():
+            try:
+                ico.size = size
+                ico.load()
+                imgs.append(ico.convert("RGBA"))
+            except Exception:
+                pass
+    if not imgs:
+        imgs = [Image.open(path).convert("RGBA")]
+    return imgs
+
+
+def _apply_glfw_icon(window, icon):
+    if icon is None:
+        return
+    from WhaleEngine.assets import assets_dir
+    if icon is default:
+        path = os.path.join(assets_dir, "whaleengine.ico")
+    else:
+        path = icon
+    try:
+        imgs = _glfw_icons_from_file(path)
+        glfw.set_window_icon(window, len(imgs), imgs)
+    except Exception as e:
+        logLn(f"Failed to set window icon: {e}", "warning")
+
+
 class windowAPI:
     def __init__(
         self,
@@ -31,6 +65,7 @@ class windowAPI:
         height=600,
         color=Color(0.1, 0.1, 0.1, 1),
         target_fps=None,
+        icon=default,
     ):
         if not glfw.init():
             logLn("GLFW initialization failed.")
@@ -48,6 +83,8 @@ class windowAPI:
             glfw.terminate()
             logLn("Vulkan window creation failed.")
             sys.exit(1)
+
+        _apply_glfw_icon(self.handle, icon)
 
         glfw.set_framebuffer_size_callback(self.handle, self._resize)
         glfw.set_key_callback(self.handle, self._on_key)

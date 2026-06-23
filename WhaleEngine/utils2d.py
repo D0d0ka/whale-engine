@@ -1,8 +1,5 @@
 import math
 
-def pixel_is_solid(r, g, b, a, alpha_threshold=10):
-    return a > alpha_threshold
-
 def distance2D(Entity1,Entity2):
     dx = Entity2.get_position()[0] - Entity1.get_position()[0]
     dy = Entity2.get_position()[1] - Entity1.get_position()[1]

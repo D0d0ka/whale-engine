@@ -51,3 +51,8 @@ class LoadModels:
         #self.cube = Model("assets/models/cube.obj")
         logLn("Models loaded.")
         raise NotImplementedError("Model loading not implemented yet.")
+
+def requireRenderer(entity,renderer_name):
+    from .engine import current_app
+    if not any(renderer.renderer_type == renderer_name for renderer in current_app.renderers):
+        raise Exception(f"Entity '{entity}' requires renderer '{renderer_name}' to be loaded first.")

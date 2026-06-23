@@ -1,5 +1,8 @@
 from random import uniform
 
+def pixel_is_solid(r, g, b, a, alpha_threshold=10):
+    return a > alpha_threshold
+
 def layers_match(a, b):
     return bool(set(a.layers) & set(b.layers))
 

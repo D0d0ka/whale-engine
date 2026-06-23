@@ -5,7 +5,7 @@ from random import uniform
 from WhaleEngine.helpers import *
 from WhaleEngine.helpers.json_save import json_save
 
-window = windowAPI(title="Flappy Dodo", width=600, height=600, target_fps=float('inf'))
+window = windowAPI(title="Flappy Dodo", width=600, height=600, target_fps=float('inf'), icon="flappydodoassets/icon.ico")
 window.set_color(Color.green)
 app = WhaleEngine(window=window)
 renderer = Renderer2D()

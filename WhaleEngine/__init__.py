@@ -15,5 +15,6 @@ from .raycast2d import raycast2d
 from .utils2d import *
 from .keys import *
 from .timer import *
+from .helpers import *
 
 logLn("Loaded standard WhaleEngine build", "python")

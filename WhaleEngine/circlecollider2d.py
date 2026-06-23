@@ -1,8 +1,8 @@
 from .plugin import Plugin
 from .entitys2d import Entity2D
 from .assets import LoadShapes
-from .utils2d import distance2D, pixel_is_solid
-from .utils import layers_match
+from .utils2d import distance2D
+from .utils import layers_match, pixel_is_solid
 from .color import Color
 from .parenting import ParentIn
 from .engine import current_app

@@ -12,6 +12,7 @@ from urllib.parse import parse_qs, urlparse
 from WhaleEngine.color import Color
 from WhaleEngine.keys import KeyAction, Keys, MouseButtons
 from WhaleEngine.logging import logLn
+from WhaleEngine.helpers import default
 # --- WebGL shader system ---
 from .shader import shader
 from .shaders import *
@@ -60,6 +61,7 @@ class windowAPI:
 		port=0,
 		open_browser=True,
 		target_fps=60,
+		icon=default,
 	):
 		self.width = int(width)
 		self.height = int(height)
@@ -94,6 +96,14 @@ class windowAPI:
 		self._lock = threading.Lock()
 		self._server = None
 		self._server_thread = None
+		# Resolve icon path once at startup
+		if icon is None:
+			self._icon_path = None
+		elif icon is default:
+			from WhaleEngine.assets import assets_dir
+			self._icon_path = os.path.join(assets_dir, "whaleengine.ico")
+		else:
+			self._icon_path = icon
 		self._start_http_server()
 		self.embed_url = f"{self.url}?embed=1"
 		logLn(f"WebGL window loaded at {self.url}", "window")
@@ -347,11 +357,24 @@ class windowAPI:
 				parsed = urlparse(self.path)
 				query = parse_qs(parsed.query)
 				if parsed.path in ("/", "/index.html"):
-					return self._write_file(os.path.join(web_root, "index.html"), "text/html; charset=utf-8")
+					html_path = os.path.join(web_root, "index.html")
+					with open(html_path, "rb") as f:
+						body = f.read()
+					if api._icon_path is not None:
+						favicon_tag = b'<link rel="icon" href="/favicon.ico">'
+						body = body.replace(b"</head>", favicon_tag + b"\n  </head>", 1)
+					self.send_response(HTTPStatus.OK)
+					self.send_header("Content-Type", "text/html; charset=utf-8")
+					self.send_header("Content-Length", str(len(body)))
+					self.end_headers()
+					self.wfile.write(body)
+					return
 				if parsed.path == "/app.js":
 					return self._write_file(os.path.join(web_root, "app.js"), "application/javascript; charset=utf-8")
 				if parsed.path == "/style.css":
 					return self._write_file(os.path.join(web_root, "style.css"), "text/css; charset=utf-8")
+				if parsed.path == "/favicon.ico" and api._icon_path is not None:
+					return self._write_file(api._icon_path, "image/x-icon")
 				if parsed.path == "/state":
 					full_textures = query.get("full_textures", ["0"])[0] == "1"
 					return self._write_json(api._make_state_payload(full_textures=full_textures))

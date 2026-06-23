@@ -1,9 +1,7 @@
 from .plugin import Plugin
 from .color import Color
 from .assets import LoadShapes
-from .utils2d import pixel_is_solid
-from .engine import current_app
-from .utils import layers_match
+from .utils import layers_match, pixel_is_solid
 from .parenting import ParentIn
 from .timer import Timer
 from .logging import logLn
@@ -34,7 +32,7 @@ class QuadCollider2D:
         self.enabled = True
         if visualize:
             from .entitys2d import Entity2D
-            self.visualition = Entity2D(texture=LoadShapes().square, scale=(w/100, h/100), rotation=rotation, color=visualition_color, renderer=visualition_renderer, position=position)
+            self.visualition = Entity2D(texture=current_app.BetterCollisionSystem2D.shapes.dot, scale=(w, h), rotation=rotation, color=visualition_color, renderer=visualition_renderer, position=position)
             ParentIn(self, self.visualition, attributes={"x": "set", "y": "set", "rotation": "set"})
         current_app.BetterCollisionSystem2D.add_quad(self)
         for key, value in kwargs.items():
@@ -62,7 +60,7 @@ class MeshCollider2D:
         self.shape = shape
         self.enabled = True
         if shape == 'Texture("Path to your texture") without string':
-            self.shape = LoadShapes().square
+            self.shape = current_app.BetterCollisionSystem2D.shapes.square
         self.local_points = []
         img = Image.open(self.shape.path).convert("RGBA")
         pixels = img.load()
@@ -113,6 +111,7 @@ class BetterCollisionSystem2D(Plugin):
         self.update_interval = update_interval
         self.timer = Timer(self.update_interval)
         self.threaded = threaded
+        self.shapes = LoadShapes()
         if threaded:
             def _threaded_update():
                 time.sleep(0.1)

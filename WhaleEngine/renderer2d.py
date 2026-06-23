@@ -7,10 +7,11 @@ class Renderer2D:
         current_app.renderers.append(self)
         self.window = current_app.window
         self.entities = []
+        self.camera = camera2d()
+        self.renderer_type = "Renderer 2D"
         for key, value in kwargs.items():
             setattr(self, key, value)
         logLn("Renderer 2d loaded.")
-        self.camera = camera2d()
     def start(self):
         pass
     def update(self, dt):

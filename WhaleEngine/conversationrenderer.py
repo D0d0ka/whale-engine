@@ -8,8 +8,8 @@ from .assets import LoadShapes
 from PIL import Image, ImageDraw, ImageFont
 
 class ConversationRenderer(Renderer2D):
-    def __init__(self,text_color=Color.white,backround_color=Color.black,font_path="arial.ttf"):
-        super().__init__()
+    def __init__(self,text_color=Color.white,backround_color=Color.black,font_path="arial.ttf", **kwargs):
+        super().__init__(**kwargs)
         self.text_color = text_color
         self.backround_color = backround_color
         self.font_path = font_path
@@ -20,6 +20,7 @@ class ConversationRenderer(Renderer2D):
         self.min_font_size = 12
         self._last_wrapped_text = None
         self._last_font_size = None
+        self.renderer_type = "Conversation Renderer 2D"
         logLn("Conversation renderer loaded.")
     def _load_font(self, font_size):
         try:

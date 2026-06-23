@@ -1,6 +1,5 @@
 from .logging import set_logging_folder
 set_logging_folder("logs")
-# while developing this engine: I'll log everything.
 
 from .errorlogging import setup_global_error_handler, controlledrun
 from .logging import logLn
@@ -18,7 +17,12 @@ import platform
 #import threading
 
 logLn(f"Python version: {version}", "version")
-logLn(f"WhaleEngine version: 0.0.1 alpha", "version")
+version_file = Path(__file__).resolve().parent / "version"
+try:
+    version_text = version_file.read_text(encoding="utf-8").strip()
+except FileNotFoundError:
+    version_text = "unknown"
+logLn(f"WhaleEngine version: {version_text}", "version")
 
 class WhaleEngine:
     def __init__(self, window=None, **kwargs):

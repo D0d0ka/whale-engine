@@ -8,3 +8,7 @@ def Or(first,second):
 
 def none(d=None):
     return None
+
+class default:
+    def __init__():
+        pass
