@@ -1,6 +1,8 @@
 from WhaleEngine import *
 from WhaleEngine.WindowAPI.OpenGL import *
 from random import randint, uniform
+from WhaleEngine.helpers.fpscounter import *
+from math import cos, sin, radians
 
 assets_path = "gunning_assets/"
 
@@ -129,13 +131,16 @@ class explosion(Entity2D):
 
 p = player((0, 100))
 
-player2 = player((0, -100), type="enemy")
+for i in range(2):
+    player2 = player((uniform(-200, 200), uniform(-200, 200)), type="enemy")
 
-bullet(p, (0, 0), 0, 0)
+#bullet(p, (0, 0), 0, 0)
 
-#QuadCollider2D(layers=["damage"],visualize=True)
-
+def on_app_close():
+    summarize_FPS(print_summary=True)
+app.on_app_close = on_app_close
 def update(dt):
+    FPS_counter(dt)
     if app.input.key(Keys.ESCAPE):
         app.close()
 app.update = update

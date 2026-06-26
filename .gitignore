@@ -10,3 +10,4 @@ cheatsheets/
 flappydodosave.json
 output/
 .pytest_cache/
+.vscode/
