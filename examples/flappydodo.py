@@ -107,7 +107,7 @@ for i in range(2):
     obstacle(x)
     coin(x+200)
     x += 400
-score_display = Text2D(text=f"Score: 0\nHighscore: {highscore}", position=(-200, 250), color=Color.white)
+score_display = Text2D(text=f"Score: 0\nHighscore: {highscore}", position=(-200, 250))
 
 def update_score(plus):
     global score, score_display, highscore

@@ -16,5 +16,6 @@ from .utils2d import *
 from .keys import *
 from .timer import *
 from .helpers import *
+from .ui import *
 
 logLn("Loaded standard WhaleEngine build", "python")

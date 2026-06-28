@@ -1,12 +1,8 @@
-from .engine import current_app
 from .color import Color
-from .texture import Texture
-from .helpers import none
+from .texture import Texture#, create_text_texture
 from .destroy import destroy
-from .parenting import ParentIn
 from .utils2d import distance2D_points
 from .assets import LoadShapes
-from .require import requirePlugin
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -40,37 +36,6 @@ class Entity2D:
     def update(self,dt):
         pass
 
-class Button2D(Entity2D):
-    def __init__(self, onclick=none,onpress=none, hover_color=Color.gray, *,density=16, texture , color=Color.white, position=(0, 0), renderer=0, **kwargs):
-        from .bettercollider2d import MeshCollider2D
-        super().__init__(texture=texture, color=color, position=position, update=True, renderer=renderer, **kwargs)
-        requirePlugin("BetterCollisionSystem2D")
-        requirePlugin("ParentingSystem")
-        requirePlugin("MouseSystem")
-        self.collider = MeshCollider2D(texture, density=density, position=position, layers=["mouse"], visualize=False, renderer=renderer)
-        ParentIn(self,self.collider,attributes={"x": "set", "y": "set", "enabled": "set"})
-        self.onclick = onclick
-        self.onpress = onpress
-        self.hover_color = hover_color
-        self.original_color = color
-        self.pressed = False
-        for key, value in kwargs.items():
-            setattr(self, key, value)
-    def update(self, dt):
-        from .engine import current_app
-        if self.collider.colliding:
-            mouse = current_app.MouseSystem
-            self.color = self.hover_color
-            if mouse.left_pressed() and self.collider.colliding:
-                self.onpress()
-                self.pressed = True
-            elif self.pressed and not mouse.left_down:
-                self.onclick()
-                self.pressed = False
-        else:
-            self.pressed = False
-            self.color = self.original_color
-
 class Text2D(Entity2D):
     def __init__(self, text, font_path="arial.ttf", font_size=32, color=Color.white, position=(0,0), renderer=0, **kwargs):
         self.text = text
@@ -83,10 +48,18 @@ class Text2D(Entity2D):
         super().__init__(texture=self.texture, color=color, position=position, update=False, renderer=renderer)
         for key, value in kwargs.items():
             setattr(self, key, value)
-    def create_text_texture(self, text, font_path, font_size, color):
+    def set_text(self, new_text):
+        self.text = new_text
+        new_tex = self.create_text_texture(new_text, self.font_path, self.font_size, self.color)
+        self.texture = new_tex
+        self.w = new_tex.w
+        self.h = new_tex.h
+    def set_font_size(self, new_font_size):
+        self.font_size = max(1, int(new_font_size))
+        self.set_text(self.text)
+    def create_text_texture(self, text, font_path, font_size, color=Color.white):
         # Load font
         font = ImageFont.truetype(font_path, font_size)
-
         # Get text size (supports multiline text)
         safe_text = text if text else " "
         measure_img = Image.new("RGBA", (1, 1), (0,0,0,0))
@@ -104,19 +77,9 @@ class Text2D(Entity2D):
 
         return Texture.from_image(img, path="<generated-text>")
 
-    def set_text(self, new_text):
-        self.text = new_text
-        new_tex = self.create_text_texture(new_text, self.font_path, self.font_size, self.color)
-        self.texture = new_tex
-        self.w = new_tex.w
-        self.h = new_tex.h
-
-    def set_font_size(self, new_font_size):
-        self.font_size = max(1, int(new_font_size))
-        self.set_text(self.text)
-
 class Line2D():
     def __init__(self, start=(0, 0), end=(0, 0), scale=1, color=Color.white, step=1, renderer=0, **kwargs):
+        from .engine import current_app
         self.start_pos = start
         self.end_pos = end
         self.color = color

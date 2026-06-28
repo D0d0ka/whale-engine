@@ -1,4 +1,5 @@
 from .logging import logLn
+from .color import Color
 
 from PIL import Image
 import os
