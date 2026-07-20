@@ -68,7 +68,7 @@ for root, dirs, files in os.walk(folder):
                 file_data.append((file_path, file_characters, file_lines, file_lenght))
 
 with open("counter.txt", "a") as f:
-    f.write(f"\n\nAll files and their lengths in the {folder} package code:")
+    f.write(f"\n\nAll files and their lengths in the {folder} folder:")
     for file_path, file_characters, file_lines, file_lenght in file_data:
         pct_chars = (file_characters / entire_characters * 100) if entire_characters else 0
         pct_lines = (file_lines / entire_lines * 100) if entire_lines else 0

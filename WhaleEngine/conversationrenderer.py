@@ -12,7 +12,10 @@ class ConversationRenderer(Renderer2D):
         super().__init__(**kwargs)
         self.text_color = text_color
         self.backround_color = backround_color
-        self.font_path = font_path
+        # Resolve the font path cross-platform once at construction time.
+        from .utils import find_font
+        resolved = find_font(font_path)
+        self.font_path = resolved if resolved else font_path
         self.text = ""
         self.padding_x = 20
         self.padding_y = 16

@@ -7,7 +7,7 @@ renderer = Renderer2D() # create a 2D renderer
 #app.input = InputSystem() # loads input system so you can use app.input instead of app.InputSystem
 #shapes = LoadShapes() # use built in shapes
 #textures = LoadTextures() # use built textures
-
+window.set_color(Color.crimson)
 #entity = Entity2D(texture=textures.whale) # create an entity with the whale texture
 
 def update(dt):

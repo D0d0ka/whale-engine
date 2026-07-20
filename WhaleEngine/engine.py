@@ -45,11 +45,10 @@ class WhaleEngine:
         self.running = False
         self.exit = self.close = self.close_app
         self.start_time = None
+        # Get workspace root: go up from WhaleEngine/engine.py -> WhaleEngine -> workspace
         path = Path(__file__).resolve().parent
-        parts = path.parts
-        if parts.count("WhaleEngine") > 1:
-            idx = parts.index("WhaleEngine")
-            path = Path(*parts[:idx + 1])
+        if path.name == "WhaleEngine":
+            path = path.parent
         self.path = str(path)
         logLn(f"{self.path}","project")
         #self.last_values = {"window_width": window.width, "window_height": window.height, "window_title": window.title, "window_color": window.color}
@@ -93,7 +92,10 @@ class WhaleEngine:
         if self.on_app_close:
             controlledrun(self.on_app_close)
         stoptime = strftime("%Y-%m-%d %H:%M:%S", localtime())
-        logLn(f"Whale engine stopped at {stoptime}. Total runtime: {round(perf_counter() - self.start_time, 2)} seconds.")
+        if self.start_time is not None:
+            logLn(f"Whale engine stopped at {stoptime}. Total runtime: {round(perf_counter() - self.start_time, 2)} seconds.")
+        else:
+            logLn(f"Whale engine stopped at {stoptime} (did not fully start).")
         self.window.terminate()
 
 # app

@@ -1,4 +1,59 @@
 from random import uniform
+import os
+import platform
+
+
+def find_font(font_name="arial.ttf"):
+    """Resolve a font name to an absolute path, searching platform-specific
+    font directories.  Returns a path string if found, otherwise None."""
+    # Already an explicit path that exists — use it directly.
+    if os.path.isfile(font_name):
+        return font_name
+
+    system = platform.system()
+    base = os.path.basename(font_name)
+    stem = os.path.splitext(base)[0]
+
+    if system == "Windows":
+        candidate_dirs = [
+            os.path.join(os.environ.get("WINDIR", r"C:\Windows"), "Fonts"),
+        ]
+        candidate_names = [base]
+    elif system == "Darwin":
+        candidate_dirs = [
+            os.path.expanduser("~/Library/Fonts"),
+            "/Library/Fonts",
+            "/System/Library/Fonts/Supplemental",
+            "/System/Library/Fonts",
+        ]
+        # macOS stores many fonts as .ttc (TrueType Collection) files.
+        candidate_names = [base, stem + ".ttc"]
+    else:  # Linux / other UNIX
+        candidate_dirs = [
+            os.path.expanduser("~/.fonts"),
+            "/usr/local/share/fonts",
+            "/usr/share/fonts",
+        ]
+        candidate_names = [base]
+
+    for d in candidate_dirs:
+        for name in candidate_names:
+            full = os.path.join(d, name)
+            if os.path.isfile(full):
+                return full
+
+    # macOS: try common system fallback fonts when the requested font is absent.
+    if system == "Darwin":
+        for fallback in [
+            "/System/Library/Fonts/Helvetica.ttc",
+            "/System/Library/Fonts/Geneva.ttf",
+            "/System/Library/Fonts/Palatino.ttc",
+            "/System/Library/Fonts/Times.ttc",
+        ]:
+            if os.path.isfile(fallback):
+                return fallback
+
+    return None
 
 def pixel_is_solid(r, g, b, a, alpha_threshold=10):
     return a > alpha_threshold

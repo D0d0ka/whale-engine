@@ -12,7 +12,7 @@ class Texture:
             self.path = os.path.join(current_app.path, path)
         self.id = None
         try:
-            image = Image.open(path).convert("RGBA")
+            image = Image.open(self.path).convert("RGBA")
         except Exception as e:
             logLn(f"Failed to load texture '{path}': {e}", "warning")
             from .assets import assets_dir

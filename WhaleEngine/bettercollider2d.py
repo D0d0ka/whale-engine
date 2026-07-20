@@ -62,7 +62,15 @@ class MeshCollider2D:
         if shape == 'Texture("Path to your texture") without string':
             self.shape = current_app.BetterCollisionSystem2D.shapes.square
         self.local_points = []
-        img = Image.open(self.shape.path).convert("RGBA")
+        try:
+            img = Image.open(self.shape.path).convert("RGBA")
+        except (FileNotFoundError, OSError) as e:
+            from .logging import logLn
+            logLn(f"Failed to load collider texture '{self.shape.path}': {e}", "warning")
+            from .assets import assets_dir
+            import os
+            missing_path = os.path.join(assets_dir, "textures", "missing_texture.png")
+            img = Image.open(missing_path).convert("RGBA")
         pixels = img.load()
         w, h = img.size
         self.w = w * self.scale_x

@@ -43,8 +43,12 @@ class Text2D(Entity2D):
         self.font_size = font_size
         self.color = color
         self.line_spacing = 4
+        # Resolve font path once so every later call uses the same resolved path.
+        from .utils import find_font
+        resolved = find_font(font_path)
+        self.font_path = resolved if resolved else font_path
         # Create texture from text
-        self.texture = self.create_text_texture(text, font_path, font_size, color)
+        self.texture = self.create_text_texture(text, self.font_path, font_size, color)
         super().__init__(texture=self.texture, color=color, position=position, update=False, renderer=renderer)
         for key, value in kwargs.items():
             setattr(self, key, value)
@@ -58,8 +62,17 @@ class Text2D(Entity2D):
         self.font_size = max(1, int(new_font_size))
         self.set_text(self.text)
     def create_text_texture(self, text, font_path, font_size, color=Color.white):
-        # Load font
-        font = ImageFont.truetype(font_path, font_size)
+        # Load font with cross-platform fallback
+        font = None
+        try:
+            font = ImageFont.truetype(font_path, font_size)
+        except (OSError, IOError):
+            pass
+        if font is None:
+            try:
+                font = ImageFont.load_default(size=font_size)
+            except TypeError:
+                font = ImageFont.load_default()
         # Get text size (supports multiline text)
         safe_text = text if text else " "
         measure_img = Image.new("RGBA", (1, 1), (0,0,0,0))
