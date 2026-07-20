@@ -1,6 +1,8 @@
 import base64
 import json
 import os
+import platform
+import subprocess
 import threading
 import webbrowser
 from time import perf_counter, sleep
@@ -84,6 +86,7 @@ class windowAPI:
 
 		self._terminated = False
 		self._should_close = False
+		self._close_browser_requested = False
 		self._pending_entities = []
 		self._pending_camera = {"x": 0.0, "y": 0.0, "zoom": 1.0, "rotation": 0.0}
 		self._next_texture_id = 1
@@ -96,6 +99,7 @@ class windowAPI:
 		self._lock = threading.Lock()
 		self._server = None
 		self._server_thread = None
+		self._shutdown_timer = None
 		# Resolve icon path once at startup
 		if icon is None:
 			self._icon_path = None
@@ -135,9 +139,29 @@ class windowAPI:
 		with self._lock:
 			self._color = color
 
+	def _try_close_browser_window(self):
+		if platform.system() != "Darwin":
+			return False
+		commands = [
+			["osascript", "-e", 'tell application "Google Chrome" to close (active tab of front window)'],
+			["osascript", "-e", 'tell application "Microsoft Edge" to close (active tab of front window)'],
+			["osascript", "-e", 'tell application "Arc" to close (active tab of front window)'],
+			["osascript", "-e", 'tell application "Safari" to close current tab of front window'],
+		]
+		for command in commands:
+			try:
+				completed = subprocess.run(command, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=2)
+				if completed.returncode == 0:
+					return True
+			except Exception:
+				continue
+		return False
+
 	def request_close(self):
 		with self._lock:
 			self._should_close = True
+			self._close_browser_requested = True
+		self._try_close_browser_window()
 
 	def poll(self):
 		return
@@ -171,19 +195,31 @@ class windowAPI:
 		with self._lock:
 			return self._should_close
 
+	def _shutdown_server_later(self):
+		if self._server is None:
+			return
+		try:
+			self._server.shutdown()
+			self._server.server_close()
+		except Exception as exc:
+			logLn(f"WebGL server shutdown warning: {exc}", "warning")
+		finally:
+			with self._lock:
+				self._server = None
+				self._server_thread = None
+				self._shutdown_timer = None
+
 	def terminate(self):
 		if self._terminated:
 			return
 		self._terminated = True
 		with self._lock:
 			self._should_close = True
-		if self._server is not None:
-			self._server.shutdown()
-			self._server.server_close()
-			self._server = None
-		if self._server_thread is not None:
-			self._server_thread.join(timeout=1.0)
-			self._server_thread = None
+			self._close_browser_requested = True
+		self._try_close_browser_window()
+		self._shutdown_timer = threading.Timer(0.15, self._shutdown_server_later)
+		self._shutdown_timer.daemon = True
+		self._shutdown_timer.start()
 		logLn("Window closed.", "window")
 
 	def __enter__(self):
@@ -319,6 +355,9 @@ class windowAPI:
 			else:
 				textures = [self._textures[tex_id] for tex_id in self._pending_texture_ids if tex_id in self._textures]
 				self._pending_texture_ids.clear()
+			close_browser = self._close_browser_requested
+			if close_browser:
+				self._close_browser_requested = False
 			return {
 				"frame_id": self._frame_id,
 				"width": self.width,
@@ -328,6 +367,7 @@ class windowAPI:
 				"entities": list(self._pending_entities),
 				"textures": textures,
 				"camera": dict(self._pending_camera),
+				"close_browser": close_browser,
 			}
 
 	def _start_http_server(self):
@@ -407,6 +447,10 @@ class windowAPI:
 
 		if self._open_browser:
 			try:
-				webbrowser.open(self.url)
+				opened = webbrowser.open_new(self.url)
+				if not opened:
+					opened = webbrowser.open(self.url)
+				if not opened:
+					logLn("Failed to open browser automatically.", "warning")
 			except Exception as exc:
 				logLn(f"Failed to open browser automatically: {exc}", "warning")

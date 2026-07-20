@@ -154,6 +154,37 @@ let eventQueue = [];
 let lastFrameId = -1;
 let needFullTextures = true;
 let requestInFlight = false;
+let shuttingDown = false;
+
+function beginShutdown(message = "Closing browser page...") {
+  if (shuttingDown) {
+    return;
+  }
+  shuttingDown = true;
+  requestInFlight = false;
+  statusEl.textContent = message;
+  try {
+    window.stop();
+  } catch {}
+  try {
+    window.close();
+  } catch {}
+  try {
+    const sameWindow = window.open("", "_self");
+    if (sameWindow && typeof sameWindow.close === "function") {
+      sameWindow.close();
+    }
+  } catch {}
+  setTimeout(() => {
+    try {
+      window.location.replace("about:blank");
+    } catch {
+      try {
+        window.location.href = "about:blank";
+      } catch {}
+    }
+  }, 100);
+}
 
 const presentedFps = {
   min: Infinity,
@@ -325,12 +356,17 @@ async function sync(close = false) {
     needFullTextures = false;
     return state;
   } catch {
-    statusEl.textContent = "Disconnected";
+    if (!shuttingDown) {
+      statusEl.textContent = "Disconnected";
+    }
     return null;
   }
 }
 
 async function tick() {
+  if (shuttingDown) {
+    return;
+  }
   if (requestInFlight) {
     requestAnimationFrame(tick);
     return;
@@ -338,6 +374,15 @@ async function tick() {
   requestInFlight = true;
 
   const state = await sync(false);
+  if (!state) {
+    beginShutdown("Disconnected from engine");
+    return;
+  }
+  if (state.close_browser) {
+    beginShutdown("Closing browser page...");
+    return;
+  }
+
   if (state) {
     const frameId = Number(state.frame_id || 0);
     titleEl.textContent = state.title || "WhaleEngine WebGL";
@@ -356,7 +401,9 @@ async function tick() {
 
   requestInFlight = false;
 
-  requestAnimationFrame(tick);
+  if (!shuttingDown) {
+    requestAnimationFrame(tick);
+  }
 }
 
 window.addEventListener("keydown", (event) => {

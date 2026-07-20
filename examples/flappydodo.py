@@ -1,11 +1,11 @@
 from WhaleEngine import *
 from WhaleEngine.helpers.fpscounter import *
-from WhaleEngine.WindowAPI.OpenGL import windowAPI
+from WhaleEngine.WindowAPI.WebGL import windowAPI
 from random import uniform
 from WhaleEngine.helpers import *
 from WhaleEngine.helpers.json_save import json_save
 
-window = windowAPI(title="Flappy Dodo", width=600, height=600, target_fps=float('inf'), icon="flappydodoassets/icon.ico")
+window = windowAPI(title="Flappy Dodo", width=600, height=600, target_fps=120, icon="flappydodoassets/icon.ico")
 window.set_color(Color.green)
 app = WhaleEngine(window=window)
 renderer = Renderer2D()
@@ -267,10 +267,11 @@ def update(dt):
     #print(dt)
     global velocity, gravity_multiplier, game_on, gravity, speed, score, show_FPS, music_on
     FPS_counter(dt)
+    display_fps = round(get_FPS())
     window.set_width(600)
     window.set_height(600)
     if show_FPS:
-        window.set_title(f"Flappy Dodo - FPS: {round(get_FPS())}")
+        window.set_title(f"Flappy Dodo - FPS: {display_fps}")
     else:
         window.set_title("Flappy Dodo")
     if music_on and not music.is_playing:

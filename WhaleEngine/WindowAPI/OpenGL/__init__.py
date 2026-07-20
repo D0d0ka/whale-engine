@@ -161,8 +161,8 @@ class windowAPI:
         glfw.make_context_current(self.handle)
         self.set_vsync(vsync)
         self._color = color
-        self.set_color(color)
-        glfw.set_framebuffer_size_callback(self.handle, self._resize)
+        glfw.set_window_size_callback(self.handle, self._on_window_size)
+        glfw.set_framebuffer_size_callback(self.handle, self._on_framebuffer_size)
         glfw.set_key_callback(self.handle, self._on_key)
         self.keys: Dict[str, bool] = {}
         self.key_callbacks: List[Callable[..., Any]] = []
@@ -172,10 +172,10 @@ class windowAPI:
         self._bound_texture_id = None
         self._quad_vao = None
         self._quad_vbo = None
+        # Get initial framebuffer size (pixels, may differ from window size on Retina displays)
         framebuffer_width, framebuffer_height = glfw.get_framebuffer_size(self.handle)
-        self.width = max(1, framebuffer_width)
-        self.height = max(1, framebuffer_height)
-        glViewport(0, 0, self.width, self.height)
+        glViewport(0, 0, framebuffer_width, framebuffer_height)
+        self.set_color(color)
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         self._setup_quad_mesh()
@@ -223,10 +223,13 @@ class windowAPI:
         glfw.set_window_should_close(self.handle, True)
     def is_key_down(self, key):
         return self.keys.get(self.normalize_key(key), False)
-    def _resize(self, window, w, h):
+    def _on_window_size(self, window, w, h):
+        """Callback for logical window size changes (not framebuffer pixels)."""
         self.width = max(1, w)
         self.height = max(1, h)
-        glViewport(0, 0, self.width, self.height)
+    def _on_framebuffer_size(self, window, w, h):
+        """Callback for framebuffer pixel size changes (Retina displays have 2x pixels)."""
+        glViewport(0, 0, w, h)
     def clear(self):
         glClear(GL_COLOR_BUFFER_BIT)
     def poll(self):
