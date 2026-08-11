@@ -18,3 +18,4 @@ def update(dt):
 app.update = update # set the app's update function to the one we just made
 
 app.run() # run the app
+# things you write here afeter app.run() won't be ever executed
