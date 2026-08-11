@@ -67,6 +67,7 @@ window = windowAPI(title="My App", width=800, height=600)
 
 - API is still evolving.
 - README and documentation might not be up to date.
+- This game engine is half vibecoded
 
 ## Screenshots
 
