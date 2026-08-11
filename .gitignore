@@ -1,13 +1,30 @@
+# python specific ignores
 __pycache__/
 *.pyc
+.pytest_cache/
+
+# logs
 *.log
 logs/
+
+# virtual environment
 .venv/
+
+# helper logs
 agent.txt
 counter.txt
+
+# test python file
 test.py
+
+# info for developer only
 cheatsheets/
+
+# game flappy dodo save file
 flappydodosave.json
+
+# .exe output
 output/
-.pytest_cache/
+
+# IDE specific
 .vscode/
