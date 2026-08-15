@@ -52,11 +52,11 @@ World coordinates are centered: `(0, 0)` is the screen center, `+x` right, `+y` 
 
 Choose the graphics API that fits your needs:
 
-| Backend | Notes                    |
-|---------|--------------------------|
-| OpenGL  | Most stable              |
-| Vulkan  | Experimental             |
-| WebGL   | Runs in a browser window |
+| Backend | Notes                              |
+|---------|------------------------------------|
+| OpenGL  | Most stable                        |
+| Vulkan  | Experimental (probably won't work) |
+| WebGL   | Runs in a browser window           |
 
 ```python
 from WhaleEngine.WindowAPI.OpenGL import windowAPI # or Vulkan / WebGL
