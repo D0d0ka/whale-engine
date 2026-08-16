@@ -1,11 +1,11 @@
 from .logging import logLn
-from .color import Color
+#from .color import Color
 
 from PIL import Image
 import os
 
 class Texture:
-    def __init__(self, path, relative=True):
+    def __init__(self, path, relative=True, pixelated=False):
         self.path = path
         if relative:
             from .engine import current_app
@@ -18,12 +18,13 @@ class Texture:
             from .assets import assets_dir
             self.path = os.path.join(assets_dir, "textures", "missing_texture.png")
             image = Image.open(self.path).convert("RGBA")
+        self.pixelated = pixelated
         self._set_image(image)
     def _set_image(self, image):
         self.image = image.convert("RGBA")
         self.w, self.h = self.image.size
         from .engine import current_app
-        self.id = current_app.window.create_texture_from_image(self.image)
+        self.id = current_app.window.create_texture_from_image(self.image, self.pixelated)
     def bind(self, slot=0):
         from .engine import current_app
         bind_texture = getattr(current_app.window, "bind_texture", None)

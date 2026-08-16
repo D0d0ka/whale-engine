@@ -263,7 +263,7 @@ class windowAPI:
 		with self._lock:
 			return self._mouse_buttons.get(normalized, False)
 
-	def create_texture_from_image(self, image):
+	def create_texture_from_image(self, image, pixelated=False):
 		img = image.convert("RGBA")
 		buffer = BytesIO()
 		img.save(buffer, format="PNG")
@@ -276,6 +276,7 @@ class windowAPI:
 				"w": img.size[0],
 				"h": img.size[1],
 				"data": f"data:image/png;base64,{payload}",
+				"pixelated": pixelated,
 			}
 			self._pending_texture_ids.add(texture_id)
 		return texture_id

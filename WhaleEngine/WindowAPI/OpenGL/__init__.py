@@ -12,6 +12,7 @@ from OpenGL.GL import (
     GL_ARRAY_BUFFER,
     GL_FLOAT,
     GL_LINEAR,
+    GL_NEAREST,
     GL_RGBA,
     GL_ONE_MINUS_SRC_ALPHA,
     GL_SRC_ALPHA,
@@ -327,15 +328,16 @@ class windowAPI:
         self._projection_matrix = _orthographic_projection(-half_width, half_width, -half_height, half_height)
         self._projection_size = size
 
-    def create_texture_from_image(self, image):
+    def create_texture_from_image(self, image, pixelated=False):
         img = image.convert("RGBA").transpose(Image.FLIP_TOP_BOTTOM)
         width, height = img.size
         data = img.tobytes()
         tex_id = glGenTextures(1)
         glBindTexture(GL_TEXTURE_2D, tex_id)
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        filter_mode = GL_NEAREST if pixelated else GL_LINEAR
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter_mode)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_mode)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
         glTexImage2D(

@@ -231,7 +231,7 @@ class windowAPI:
         native_button = self._normalize_mouse_button(button)
         return glfw.get_mouse_button(self.handle, native_button) == glfw.PRESS
 
-    def create_texture_from_image(self, image):
+    def create_texture_from_image(self, image, pixelated=False):
         # Texture upload path is separate; keeping API stable for engine users.
         img = image.convert("RGBA")
         tex_id = self._next_texture_id
@@ -241,6 +241,7 @@ class windowAPI:
             "width": img.size[0],
             "height": img.size[1],
             "pixels_np": pixels_np,
+            "pixelated": pixelated,
         }
         return tex_id
 
