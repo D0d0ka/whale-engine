@@ -1,7 +1,7 @@
 from random import uniform
 import os
 import platform
-
+from .logging import logLn
 
 def find_font(font_name="arial.ttf"):
     """Resolve a font name to an absolute path, searching platform-specific
@@ -51,8 +51,9 @@ def find_font(font_name="arial.ttf"):
             "/System/Library/Fonts/Times.ttc",
         ]:
             if os.path.isfile(fallback):
+                logLn(f"Using {fallback} as fallback (macOS)","Font finder")
                 return fallback
-
+    logLn(f"Couldn't find any fonts searching for {font_name}", "Font finder")
     return None
 
 def pixel_is_solid(r, g, b, a, alpha_threshold=10):

@@ -13,7 +13,7 @@ from PIL import Image
 
 class CircleCollider2D:
     def __init__(self,size,*,layers=[0],position=(0,0),visualize=False,visualition_color=Color.cyan,visualition_renderer=0, **kwargs):
-        requirePlugin("CircleCollisionSystem2D")
+        requirePlugin("CircleCollisionSystem2D", "CircleCollider2D")
         from .engine import current_app
         self.x, self.y = position
         self.size = size/2
@@ -46,12 +46,14 @@ class CircleCollider2D:
         self.visualized = False
     def get_position(self):
         return (self.x, self.y)
+    def set_position(self, pos):
+        self.x, self.y = pos
     def ignore(self, collider):
         self.ignores.append(collider)
 
 class MeshCircleCollider2D:
     def __init__(self,shape='Texture("Path to your texture") without string',density=8,size=8,offset_x=50,offset_y=60,*,layers=[0],position=(0,0),visualize=False,visualition_color=Color.cyan,visualition_renderer=0,load_once=10, **kwargs):
-        requirePlugin("CircleCollisionSystem2D")
+        requirePlugin("CircleCollisionSystem2D", "MeshCircleCollider2D")
         from .engine import current_app
         self.x, self.y = position
         self.shape = shape
@@ -104,6 +106,10 @@ class MeshCircleCollider2D:
             current_app.CircleCollisionSystem2D.add_mesh(self)
         for key, value in kwargs.items():
             setattr(self, key, value)
+    def set_position(self, pos):
+        self.x, self.y = pos
+    def get_position(self):
+        return (self.x, self.y)
     def ignore(self, collider):
         self.ignores.append(collider)
 

@@ -3,7 +3,7 @@ from uuid import uuid4
 from os import makedirs, path as os_path
 
 logging_file = None
-logging_mode = "console" # can be: "console", "file", "folder"
+logging_mode = "onlyconsole" # can be: "onlyconsole", "file", "folder"
 
 def set_logging_file(path):
     global logging_file, logging_mode

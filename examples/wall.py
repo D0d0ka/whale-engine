@@ -1,5 +1,5 @@
 from WhaleEngine import *
-from WhaleEngine.WindowAPI.OpenGL import windowAPI # from WhaleEngine.WindowAPI.Vulkan import windowAPI # from WhaleEngine.WindowAPI.WebGL import windowAPI
+from WhaleEngine.WindowAPI.OpenGL import windowAPI
 
 window = windowAPI(title="Whale engine app")
 app = WhaleEngine(window=window)
@@ -8,8 +8,7 @@ app.input = InputSystem()
 ParentingSystem()
 TimerSystem()
 BetterCollisionSystem2D(update_interval=0)
-shapes = LoadShapes() #use built in shapes
-textures = LoadTextures() #use built textures
+textures = LoadTextures()
 
 collider = QuadCollider2D(100, 1000, position=(-160, 0), visualize=True)
 

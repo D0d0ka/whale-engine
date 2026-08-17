@@ -1,4 +1,5 @@
 import math
+from require import requirePlugin
 
 def _segment_segment_intersection(x1, y1, x2, y2, x3, y3, x4, y4):
     dx1 = x2 - x1
@@ -83,7 +84,9 @@ def raycast2d(start=(0, 0), end=(0, 0), layers=None):
         if closest_t is None or t < closest_t:
             closest_t = t
             hit_point = (hx, hy)
+    got = False
     if hasattr(current_app, "CircleCollisionSystem2D"):
+        got = True
         for collider in current_app.CircleCollisionSystem2D.circle_colliders:
             target = collider.owner if getattr(collider, "owner", None) is not None else collider
             if not target.enabled:
@@ -93,6 +96,7 @@ def raycast2d(start=(0, 0), end=(0, 0), layers=None):
             hit = _segment_circle_intersection(x1, y1, x2, y2, collider.x, collider.y, collider.size)
             register_hit(hit)
     if hasattr(current_app, "BetterCollisionSystem2D"):
+        got = True
         for collider in current_app.BetterCollisionSystem2D.colliders:
             if not collider.enabled:
                 continue
@@ -108,4 +112,6 @@ def raycast2d(start=(0, 0), end=(0, 0), layers=None):
                 j = (i + 1) % len(polygon)
                 edge_hit = _segment_segment_intersection(x1, y1, x2, y2,polygon[i][0], polygon[i][1],polygon[j][0], polygon[j][1])
                 register_hit(edge_hit)
+    if not got:
+        requirePlugin("BetterCollisionSystem2D or CircleCollisionSystem2D", "Raycast")
     return hit_point

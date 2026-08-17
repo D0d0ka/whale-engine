@@ -4,3 +4,7 @@ class camera2d:
         self.y = y
         self.zoom = zoom
         self.rotation = rotation
+    def get_position(self):
+        return (self.x, self.y)
+    def set_position(self, pos):
+        self.x, self.y = pos

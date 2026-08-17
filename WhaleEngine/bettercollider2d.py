@@ -15,7 +15,7 @@ import time
 
 class QuadCollider2D:
     def __init__(self, w=100, h=100, *, position=(0, 0), rotation=0, layers=[0], visualize=False, visualition_color=Color.cyan, visualition_renderer=0, **kwargs):
-        requirePlugin("BetterCollisionSystem2D")
+        requirePlugin("BetterCollisionSystem2D", "QuadCollider2D")
         from .engine import current_app
         self.x = position[0]
         self.y = position[1]
@@ -39,12 +39,14 @@ class QuadCollider2D:
             setattr(self, key, value)
     def get_position(self):
         return (self.x, self.y)
+    def set_position(self, pos):
+        self.x, self.y = pos
     def ignore(self, collider):
         self.ignores.append(collider)
 
 class MeshCollider2D:
     def __init__(self, shape='Texture("Path to your texture") without string', density=16, *, position=(0, 0), scale=(1, 1), rotation=0, layers=[0], visualize=False, visualition_color=Color.cyan, visualition_renderer=0, **kwargs):
-        requirePlugin("BetterCollisionSystem2D")
+        requirePlugin("BetterCollisionSystem2D", "MeshCollider2D")
         from .engine import current_app
         self.x, self.y = position
         self.scale_x, self.scale_y = scale
@@ -109,15 +111,18 @@ class MeshCollider2D:
             setattr(self, key, value)
     def get_position(self):
         return (self.x, self.y)
+    def set_position(self, pos):
+        self.x, self.y = pos
     def ignore(self, collider):
         self.ignores.append(collider)
 
 class BetterCollisionSystem2D(Plugin):
-    def __init__(self, update_interval=0.1,* , threaded=False):
-        super().__init__(requirements=["ParentingSystem", "TimerSystem"],incompatibilities=["CircleCollisionSystem2D"])
+    def __init__(self, update_interval=0,* , threaded=False):
+        super().__init__(requirements=["ParentingSystem"],incompatibilities=["CircleCollisionSystem2D"])
         self.colliders = []
         self.update_interval = update_interval
-        self.timer = Timer(self.update_interval)
+        if update_interval > 0:
+            self.set_up_timer()
         self.threaded = threaded
         self.shapes = LoadShapes()
         if threaded:
@@ -129,6 +134,9 @@ class BetterCollisionSystem2D(Plugin):
             threading.Thread(target=_threaded_update, daemon=True).start()
     def add_quad(self, collider):
         self.colliders.append(collider)
+    def set_up_timer(self):
+        requirePlugin("TimerSystem","BetterCollisionSystem2D")
+        self.timer = Timer(self.update_interval)
     def add_mesh(self, collider):
         # Precompute the convex hull of local_points once so _get_mesh_polygon
         # only needs to transform the (much smaller) hull vertices each frame.
@@ -244,10 +252,11 @@ class BetterCollisionSystem2D(Plugin):
     def update(self, dt, running_in_thread=False):
         if self.threaded and not running_in_thread:
             return
-        if not self.timer.over:
-            return
-        self.timer.lenght = self.update_interval
-        self.timer.reset()
+        if self.update_interval > 0:
+            if not self.timer.over:
+                return
+            self.timer.lenght = self.update_interval
+            self.timer.reset()
         polygon_cache = {}
         aabb_cache = {}
         for collider in self.colliders:

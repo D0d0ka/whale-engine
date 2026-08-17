@@ -11,7 +11,7 @@ class ParentingSystem(Plugin):
 
 class ParentIn:
     def __init__(self, parent, child, attributes={"x": "set", "y": "set"}):
-        requirePlugin("ParentingSystem")
+        requirePlugin("ParentingSystem", "Parenting")
         from .engine import current_app
         self.parent = parent
         self.child = child

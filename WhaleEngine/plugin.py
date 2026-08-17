@@ -6,7 +6,7 @@ class Plugin:
         self.name = self.__class__.__name__
         from .engine import current_app
         for req in requirements:
-            requirePlugin(req)
+            requirePlugin(req, self.name)
         for inc in incompatibilities:
             incompatibleWithPlugin(inc)
         current_app.plugins[self.name] = self

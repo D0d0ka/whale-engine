@@ -12,9 +12,9 @@ class Button2D(Entity2D):
     def __init__(self, onclick=none,onpress=none, hover_color=Color.gray, *,density=16, texture , color=Color.white, position=(0, 0), renderer=0, **kwargs):
         from .bettercollider2d import MeshCollider2D
         super().__init__(texture=texture, color=color, position=position, update=True, renderer=renderer, **kwargs)
-        requirePlugin("BetterCollisionSystem2D")
-        requirePlugin("ParentingSystem")
-        requirePlugin("MouseSystem")
+        requirePlugin("BetterCollisionSystem2D","Button2D")
+        requirePlugin("ParentingSystem","Button2D")
+        requirePlugin("MouseSystem","Button2D")
         self.collider = MeshCollider2D(texture, density=density, position=position, layers=["mouse"], visualize=False, renderer=renderer)
         ParentIn(self,self.collider,attributes={"x": "set", "y": "set", "enabled": "set"})
         self.onclick = onclick
