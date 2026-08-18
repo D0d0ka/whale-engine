@@ -5,7 +5,6 @@ from .utils2d import distance2D
 from .utils import layers_match, pixel_is_solid
 from .color import Color
 from .parenting import ParentIn
-from .engine import current_app
 from .destroy import destroy
 from .require import requirePlugin
 

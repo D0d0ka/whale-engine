@@ -27,5 +27,5 @@ flappydodosave.json
 # .exe output
 output/
 
-# IDE specific
+# vscode specific
 .vscode/
