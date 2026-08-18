@@ -26,7 +26,8 @@ logLn(f"WhaleEngine version: {version_text}", "version")
 
 class WhaleEngine:
     def __init__(self, window=None, **kwargs):
-        logLn("Whale engine starting.")
+        loading_time = perf_counter()
+        logLn("Whale engine loading.")
         self.os = platform.system()
         logLn(self.os, "os")
         global current_app          
@@ -58,15 +59,16 @@ class WhaleEngine:
                 set_mode(value)
             else:
                 setattr(self, key, value)
-        logLn("Whale engine loaded.")
+        logLn(f"Whale engine loaded in {round(perf_counter() - loading_time)} seconds.")
     def run(self):
+        staring_time = perf_counter()
         logLn("Whale engine starting.")
         if len(self.renderers) == 0:
             self.renderers.append(Renderer2D())
         for i in self.renderers:
             i.start()
         self.start_time_str, self.start_time = strftime("%Y-%m-%d %H:%M:%S", localtime()), perf_counter()
-        logLn(f"Whale engine started at {self.start_time_str}.")
+        logLn(f"Whale engine started at {self.start_time_str}, took {round(perf_counter() - staring_time)} seconds.")
         self.running = True
         while not self.window.should_close():
             this_update = perf_counter()
