@@ -14,7 +14,7 @@ character = CharacterController2D(texture=textures.dodo, collider_w=50, collider
 
 QuadCollider2D(50, 170, position=(300, 0), visualize=True, visualition_color=Color.red)
 QuadCollider2D(1000, 50, position=(0, -122), visualize=True, visualition_color=Color.green, layers=[0, "ground"])
-QuadCollider2D(1000, 50, position=(0, 150), visualize=True, visualition_color=Color.green, layers=[0, "ground"])
+QuadCollider2D(400, 50, position=(0, 150), visualize=True, visualition_color=Color.green, layers=[0, "ground"])
 
 def update(dt):
     pass

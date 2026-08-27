@@ -78,3 +78,6 @@ window = windowAPI(title="My App", width=800, height=600)
 <img src="screenshots/shaders.png" width="500">
 <img src="screenshots/particles.png" width="500">
 <img src="screenshots/WebGL.png" width="500">
+<img src="screenshots/guns.png" width="500">
+<img src="screenshots/platformer.png" width="500">
+<img src="screenshots/powertest.png" width="500">

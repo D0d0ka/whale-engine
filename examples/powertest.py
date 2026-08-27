@@ -1,8 +1,10 @@
 from WhaleEngine import *
 from WhaleEngine.WindowAPI.OpenGL import windowAPI
 from WhaleEngine.helpers.fpscounter import *
-from random import randint
-#from WhaleEngine.betterrenderer2d import BetterRenderer2D
+from random import uniform
+#from WhaleEngine.betterrenderer2d import BetterRenderer2D 
+# # I tested the BetterRenderer2D here
+# but this is stress test so we stick with the basic Renderer2D
 
 window = windowAPI(title="powertest", width=800, height=600, target_fps=float('inf'))
 app = WhaleEngine(window=window)
@@ -17,11 +19,13 @@ def on_app_close():
     summarize_FPS(print_summary=True)
 app.on_app_close = on_app_close
 
-objects = 1000
+objects = 10000
 object_texture = textures.dodo
 
+max_move_speed = 1000
+
 for i in range(objects):
-    entitys.append(Entity2D(texture=object_texture, position=(randint(-400, 400), randint(-300, 300)), rot_dt=randint(-10, 10), x_dt=randint(-10, 10), y_dt=randint(-10, 10)))
+    entitys.append(Entity2D(texture=object_texture, position=(uniform(-window.width/2, window.width/2), uniform(-window.height/2, window.height/2)), rot_dt=uniform(-max_move_speed, max_move_speed), x_dt=uniform(-max_move_speed, max_move_speed), y_dt=uniform(-max_move_speed, max_move_speed)))
 
 def update(dt):
     FPS_counter(dt,print_fps=True)

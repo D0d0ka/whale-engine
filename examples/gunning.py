@@ -2,7 +2,6 @@ from WhaleEngine import *
 from WhaleEngine.WindowAPI.OpenGL import *
 from random import randint, uniform
 from WhaleEngine.helpers.fpscounter import *
-from math import cos, sin, radians
 
 assets_path = "gunning_assets/"
 
