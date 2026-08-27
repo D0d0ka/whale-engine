@@ -2,22 +2,22 @@ from WhaleEngine import *
 from WhaleEngine.WindowAPI.OpenGL import windowAPI
 import math
 from WhaleEngine.betterrenderer2d import *
+from random import uniform
 
-# --- Setup ---
 window = windowAPI(title="Camera demo")
 app = WhaleEngine(window=window)
 app.input = InputSystem()
-renderer = BetterRenderer2D(100)
+renderer = BetterRenderer2D()
 app.window.set_color(Color(0.08, 0.08, 0.12, 1))
 
 textures = LoadTextures()
 shapes = LoadShapes()
 
-whale  = Entity2D(texture=textures.whale, position=(0,0), scale=(1.5, 1.5))
-dodo   = Entity2D(texture=textures.dodo, position=(250,100))
-dodo2  = Entity2D(texture=textures.dodo, position=(-200,-80), scale=(-1, 1))
-square = Entity2D(texture=shapes.square, position=(0,-200), color=Color.cyan, scale=(3,0.4))
-circle = Entity2D(texture=shapes.circle, position=(150,-200), color=Color.yellow)
+whale  = Entity2D(texture=textures.whale, position=(0,0), scale=(1.5, 1.5), rotation=uniform(0, 360))
+dodo   = Entity2D(texture=textures.dodo, position=(250,100), scale=(2, 2), rotation=uniform(0, 360))
+dodo2  = Entity2D(texture=textures.dodo, position=(-200,-80), scale=(-1, 1), rotation=uniform(0, 360))
+square = Entity2D(texture=shapes.square, position=(0,-200), color=Color.cyan, scale=(3,0.4), rotation=uniform(0, 360))
+circle = Entity2D(texture=shapes.circle, position=(150,-200), color=Color.yellow, rotation=uniform(0, 360))
 
 MOVE_SPEED    = 300
 ZOOM_SPEED   = 1.2

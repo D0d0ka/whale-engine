@@ -8,6 +8,7 @@ from .bettercollider2d import *
 from .destroy import *
 from .parenting import *
 from .texture import *
+#from .textureeditor import *
 from .assets import *
 from .color import *
 from .logging import *
@@ -18,4 +19,4 @@ from .timer import *
 from .helpers import *
 from .ui import *
 
-logLn("Loaded standard WhaleEngine build", "python")
+logLn("Imported standard WhaleEngine build", "python")
