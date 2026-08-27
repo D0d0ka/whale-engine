@@ -1,5 +1,7 @@
 # whale-engine
 
+![GitHub stars](https://img.shields.io/github/stars/D0d0ka/whale-engine?style=for-the-badge)
+![GitHub watchers](https://img.shields.io/github/watchers/D0d0ka/whale-engine?style=for-the-badge)
 <p align="left">
   <img src="WhaleEngine/assets/textures/whale.png" width="250">
   <img src="WhaleEngine/assets/textures/dodo.png" width="250">
@@ -7,7 +9,7 @@
 
 Whale Engine is a game engine for Python.
 
-# developed by dodo_k
+# developed by dodo (D0d0ka)
 
 ## Documentation
 
