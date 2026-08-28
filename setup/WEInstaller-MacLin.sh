@@ -5,6 +5,8 @@ set -e
 REPO="https://github.com/D0d0ka/whale-engine.git"
 TEMP_DIR="whale-engine-temp"
 
+rm -rf "WhaleEngine"
+
 # Check if Git is installed
 if ! command -v git &> /dev/null; then
     echo "ERROR: Git is not installed!"
@@ -31,8 +33,16 @@ cp -r "$TEMP_DIR/WhaleEngine" .
 if [ ! -f "main.py" ]; then
     echo "main.py not found. Creating it from WhaleEngine/AppBase.py..."
     cp "$TEMP_DIR/AppBase.py" "main.py"
-else
-    echo "main.py already exists. Skipping..."
+fi
+
+if [ ! -f "NOTICE" ]; then
+    echo "NOTICE not found. Creating it from WhaleEngine/NOTICE..."
+    cp "$TEMP_DIR/NOTICE" "NOTICE"
+fi
+
+if [ ! -f ".gitignore" ]; then
+    echo ".gitignore not found. Creating it from WhaleEngine/.gitignore..."
+    cp "$TEMP_DIR/setup/.gitignoretemplate" ".gitignore"
 fi
 
 echo "Deleting clone..."

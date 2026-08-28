@@ -2,6 +2,7 @@
 
 ![GitHub stars](https://img.shields.io/github/stars/D0d0ka/whale-engine?style=for-the-badge)
 ![GitHub watchers](https://img.shields.io/github/watchers/D0d0ka/whale-engine?style=for-the-badge)
+![Downloads](https://img.shields.io/github/downloads/D0d0ka/whale-engine/total?style=for-the-badge)
 
 <p align="left">
   <img src="WhaleEngine/assets/textures/whale.png" width="250">
