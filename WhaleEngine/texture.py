@@ -24,6 +24,8 @@ class Texture:
         self.image = image.convert("RGBA")
         self.w, self.h = self.image.size
         from .engine import current_app
+        if not hasattr(self, "pixelated"):
+            self.pixelated = False
         self.id = current_app.window.create_texture_from_image(self.image, self.pixelated)
     def bind(self, slot=0):
         from .engine import current_app

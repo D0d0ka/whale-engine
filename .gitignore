@@ -31,3 +31,5 @@ output/
 # vscode specific
 .vscode/
 .companion/
+
+.ds_store
