@@ -20,6 +20,29 @@ For practical examples look at the `examples/` folder.
 
 ## Quick start
 
+Get a [WhaleEngine installer](https://github.com/D0d0ka/whale-engine/releases/tag/installer)
+
+Move it into your project folder:
+
+Run it:
+
+MacOS/Linux:
+```bash
+chmod u+x WEInstaller-MacLin.sh
+./WEInstaller-MacLin.sh
+```
+
+Windows:
+```bash
+.\WEInstaller-Win.bat
+```
+
+Install WindowAPI-s you Wan't.
+
+And there you go.
+
+Now you can use WhaleEngine.
+
 ```python
 from WhaleEngine import *
 from WhaleEngine.WindowAPI.OpenGL import windowAPI # from WhaleEngine.WindowAPI.Vulkan import windowAPI # from WhaleEngine.WindowAPI.WebGL import windowAPI

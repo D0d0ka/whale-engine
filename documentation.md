@@ -4,49 +4,28 @@ This document describes the current public API of the engine as it exists in thi
 
 ## 1. Setup
 
-Clone the project and create a virtual environment:
+Get a [WhaleEngine installer](https://github.com/D0d0ka/whale-engine/releases/tag/installer)
 
+Move it into your project folder.
+
+Run it:
+
+MacOS/Linux:
 ```bash
-git clone https://github.com/D0d0ka/whale-engine.git
-cd whale-engine
-python -m venv .venv
+chmod u+x WEInstaller-MacLin.sh
+./WEInstaller-MacLin.sh
 ```
-
-Activate it:
 
 Windows:
 ```bash
-.venv\Scripts\activate
+.\WEInstaller-Win.bat
 ```
 
-macOS/Linux:
-```bash
-source .venv/bin/activate
-```
+Install WindowAPI-s you wan't.
 
-Install the base dependencies:
+And there you go.
 
-```bash
-python -m pip install --upgrade pip
-python -m pip install -r WhaleEngine/requirements/mainrequirements.txt
-```
-
-Then install the graphics backend you want to use:
-
-OpenGL (recommended):
-```bash
-python -m pip install -r WhaleEngine/requirements/openGLrequirements.txt
-```
-
-Vulkan (most unstable):
-```bash
-python -m pip install -r WhaleEngine/requirements/vulcanrequirements.txt
-```
-
-WebGL:
-```bash
-python -m pip install -r WhaleEngine/requirements/webGLrequirements.txt
-```
+Now you can use WhaleEngine.
 
 ## 2. Example
 
