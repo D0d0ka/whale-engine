@@ -12,6 +12,13 @@ if ! command -v git &> /dev/null; then
     exit 1
 fi
 
+# Check if Python is installed
+if ! command -v python3 &> /dev/null; then
+    echo "ERROR: Python is not installed!"
+    echo "Please install Python before running this script."
+    exit 1
+fi
+
 echo "Cloning whale-engine..."
 
 git clone "$REPO" "$TEMP_DIR"
@@ -20,9 +27,13 @@ echo "Copying WhaleEngine..."
 
 cp -r "$TEMP_DIR/WhaleEngine" .
 
-echo "Copying requirements..."
-
-cp -r "$TEMP_DIR/requirements" .
+# Create main.py if it does not exist
+if [ ! -f "main.py" ]; then
+    echo "main.py not found. Creating it from WhaleEngine/AppBase.py..."
+    cp "$TEMP_DIR/AppBase.py" "main.py"
+else
+    echo "main.py already exists. Skipping..."
+fi
 
 echo "Deleting clone..."
 

@@ -18,13 +18,13 @@ python.exe -m pip install --upgrade pip
 python -m pip install -r requirements/mainrequirements.txt
 
 # if you wan't to use openGL then you need to install this:
-python -m pip install -r requirements/openGLrequirements.txt
+python -m pip install -r WhaleEngine/requirements/openGLrequirements.txt
 
 # if you wan't to use Vulcan then you need to install this:
-python -m pip install -r requirements/vulcanrequirements.txt
+python -m pip install -r WhaleEngine/requirements/vulcanrequirements.txt
 
 # if you wan't to use WebGL then you need to install this (Currently there are none): 
-python -m pip install -r requirements/webGLrequirements.txt
+python -m pip install -r WhaleEngine/requirements/webGLrequirements.txt
 
 # to save requirements (development)
 pip freeze > requirements.txt

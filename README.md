@@ -2,6 +2,7 @@
 
 ![GitHub stars](https://img.shields.io/github/stars/D0d0ka/whale-engine?style=for-the-badge)
 ![GitHub watchers](https://img.shields.io/github/watchers/D0d0ka/whale-engine?style=for-the-badge)
+
 <p align="left">
   <img src="WhaleEngine/assets/textures/whale.png" width="250">
   <img src="WhaleEngine/assets/textures/dodo.png" width="250">
@@ -20,24 +21,31 @@ For practical examples look at the `examples/` folder.
 
 ```python
 from WhaleEngine import *
-from WhaleEngine.WindowAPI.OpenGL import windowAPI # or Vulkan / WebGL
+from WhaleEngine.WindowAPI.OpenGL import windowAPI # from WhaleEngine.WindowAPI.Vulkan import windowAPI # from WhaleEngine.WindowAPI.WebGL import windowAPI
 
-window = windowAPI(title="Whale engine app")
-app = WhaleEngine(window=window)
-renderer = Renderer2D()
-app.input = InputSystem()
-textures = LoadTextures()
+window = windowAPI(title="Whale engine app") # create a window using the OpenGL API, you can also use Vulkan or WebGL by changing the import above and uncommenting the line below
+app = WhaleEngine(window=window) # create app with the window we just made
+renderer = Renderer2D() # create a 2D renderer
+app.input = InputSystem() # loads input system so you can use app.input instead of app.InputSystem
+textures = LoadTextures() # load built textures
 
-entity = Entity2D(texture=textures.dodo)
+window.set_color(Color.cyan) # set window background color to cyan
+
+entity = Entity2D(texture=textures.whale) # create an entity with the whale texture
 
 def update(dt):
-    if app.input.key_pressed(Keys.ESCAPE):
-      app.exit()
-app.update = update
+    if app.input.key(Keys.SPACE): # check if space is being pressed
+        entity.rotation += 90 * dt # rotate entity 90 degrees per second
+        entity.x -= 100 * dt # move entity 100 pixels to the right per second
+app.update = update # set the app's update function
 
-app.run()
+def on_app_close():
+    logLn("Closing", "app") # logs this: <app> Closing
+app.on_app_close = on_app_close # set the app's on_app_close function
+
+app.run() # run the app
 ```
-> Another one: [`AppBase.py`](AppBase.py)
+> Another one but without comments: [`AppBase.py`](AppBase.py)
 
 ## How it works
 

@@ -15,6 +15,16 @@ if errorlevel 1 (
     exit /b 1
 )
 
+where python >nul 2>&1
+if errorlevel 1 (
+    echo.
+    echo ERROR: Python is not installed!
+    echo Please install Python before running this script.
+    echo.
+    pause
+    exit /b 1
+)
+
 echo Cloning whale-engine...
 
 git clone "%REPO%" "%TEMP_DIR%"
@@ -32,17 +42,6 @@ xcopy "%TEMP_DIR%\WhaleEngine" ".\WhaleEngine" /E /I /Y
 if errorlevel 1 (
     echo.
     echo ERROR: Failed to copy WhaleEngine!
-    echo.
-    pause
-    exit /b 1
-)
-
-echo Copying requirements...
-
-xcopy "%TEMP_DIR%\requirements" ".\requirements" /E /I /Y
-if errorlevel 1 (
-    echo.
-    echo ERROR: Failed to copy requirements!
     echo.
     pause
     exit /b 1

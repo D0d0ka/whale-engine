@@ -28,47 +28,56 @@ Install the base dependencies:
 
 ```bash
 python -m pip install --upgrade pip
-python -m pip install -r requirements/mainrequirements.txt
+python -m pip install -r WhaleEngine/requirements/mainrequirements.txt
 ```
 
 Then install the graphics backend you want to use:
 
 OpenGL (recommended):
 ```bash
-python -m pip install -r requirements/openGLrequirements.txt
+python -m pip install -r WhaleEngine/requirements/openGLrequirements.txt
 ```
+
 Vulkan (most unstable):
 ```bash
-python -m pip install -r requirements/vulcanrequirements.txt
+python -m pip install -r WhaleEngine/requirements/vulcanrequirements.txt
 ```
 
 WebGL:
 ```bash
-python -m pip install -r requirements/webGLrequirements.txt
+python -m pip install -r WhaleEngine/requirements/webGLrequirements.txt
 ```
 
-## 2. Minimal example
+## 2. Example
 
 ```python
 from WhaleEngine import *
-from WhaleEngine.WindowAPI.OpenGL import windowAPI
+from WhaleEngine.WindowAPI.OpenGL import windowAPI # from WhaleEngine.WindowAPI.Vulkan import windowAPI # from WhaleEngine.WindowAPI.WebGL import windowAPI
 
-window = windowAPI(title="Whale engine app")
-app = WhaleEngine(window=window)
-renderer = Renderer2D()
-app.input = InputSystem()
-textures = LoadTextures()
+window = windowAPI(title="Whale engine app") # create a window using the OpenGL API, you can also use Vulkan or WebGL by changing the import above and uncommenting the line below
+app = WhaleEngine(window=window) # create app with the window we just made
+renderer = Renderer2D() # create a 2D renderer
+app.input = InputSystem() # loads input system so you can use app.input instead of app.InputSystem
 
-entity = Entity2D(texture=textures.dodo)
+shapes = LoadShapes() # load built in shapes
+textures = LoadTextures() # load built textures
 
+window.set_color(Color.white) # set window background color to white
+
+entity = Entity2D(texture=textures.whale) # create an entity with the whale texture
 
 def update(dt):
-    if app.input.key_pressed(Keys.ESCAPE):
-        app.exit()
+    if app.input.key(Keys.SPACE): # check if space is being pressed
+        entity.rotation += 90 * dt # rotate entity 90 degrees per second
+        entity.x -= 100 * dt # move entity 100 pixels to the right per second
+app.update = update # set the app's update function to the one we just made
 
+def on_app_close():
+    logLn("Closing", "app") # logs this: <app> Closing
+app.on_app_close = on_app_close # set the app's on_app_close function
 
-app.update = update
-app.run()
+app.run() # run the app
+# things you write here after app.run() won't be ever executed
 ```
 
 ## 3. Window API
