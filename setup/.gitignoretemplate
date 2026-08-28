@@ -9,3 +9,5 @@ WEInstaller-Win.bat
 #python
 .venv/
 __pycache__/
+
+.DS_Store
