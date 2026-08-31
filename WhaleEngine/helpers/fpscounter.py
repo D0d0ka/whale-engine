@@ -4,6 +4,12 @@ min_fps = float("inf")
 max_fps = avg_fps = fps_timer = frame_count = 0
 FPS = 60
 
+def reset_FPS_counter():
+    global min_fps, max_fps, avg_fps, fps_timer, frame_count, FPS
+    min_fps = float("inf")
+    max_fps = avg_fps = fps_timer = frame_count = 0
+    FPS = 60
+
 def FPS_counter(dt, fps_timer_lenght=1, print_fps=False):
     global min_fps, max_fps, avg_fps, fps_timer, frame_count, FPS
     if dt <= 0:

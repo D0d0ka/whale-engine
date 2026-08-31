@@ -14,14 +14,14 @@ class TextureEditor:
             self.path = texture.path
         elif path is not None:
             if relative:
-                from ..WhaleEngine.engine import current_app
+                from .WhaleEngine.engine import current_app
                 path = os.path.join(current_app.path, path)
             try:
                 self.image = Image.open(path).convert("RGBA")
                 self.path = path
             except Exception as e:
                 logLn(f"Failed to load texture for editor '{path}': {e}", "warning")
-                from ..WhaleEngine.assets import assets_dir
+                from .WhaleEngine.assets import assets_dir
                 self.path = os.path.join(assets_dir, "textures", "missing_texture.png")
                 self.image = Image.open(self.path).convert("RGBA")
             self.w, self.h = self.image.size
@@ -165,7 +165,7 @@ class TextureEditor:
         self.crop(min_x, min_y, max_x - min_x + 1, max_y - min_y + 1)
 
     def to_texture(self, pixelated=False):
-        from ..WhaleEngine.texture import Texture
+        from .WhaleEngine.texture import Texture
 
         if not self._cache_dirty and self._texture_cache is not None:
             return self._texture_cache
@@ -178,7 +178,7 @@ class TextureEditor:
 
     def save(self, path, relative=True):
         if relative:
-            from ..WhaleEngine.engine import current_app
+            from .WhaleEngine.engine import current_app
             path = os.path.join(current_app.path, path)
         self.image.save(path)
         logLn(f"TextureEditor saved to '{path}'")

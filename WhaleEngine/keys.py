@@ -3,7 +3,6 @@ class KeyAction:
     REPEAT = "repeat"
     RELEASE = "release"
 
-
 class Keys:
     # Letters
     A = "a"
