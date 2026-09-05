@@ -31,5 +31,6 @@ output/
 # vscode specific
 .vscode/
 .companion/
+# this is a little sideproject I have.
 
 .DS_Store
