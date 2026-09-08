@@ -2,8 +2,8 @@ from .plugin import Plugin
 from .require import requirePlugin
 
 class ParentingSystem(Plugin):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, update_before_rendering=False):
+        super().__init__(update_before_rendering=update_before_rendering)
         self.parentchildrelationships = []
     def update(self, dt):
         for i in self.parentchildrelationships:

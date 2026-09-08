@@ -17,15 +17,17 @@ textures = LoadTextures()
 
 dodo = Entity2D(texture=textures.dodo)
 player = Entity2D(texture=textures.whale)
-player.collider = CircleCollider2D(100,visualize=False,visualition_color=Color.red)
+player.collider = CircleCollider2D(100,visualize=True,visualition_color=Color.red)
 ParentIn(player,player.collider)
-collider = CircleCollider2D(200,visualize=False,visualition_color=Color.red)#MeshCollider2D(shapes.dodo,visualize=True,visualition_color=Color.red)#CircleCollider2D(200,visualize=True,visualition_color=Color.red)
+collider = MeshCircleCollider2D(shape=textures.dodo,density=15,size=40,offset_x=0,offset_y=0,visualize=True)#CircleCollider2D(200,visualize=True,visualition_color=Color.red)#CircleCollider2D(200,visualize=True,visualition_color=Color.red)
+ParentIn(dodo,collider)
 
 speed = 200
 way = "u"
 
 def update(dt):
     global speed, way
+    #dodo.x += speed*dt
     if player.collider.colliding:
         print(f"Player is colliding! Pos: ({player.collider.x:.1f},{player.collider.y:.1f})")
     if app.input.key(Keys.W) or app.input.key(Keys.UP):

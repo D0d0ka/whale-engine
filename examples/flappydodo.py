@@ -1,6 +1,6 @@
 from WhaleEngine import *
 from WhaleEngine.helpers.fpscounter import *
-from WhaleEngine.WindowAPI.WebGL import windowAPI
+from WhaleEngine.WindowAPI.OpenGL import windowAPI
 from random import uniform
 from WhaleEngine.helpers import *
 from WhaleEngine.helpers.json_save import json_save
@@ -29,7 +29,7 @@ obstacles = []
 coins = []
 
 dodo = Entity2D(texture=textures.dodo, scale=(-0.5,0.5), position=(-150,0))
-dodo_collider = QuadCollider2D(75,100, position=(-150, 0), visualize=False)
+dodo_collider = QuadCollider2D(75,100, position=(-150, 0), visualize=True)
 ParentIn(dodo, dodo_collider, {"y": "set", "x": "set"})
 
 speed = 100

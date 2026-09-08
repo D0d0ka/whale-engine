@@ -21,8 +21,8 @@ dodo = Entity2D(
 
 collider = MeshCircleCollider2D(
     shape=shape,
-    density=16,
-    size=39,
+    density=15,
+    size=40,
     offset_x=0,
     offset_y=0,
     visualize=True
