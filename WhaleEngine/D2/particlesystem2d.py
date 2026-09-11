@@ -1,11 +1,11 @@
-from .plugin import Plugin
-from .texture import Texture
-from .utils import Range
+from WhaleEngine.plugin import Plugin
+from WhaleEngine.texture import Texture
+from WhaleEngine.utils import Range
 from .entitys2d import Entity2D
-from .color import Color
-from .destroy import destroy
-from .timer import Timer
-from .require import requirePlugin
+from WhaleEngine.color import Color
+from WhaleEngine.destroy import destroy
+from WhaleEngine.timer import Timer
+from WhaleEngine.require import requirePlugin
 
 class ParticleSystem2d(Plugin):
     def __init__(self):
@@ -77,7 +77,7 @@ class Particle2d(Entity2D):
         self.color_g_speed = particle_type.color_g_speed.safe_uniform()
         self.color_b_speed = particle_type.color_b_speed.safe_uniform()
         self.color_a_speed = particle_type.color_a_speed.safe_uniform()
-        from .engine import current_app
+        from WhaleEngine.engine import current_app
         current_app.ParticleSystem2d.particles.append(self)
 
 class ParticleSpawner2d:
@@ -91,5 +91,5 @@ class ParticleSpawner2d:
         self.active = True
         self.renderer = renderer
         self.entity_type = "Particle Spawner 2D"
-        from .engine import current_app
+        from WhaleEngine.engine import current_app
         current_app.ParticleSystem2d.particle_spawners.append(self)

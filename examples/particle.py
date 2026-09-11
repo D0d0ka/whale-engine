@@ -1,6 +1,6 @@
 from WhaleEngine import *
 from WhaleEngine.WindowAPI.OpenGL import windowAPI # from WhaleEngine.WindowAPI.Vulkan import windowAPI
-from WhaleEngine.particlesystem2d import *
+from WhaleEngine.D2 import *
 from WhaleEngine.helpers.fpscounter import *
 
 window = windowAPI(title="Particle System Demo", width=800, height=600)
@@ -44,6 +44,10 @@ def update(dt):
         app.close()
     if app.input.key_pressed(Keys.E):
         destroy(spawner)
+    if app.input.key_pressed(Keys.Q):
+        destroy(p1)
+    if app.input.key_pressed(Keys.W):
+        destroy(p2)
 app.update = update
 def on_app_close():
     summarize_FPS(print_summary=True)

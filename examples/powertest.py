@@ -1,5 +1,6 @@
 from WhaleEngine import *
-from WhaleEngine.WindowAPI.WebGL import windowAPI
+from WhaleEngine.D2 import *
+from WhaleEngine.WindowAPI.OpenGL import windowAPI
 from WhaleEngine.helpers.fpscounter import *
 from random import uniform
 #from WhaleEngine.betterrenderer2d import BetterRenderer2D 
@@ -19,7 +20,7 @@ def on_app_close():
     summarize_FPS(print_summary=True)
 app.on_app_close = on_app_close
 
-objects = 0
+objects = 100
 object_texture = textures.dodo
 
 max_move_speed = 10

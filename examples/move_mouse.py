@@ -1,9 +1,11 @@
 from WhaleEngine import *
-from WhaleEngine.WindowAPI.Vulkan import windowAPI
+from WhaleEngine.helpers.DummyRenderer import DummyRenderer
+from WhaleEngine.WindowAPI.OpenGL import windowAPI 
+# this does not work with WebGL
 
 window = windowAPI(title="Whale engine app")
 app = WhaleEngine(window=window)
-renderer = Renderer2D()
+renderer = DummyRenderer()
 app.input = InputSystem()
 app.mouse = MouseSystem()
 

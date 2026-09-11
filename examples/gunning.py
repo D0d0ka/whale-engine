@@ -1,7 +1,9 @@
 from WhaleEngine import *
 from WhaleEngine.WindowAPI.OpenGL import *
-from random import randint, uniform
+from WhaleEngine.D2 import *
 from WhaleEngine.helpers.fpscounter import *
+
+from random import randint, uniform
 
 assets_path = "gunning_assets/"
 

@@ -3,6 +3,7 @@ from threading import Thread
 import webbrowser
 
 from WhaleEngine import *
+from WhaleEngine.D2 import *
 from WhaleEngine.WindowAPI.WebGL import windowAPI
 
 ENGINE_PORT = 8765

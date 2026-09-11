@@ -1,7 +1,8 @@
 from WhaleEngine import *
+from WhaleEngine.D2 import *
+from WhaleEngine.WindowAPI.OpenGL import windowAPI
 from WhaleEngine.helpers.fpscounter import FPS_counter, summarize_FPS
 from WhaleEngine.assets import LoadShapes
-from WhaleEngine.WindowAPI.OpenGL import windowAPI
 
 #set_logging_file("log.log")
 

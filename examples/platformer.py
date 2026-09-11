@@ -1,6 +1,7 @@
 from WhaleEngine import *
 from WhaleEngine.WindowAPI.OpenGL import windowAPI
-from WhaleEngine.prefabs.charactercontroller2d import CharacterController2D
+from WhaleEngine.D2 import *
+from WhaleEngine.D2.prefabs.charactercontroller2d import CharacterController2D
 
 window = windowAPI(title="Whale engine app")
 app = WhaleEngine(window=window)

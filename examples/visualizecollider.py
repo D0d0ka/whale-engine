@@ -1,5 +1,6 @@
 from WhaleEngine import *
-from WhaleEngine.circlecollider2d import *
+from WhaleEngine.D2 import *
+from WhaleEngine.D2.circlecollider2d import *
 from WhaleEngine.WindowAPI.OpenGL import windowAPI
 
 window = windowAPI(title="circle mesh collider show", width=800, height=600)

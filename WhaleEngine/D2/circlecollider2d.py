@@ -1,19 +1,19 @@
-from .plugin import Plugin
+from WhaleEngine.plugin import Plugin
 from .entitys2d import Entity2D
-from .assets import LoadShapes
+from WhaleEngine.assets import LoadShapes
 from .utils2d import distance2D
-from .utils import layers_match, pixel_is_solid
-from .color import Color
-from .parenting import ParentIn
-from .destroy import destroy
-from .require import requirePlugin
+from WhaleEngine.utils import layers_match, pixel_is_solid
+from WhaleEngine.color import Color
+from WhaleEngine.parenting import ParentIn
+from WhaleEngine.destroy import destroy
+from WhaleEngine.require import requirePlugin
 
 from PIL import Image
 
 class CircleCollider2D:
     def __init__(self,size,*,layers=[0],position=(0,0),visualize=False,visualition_color=Color.cyan,visualition_renderer=0, **kwargs):
         requirePlugin("CircleCollisionSystem2D", "CircleCollider2D")
-        from .engine import current_app
+        from WhaleEngine.engine import current_app
         self.x, self.y = position
         self.size = size/2
         self.layers = layers
@@ -53,7 +53,7 @@ class CircleCollider2D:
 class MeshCircleCollider2D:
     def __init__(self,shape='Texture("Path to your texture") without string',density=8,size=8,offset_x=50,offset_y=60,*,layers=[0],position=(0,0),visualize=False,visualition_color=Color.cyan,visualition_renderer=0,load_once=10, **kwargs):
         requirePlugin("CircleCollisionSystem2D", "MeshCircleCollider2D")
-        from .engine import current_app
+        from WhaleEngine.engine import current_app
         self.x, self.y = position
         self.shape = shape
         if shape == 'Texture("Path to your texture") without string':
@@ -123,7 +123,7 @@ class CircleCollisionSystem2D(Plugin):
     def add_mesh(self, collider):
         self.mesh_colliders.append(collider)
     def update(self,dt):
-        from .engine import current_app
+        from WhaleEngine.engine import current_app
         for c in self.circle_colliders:
             c.colliding = False
         for c in self.mesh_colliders:

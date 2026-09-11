@@ -1,16 +1,16 @@
 from .entitys2d import Entity2D
-from .require import requirePlugin
-from .parenting import ParentIn
-from .helpers import none
-from .color import Color
-from .helpers import default
-from .texture import Texture
+from WhaleEngine.require import requirePlugin
+from WhaleEngine.parenting import ParentIn
+from WhaleEngine.helpers import none
+from WhaleEngine.color import Color
+from WhaleEngine.helpers import default
+from WhaleEngine.texture import Texture
 
 import os
 
 class Button2D(Entity2D):
     def __init__(self, onclick=none,onpress=none, hover_color=Color.gray, *,density=16, texture , color=Color.white, position=(0, 0), renderer=0, **kwargs):
-        from .bettercollider2d import MeshCollider2D
+        from WhaleEngine.D2.bettercollider2d import MeshCollider2D
         super().__init__(texture=texture, color=color, position=position, update=True, renderer=renderer, **kwargs)
         requirePlugin("BetterCollisionSystem2D","Button2D")
         requirePlugin("ParentingSystem","Button2D")
@@ -25,7 +25,7 @@ class Button2D(Entity2D):
         for key, value in kwargs.items():
             setattr(self, key, value)
     def update(self, dt):
-        from .engine import current_app
+        from WhaleEngine.engine import current_app
         if self.collider.colliding:
             mouse = current_app.MouseSystem
             self.color = self.hover_color
@@ -42,11 +42,11 @@ class Button2D(Entity2D):
 class checkbox(Button2D):
     def __init__(self,checked=False, checked_texture=default, unchecked_texture=default, color=Color.white, hover_color=Color.gray, *, density=16, position=(0, 0), scale=(1,1), renderer=0, **kwargs):
         if checked_texture is default:
-            from .assets import assets_dir
+            from WhaleEngine.assets import assets_dir
             checked_texture = Texture(os.path.join(assets_dir, "ui", "checkbox_checked.png"))
         self.checked_texture = checked_texture
         if unchecked_texture is default:
-            from .assets import assets_dir
+            from WhaleEngine.assets import assets_dir
             unchecked_texture = Texture(os.path.join(assets_dir, "ui", "checkbox_unchecked.png"))
         self.unchecked_texture = unchecked_texture
         self.checked = checked

@@ -1,5 +1,6 @@
 from WhaleEngine import *
 from WhaleEngine.WindowAPI.OpenGL import windowAPI
+from WhaleEngine.helpers.DummyRenderer import DummyRenderer
 
 #simple plugin that prints "Dodo!" every [delay] seconds, using the TimerSystem to keep track of time
 class DodoPlugin(Plugin):
@@ -13,6 +14,7 @@ class DodoPlugin(Plugin):
 
 window = windowAPI("Dodo Plugin example",800, 600)
 app = WhaleEngine(window=window)
+renderer = DummyRenderer()
 TimerSystem()
 DodoPlugin(1)
 app.run()

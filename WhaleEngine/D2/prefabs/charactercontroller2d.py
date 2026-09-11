@@ -1,7 +1,7 @@
-from WhaleEngine.entitys2d import Entity2D
-from WhaleEngine.bettercollider2d import QuadCollider2D
+from WhaleEngine.D2.entitys2d import Entity2D
+from WhaleEngine.D2.bettercollider2d import QuadCollider2D
 from WhaleEngine.parenting import ParentIn
-from WhaleEngine.raycast2d import raycast2d
+from WhaleEngine.D2.raycast2d import raycast2d
 from WhaleEngine.keys import Keys
 from WhaleEngine.require import requirePlugin
 

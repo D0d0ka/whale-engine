@@ -1,4 +1,5 @@
 from WhaleEngine import *
+from WhaleEngine.D2 import *
 from WhaleEngine.WindowAPI.WebGL import windowAPI
 
 window = windowAPI(title="sound test", width=800, height=600)

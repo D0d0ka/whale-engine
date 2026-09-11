@@ -1,6 +1,7 @@
 from WhaleEngine import *
-from WhaleEngine.helpers.fpscounter import *
+from WhaleEngine.D2 import *
 from WhaleEngine.WindowAPI.OpenGL import *
+from WhaleEngine.helpers.fpscounter import *
 
 #set_logging_file("boom.log")
 

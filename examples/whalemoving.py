@@ -1,5 +1,6 @@
 from WhaleEngine import *
-from WhaleEngine.circlecollider2d import *
+from WhaleEngine.D2 import *
+from WhaleEngine.D2.circlecollider2d import *
 from WhaleEngine.WindowAPI.OpenGL import *
 
 window = windowAPI(title="Whale moving demo")

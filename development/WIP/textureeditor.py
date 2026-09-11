@@ -3,6 +3,8 @@ from .color import Color
 from PIL import Image
 import os
 
+# init part
+#from .textureeditor import *
 
 class TextureEditor:
     """A texture editor for pixel editing, compositing, and conversion to regular Texture objects."""

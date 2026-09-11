@@ -1,14 +1,15 @@
-from .color import Color
-from .texture import Texture#, create_text_texture
-from .destroy import destroy
+from WhaleEngine.color import Color
+from WhaleEngine.texture import Texture#, create_text_texture
+from WhaleEngine.destroy import destroy
 from .utils2d import distance2D_points
-from .assets import LoadShapes
+from WhaleEngine.assets import LoadShapes
+from WhaleEngine.utils import find_font
 
 from PIL import Image, ImageDraw, ImageFont
 
 class Entity2D:
     def __init__(self, *,texture,color=Color.white,position=(0, 0),scale=(1, 1),rotation=0.0,update=False,renderer=0,visible=True,enabled=True,shader=None, **kwargs):
-        from .engine import current_app
+        from WhaleEngine.engine import current_app
         if type(texture) == str:
             texture = Texture(texture)
         self.texture = texture
@@ -44,7 +45,6 @@ class Text2D(Entity2D):
         self.color = color
         self.line_spacing = 4
         # Resolve font path once so every later call uses the same resolved path.
-        from .utils import find_font
         resolved = find_font(font_path)
         self.font_path = resolved if resolved else font_path
         # Create texture from text
@@ -92,7 +92,7 @@ class Text2D(Entity2D):
 
 class Line2D():
     def __init__(self, start=(0, 0), end=(0, 0), scale=1, color=Color.white, step=1, renderer=0, **kwargs):
-        from .engine import current_app
+        from WhaleEngine.engine import current_app
         self.start_pos = start
         self.end_pos = end
         self.color = color

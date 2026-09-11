@@ -1,4 +1,5 @@
 from WhaleEngine import *
+from WhaleEngine.D2 import *
 from WhaleEngine.WindowAPI.OpenGL import windowAPI
 
 set_logging_folder("logs") # makes a folder called logs and saves all logs there, instead of the current folder. This is useful for keeping many logs if you wan't to clear console and don't wan't to change the log file in code.
@@ -22,6 +23,8 @@ def update(dt):
     elif app.input.key(Keys.NUMBER_3) or app.input.key(Keys.NUMPAD_3):
         1/0
     4/0 # crash app for testing error handling
+
+    print("Something") # this shouldn't run, because before this line there's an error
 app.update = update
 
 app.run()

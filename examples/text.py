@@ -1,4 +1,5 @@
 from WhaleEngine import *
+from WhaleEngine.D2 import *
 from WhaleEngine.WindowAPI.OpenGL import windowAPI
 
 window = windowAPI("Text",800, 600)
@@ -10,7 +11,7 @@ text = Text2D("dodo")
 
 def update(dt):
     text.x += dt*10
-    if app.input.key_pressed(Keys.E):
+    if app.input.key_pressed(Keys.SPACE):
         destroy(text)
 app.update = update
 

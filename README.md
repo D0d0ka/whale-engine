@@ -45,6 +45,7 @@ Now you can use WhaleEngine.
 
 ```python
 from WhaleEngine import *
+from WhaleEngine.D2 import * # import WhaleEngine 2D module
 from WhaleEngine.WindowAPI.OpenGL import windowAPI # from WhaleEngine.WindowAPI.Vulkan import windowAPI # from WhaleEngine.WindowAPI.WebGL import windowAPI
 
 window = windowAPI(title="Whale engine app") # create a window using the OpenGL API, you can also use Vulkan or WebGL by changing the import above and uncommenting the line below

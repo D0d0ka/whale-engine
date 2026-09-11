@@ -26,7 +26,7 @@ def forwardMove2D(angle, distance):
 def is_on_screen2D(entity, camera):
     x, y = abs(entity.x - camera.x), abs(entity.y - camera.y)
     diagonal = math.sqrt((entity.texture.w*entity.scale_x)**2 + (entity.texture.h * entity.scale_y)**2)
-    from .engine import current_app
+    from WhaleEngine.engine import current_app
     zoom = camera.zoom
     rendering_width = abs(current_app.window.width + diagonal) / zoom / 2
     rendering_height = abs(current_app.window.height + diagonal) / zoom / 2

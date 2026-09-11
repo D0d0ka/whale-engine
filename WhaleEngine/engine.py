@@ -6,8 +6,6 @@ from .logging import logLn
 setup_global_error_handler()
 logLn("Global error handler set up.", "error logger")
 
-from .renderer2d import Renderer2D
-
 from time import perf_counter, strftime, localtime
 from pathlib import Path
 from sys import version
@@ -64,7 +62,7 @@ class WhaleEngine:
         staring_time = perf_counter()
         logLn("Whale engine starting.")
         if len(self.renderers) == 0:
-            self.renderers.append(Renderer2D())
+            raise Exception("No renderers available.")
         for i in self.renderers:
             i.start()
         self.start_time_str, self.start_time = strftime("%Y-%m-%d %H:%M:%S", localtime()), perf_counter()

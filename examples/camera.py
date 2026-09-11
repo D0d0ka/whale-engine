@@ -1,7 +1,7 @@
 from WhaleEngine import *
+from WhaleEngine.D2 import *
+from WhaleEngine.D2.betterrenderer2d import *
 from WhaleEngine.WindowAPI.OpenGL import windowAPI
-import math
-from WhaleEngine.betterrenderer2d import *
 from random import uniform
 
 window = windowAPI(title="Camera demo")

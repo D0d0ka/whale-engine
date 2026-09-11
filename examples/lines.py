@@ -1,6 +1,8 @@
 from WhaleEngine import *
-from random import randint
+from WhaleEngine.D2 import *
 from WhaleEngine.WindowAPI.OpenGL import windowAPI
+
+from random import randint
 
 window = windowAPI(title="Lines demo", width=1200, height=800)
 app = WhaleEngine(window=window)

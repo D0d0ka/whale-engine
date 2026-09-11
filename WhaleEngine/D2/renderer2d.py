@@ -1,9 +1,9 @@
-from .logging import logLn
+from WhaleEngine.logging import logLn
 from .camera2d import camera2d
 
 class Renderer2D:
     def __init__(self, **kwargs):
-        from .engine import current_app
+        from WhaleEngine.engine import current_app
         current_app.renderers.append(self)
         self.window = current_app.window
         self.entities = []

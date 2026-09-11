@@ -1,4 +1,5 @@
 from WhaleEngine import *
+from WhaleEngine.D2 import *
 from WhaleEngine.WindowAPI.WebGL import *
 
 window = windowAPI("Shader test",800, 600)

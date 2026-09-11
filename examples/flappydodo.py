@@ -1,9 +1,11 @@
 from WhaleEngine import *
-from WhaleEngine.helpers.fpscounter import *
+from WhaleEngine.D2 import *
 from WhaleEngine.WindowAPI.OpenGL import windowAPI
-from random import uniform
 from WhaleEngine.helpers import *
 from WhaleEngine.helpers.json_save import json_save
+from WhaleEngine.helpers.fpscounter import *
+
+from random import uniform
 
 window = windowAPI(title="Flappy Dodo", width=600, height=600, target_fps=120, icon="flappydodoassets/icon.ico")
 window.set_color(Color.green)
@@ -29,7 +31,7 @@ obstacles = []
 coins = []
 
 dodo = Entity2D(texture=textures.dodo, scale=(-0.5,0.5), position=(-150,0))
-dodo_collider = QuadCollider2D(75,100, position=(-150, 0), visualize=True)
+dodo_collider = QuadCollider2D(75,100, position=(-150, 0), visualize=False)
 ParentIn(dodo, dodo_collider, {"y": "set", "x": "set"})
 
 speed = 100

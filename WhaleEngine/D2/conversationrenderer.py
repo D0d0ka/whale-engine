@@ -1,9 +1,10 @@
-from .logging import logLn
+from WhaleEngine.logging import logLn
 from .renderer2d import Renderer2D
-from .color import Color
+from WhaleEngine.color import Color
 from .entitys2d import Entity2D
 from .entitys2d import Text2D
-from .assets import LoadShapes
+from WhaleEngine.assets import LoadShapes
+from WhaleEngine.utils import find_font
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -13,7 +14,6 @@ class ConversationRenderer(Renderer2D):
         self.text_color = text_color
         self.backround_color = backround_color
         # Resolve the font path cross-platform once at construction time.
-        from .utils import find_font
         resolved = find_font(font_path)
         self.font_path = resolved if resolved else font_path
         self.text = ""
@@ -90,11 +90,11 @@ class ConversationRenderer(Renderer2D):
                 break
         return selected_text, selected_size
     def start(self): 
-        from .engine import current_app
+        from WhaleEngine.engine import current_app
         self.backround = Entity2D(texture=LoadShapes().dot,renderer=self)
         self.text_entity = Text2D(text=self.text,font_path=self.font_path,color=self.text_color,position=(0,-current_app.window.height/2 + self.backround.scale_y),renderer=self)
     def update(self,dt):
-        from .engine import current_app
+        from WhaleEngine.engine import current_app
         self.backround.scale_x = current_app.window.width
         self.backround.scale_y = current_app.window.height/3
         self.backround.color = self.backround_color

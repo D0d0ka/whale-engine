@@ -1,5 +1,5 @@
 import math
-from .require import requirePlugin
+from WhaleEngine.require import requirePlugin
 
 def _segment_segment_intersection(x1, y1, x2, y2, x3, y3, x4, y4):
     dx1 = x2 - x1
@@ -63,7 +63,7 @@ def _point_in_polygon(point_x, point_y, polygon):
     return inside
 
 def raycast2d(start=(0, 0), end=(0, 0), layers=None):
-    from .engine import current_app
+    from WhaleEngine.engine import current_app
     if current_app is None:
         return None
     x1, y1 = start

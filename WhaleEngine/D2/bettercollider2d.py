@@ -1,22 +1,23 @@
-from .plugin import Plugin
-from .color import Color
-from .assets import LoadShapes
-from .utils import layers_match, pixel_is_solid
-from .parenting import ParentIn
-from .timer import Timer
-from .logging import logLn
-from .require import requirePlugin
+from WhaleEngine.plugin import Plugin
+from WhaleEngine.color import Color
+from WhaleEngine.assets import LoadShapes
+from WhaleEngine.utils import layers_match, pixel_is_solid
+from WhaleEngine.parenting import ParentIn
+from WhaleEngine.timer import Timer
+from WhaleEngine.logging import logLn
+from WhaleEngine.require import requirePlugin
+from WhaleEngine.assets import assets_dir
 
 import math
 from PIL import Image
-
 import threading
 import time
+import os
 
 class QuadCollider2D:
     def __init__(self, w=100, h=100, *, position=(0, 0), rotation=0, layers=[0], visualize=False, visualition_color=Color.cyan, visualition_renderer=0, **kwargs):
         requirePlugin("BetterCollisionSystem2D", "QuadCollider2D")
-        from .engine import current_app
+        from WhaleEngine.engine import current_app
         self.x = position[0]
         self.y = position[1]
         self.w = w
@@ -47,7 +48,7 @@ class QuadCollider2D:
 class MeshCollider2D:
     def __init__(self, shape='Texture("Path to your texture") without string', density=16, *, position=(0, 0), scale=(1, 1), rotation=0, layers=[0], visualize=False, visualition_color=Color.cyan, visualition_renderer=0, **kwargs):
         requirePlugin("BetterCollisionSystem2D", "MeshCollider2D")
-        from .engine import current_app
+        from WhaleEngine.engine import current_app
         self.x, self.y = position
         self.scale_x, self.scale_y = scale
         self.rotation = rotation
@@ -67,10 +68,8 @@ class MeshCollider2D:
         try:
             img = Image.open(self.shape.path).convert("RGBA")
         except (FileNotFoundError, OSError) as e:
-            from .logging import logLn
             logLn(f"Failed to load collider texture '{self.shape.path}': {e}", "warning")
-            from .assets import assets_dir
-            import os
+            
             missing_path = os.path.join(assets_dir, "textures", "missing_texture.png")
             img = Image.open(missing_path).convert("RGBA")
         pixels = img.load()
@@ -236,7 +235,7 @@ class BetterCollisionSystem2D(Plugin):
                     return False
         return True
     def _mouse_world_position(self):
-        from .engine import current_app
+        from WhaleEngine.engine import current_app
         mouse_system = current_app.MouseSystem
         if hasattr(mouse_system, "x") and hasattr(mouse_system, "y"):
             return mouse_system.x, mouse_system.y

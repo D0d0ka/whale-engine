@@ -1,4 +1,5 @@
 from WhaleEngine import *
+from WhaleEngine.D2 import *
 from WhaleEngine.WindowAPI.OpenGL import *
 
 window = windowAPI(title="button", width=800, height=600)
