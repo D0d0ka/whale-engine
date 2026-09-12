@@ -3,19 +3,22 @@
 ### Clean logs
 
 ```terminal
-<Logger> Log file set to "logs/2026-06-23_18-52-36-935539ac-5.log" and created.
+<Logger> Log file set to "logs/2026-09-12_17-51-19-7c30f7fb-c.log" and created.
 <error logger> Global error handler set up.
-<version> Python version: 3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]
-<version> WhaleEngine version: Standard whale engine - 0.0.1 alpha
-<python> Loaded standard WhaleEngine build
+<version> Python version: 3.13.14 (v3.13.14:fd17997c386, Jun 10 2026, 08:55:00) [Clang 21.0.0 (clang-2100.1.1.101)]
+<version> WhaleEngine version: 0.0.4 alpha (Standard whale engine)
+<python> Imported WhaleEngine core
+<WhaleEngine> Imported WhaleEngine 2D module
 <window> OpenGL window loaded.
-<WhaleEngine> Whale engine starting.
-<os> Windows
-<project> PATH TO YOUR PROJECT
-<WhaleEngine> Whale engine loaded.
+<WhaleEngine> Whale engine loading.
+<os> Darwin
+<project> path/to/your/project
+<WhaleEngine> Whale engine loaded in 0 seconds.
 <WhaleEngine> Renderer 2d loaded.
+<WhaleEngine> InputSystem loaded.
+<WhaleEngine> Textures loaded.
 <WhaleEngine> Whale engine starting.
-<WhaleEngine> Whale engine started at 2026-06-23 18:52:39.
-<WhaleEngine> Whale engine stopped at 2026-06-23 18:52:41. Total runtime: 2.68 seconds.
+<WhaleEngine> Whale engine started at 2026-09-12 17:51:20, took 0 seconds.
+<WhaleEngine> Whale engine stopped at 2026-09-12 17:51:22. Total runtime: 1.78 seconds.
 <window> Window closed.
 ```

@@ -1,5 +1,14 @@
+# install it
+git clone https://github.com/D0d0ka/whale-engine.git
+
 # make venv
+windows:
+
 python -m venv .venv
+
+linux/macos
+
+python3 -m venv .venv
 
 # activate venv
 windows:
@@ -12,10 +21,16 @@ source .venv/bin/activate
 
 # upgrade pip
 
+windows:
+
 python.exe -m pip install --upgrade pip
 
+linux/macos:
+
+pip install --upgrade pip
+
 # you need to install theese
-python -m pip install -r requirements/mainrequirements.txt
+python -m pip install -r WhaleEngine/requirements/mainrequirements.txt
 
 # if you wan't to use openGL then you need to install this:
 python -m pip install -r WhaleEngine/requirements/openGLrequirements.txt

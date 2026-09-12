@@ -1,5 +1,5 @@
 from WhaleEngine import *
-from WhaleEngine.D2.conversationrenderer import ConversationRenderer
+from WhaleEngine.D2.prefabs.conversationrenderer import ConversationRenderer
 from WhaleEngine.WindowAPI.OpenGL import windowAPI
 
 window = windowAPI("Conversation Example",800, 600)

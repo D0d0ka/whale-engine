@@ -1,8 +1,8 @@
 from WhaleEngine.logging import logLn
-from .renderer2d import Renderer2D
+from WhaleEngine.D2.renderer2d import Renderer2D
 from WhaleEngine.color import Color
-from .entitys2d import Entity2D
-from .entitys2d import Text2D
+from WhaleEngine.D2.entitys2d import Entity2D
+from WhaleEngine.D2.entitys2d import Text2D
 from WhaleEngine.assets import LoadShapes
 from WhaleEngine.utils import find_font
 

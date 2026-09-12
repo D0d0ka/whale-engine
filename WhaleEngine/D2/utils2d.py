@@ -30,7 +30,6 @@ def is_on_screen2D(entity, camera):
     zoom = camera.zoom
     rendering_width = abs(current_app.window.width + diagonal) / zoom / 2
     rendering_height = abs(current_app.window.height + diagonal) / zoom / 2
-    #logLn(f"Entity position: ({x}, {y}), texture diagonal size: ({diagonal}), Screen size: ({rendering_width}, {rendering_height})", "betterrenderer2d")
     if x > rendering_width or y > rendering_height:
         return False
     return True

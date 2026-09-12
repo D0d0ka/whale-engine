@@ -3,7 +3,7 @@ from WhaleEngine.D2 import *
 from WhaleEngine.WindowAPI.OpenGL import windowAPI
 from WhaleEngine.helpers.fpscounter import *
 from random import uniform
-#from WhaleEngine.betterrenderer2d import BetterRenderer2D 
+#from WhaleEngine.D2.prefabs.betterrenderer2d import BetterRenderer2D 
 # # I tested the BetterRenderer2D here
 # but this is stress test so we stick with the basic Renderer2D
 

@@ -25,12 +25,16 @@ cheatsheets/
 # game flappy dodo save file
 flappydodosave.json
 
-# .exe output
+# turning to .exe output
 output/
+
+# turning to .dmg output
+build/
+dist/
+*.spec
 
 # vscode specific
 .vscode/
-.companion/
-# this is a little sideproject I have.
+.companion/ # this is a little sideproject I have.
 
 .DS_Store

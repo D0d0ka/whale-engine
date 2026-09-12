@@ -1,6 +1,6 @@
 from WhaleEngine import *
-from WhaleEngine.WindowAPI.OpenGL import windowAPI # or Vulkan / WebGL
 from WhaleEngine.D2 import *
+from WhaleEngine.WindowAPI.OpenGL import windowAPI # or Vulkan / WebGL
 
 window = windowAPI(title="Whale engine app")
 app = WhaleEngine(window=window)

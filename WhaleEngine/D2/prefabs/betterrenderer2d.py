@@ -1,5 +1,8 @@
-from .renderer2d import Renderer2D
-from .utils2d import is_on_screen2D
+from ..renderer2d import Renderer2D
+from ..utils2d import is_on_screen2D
+
+# part of in on screen function
+#logLn(f"Entity position: ({x}, {y}), texture diagonal size: ({diagonal}), Screen size: ({rendering_width}, {rendering_height})", "betterrenderer2d")
 
 class BetterRenderer2D(Renderer2D):
     def __init__(self ,**kwargs):

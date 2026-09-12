@@ -1,6 +1,6 @@
 from WhaleEngine import *
 from WhaleEngine.D2 import *
-from WhaleEngine.D2.betterrenderer2d import *
+from WhaleEngine.D2.prefabs.betterrenderer2d import *
 from WhaleEngine.WindowAPI.OpenGL import windowAPI
 from random import uniform
 
