@@ -28,9 +28,10 @@ class MouseSystem(Plugin):
         self.y = -(my / h) * h + h / 2
     def get_position(self):
         return (self.x, self.y)
-    def set_position(self, x, y):
+    def set_position(self, pos):
         w = self.window.width
         h = self.window.height
+        x, y = pos
         wx = x + w / 2
         wy = h / 2 - y
         self.window.set_cursor_pos(wx, wy)

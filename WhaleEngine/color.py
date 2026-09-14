@@ -23,6 +23,10 @@ class Color:
         g = int(hexcode[2:4], 16)
         b = int(hexcode[4:6], 16)
         return Color.rgb(r, g, b)
+    @staticmethod
+    def random():
+        from random import random
+        return Color(random(), random(), random(), 1)
 
     # ---------- PRESETS ----------
     white   = None

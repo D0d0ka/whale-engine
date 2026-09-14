@@ -1,14 +1,11 @@
 from WhaleEngine.logging import logLn
-
-class DummyCamera:
-    def __init__(self):
-        pass
+from WhaleEngine.D2.camera2d import camera2d
 
 class DummyRenderer:
     def __init__(self, **kwargs):
         from WhaleEngine.engine import current_app
         current_app.renderers.append(self)
-        self.camera = DummyCamera()
+        self.camera = camera2d()
         self.renderer_type = "DummyRenderer"
         for key, value in kwargs.items():
             setattr(self, key, value)
