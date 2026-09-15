@@ -110,11 +110,37 @@
         linear-gradient(transparent 95%, var(--grid) 95%),
         linear-gradient(90deg, transparent 95%, var(--grid) 95%);
       background-size: 24px 24px;
+      cursor: none;
     }
     body.embed canvas {
       height: 100%;
       border: 0;
       border-radius: 0;
+    }
+    .virtual-cursor {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      width: 18px;
+      height: 18px;
+      margin-left: -2px;
+      margin-top: -2px;
+      border-radius: 999px;
+      border: 2px solid rgba(255, 255, 255, 0.92);
+      background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.95), rgba(76, 201, 240, 0.82) 45%, rgba(76, 201, 240, 0.12) 70%, transparent 72%);
+      box-shadow: 0 0 18px rgba(76, 201, 240, 0.42);
+      pointer-events: none;
+      transform: translate(-9999px, -9999px);
+      opacity: 0;
+      transition: opacity 120ms ease;
+      z-index: 2;
+    }
+    .virtual-cursor.visible {
+      opacity: 1;
+    }
+    body.embed .virtual-cursor {
+      top: 0;
+      left: 0;
     }
     @keyframes rise-in {
       from {

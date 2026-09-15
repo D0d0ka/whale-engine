@@ -2,6 +2,7 @@ const canvas = document.getElementById("stage");
 const titleEl = document.getElementById("appTitle");
 const statusEl = document.getElementById("status");
 const closeBtn = document.getElementById("closeBtn");
+const cursorEl = document.getElementById("virtualCursor");
 
 const gl = canvas.getContext("webgl", { alpha: false, antialias: true });
 if (!gl) {
@@ -155,6 +156,23 @@ let lastFrameId = -1;
 let needFullTextures = true;
 let requestInFlight = false;
 let shuttingDown = false;
+let cursorVisible = false;
+
+function clamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function updateCursorVisual(forceVisible = cursorVisible) {
+  const rect = canvas.getBoundingClientRect();
+  const width = Math.max(1, canvas.width);
+  const height = Math.max(1, canvas.height);
+  const x = clamp(Number(cursor.x || 0), 0, width);
+  const y = clamp(Number(cursor.y || 0), 0, height);
+  const screenX = (x / width) * rect.width;
+  const screenY = (y / height) * rect.height;
+  cursorEl.style.transform = `translate(${screenX}px, ${screenY}px)`;
+  cursorEl.classList.toggle("visible", !!forceVisible);
+}
 
 function beginShutdown(message = "Closing browser page...") {
   if (shuttingDown) {
@@ -384,6 +402,13 @@ async function tick() {
     return;
   }
 
+  if (state.cursor_target) {
+    cursor.x = Number(state.cursor_target.x ?? cursor.x);
+    cursor.y = Number(state.cursor_target.y ?? cursor.y);
+    cursorVisible = true;
+    updateCursorVisual(true);
+  }
+
   if (state) {
     const frameId = Number(state.frame_id || 0);
     titleEl.textContent = state.title || "WhaleEngine WebGL";
@@ -425,6 +450,18 @@ canvas.addEventListener("mousemove", (event) => {
   const scaleY = canvas.height / Math.max(1, rect.height);
   cursor.x = (event.clientX - rect.left) * scaleX;
   cursor.y = (event.clientY - rect.top) * scaleY;
+  cursorVisible = true;
+  updateCursorVisual(true);
+});
+
+canvas.addEventListener("mouseenter", () => {
+  cursorVisible = true;
+  updateCursorVisual(true);
+});
+
+canvas.addEventListener("mouseleave", () => {
+  cursorVisible = false;
+  updateCursorVisual(false);
 });
 
 canvas.addEventListener("mousedown", (event) => {
@@ -452,5 +489,11 @@ window.addEventListener("beforeunload", () => {
   const data = JSON.stringify({ close: true });
   navigator.sendBeacon("/input", data);
 });
+
+window.addEventListener("resize", () => {
+  updateCursorVisual(cursorVisible);
+});
+
+updateCursorVisual(false);
 
 tick();

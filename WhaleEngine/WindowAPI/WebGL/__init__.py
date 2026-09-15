@@ -95,6 +95,7 @@ class windowAPI:
 		self._last_swap = perf_counter()
 		self._frame_duration = 1.0 / float(self._target_fps)
 		self._pending_texture_ids = set()
+		self._pending_cursor_target = None
 
 		self._lock = threading.Lock()
 		self._server = None
@@ -252,8 +253,12 @@ class windowAPI:
 
 	def set_cursor_pos(self, x, y):
 		with self._lock:
-			self._mouse_x = x
-			self._mouse_y = y
+			self._mouse_x = float(x)
+			self._mouse_y = float(y)
+			self._pending_cursor_target = {
+				"x": self._mouse_x,
+				"y": self._mouse_y,
+			}
 
 	def is_mouse_button_down(self, button):
 		if isinstance(button, str):
@@ -356,6 +361,8 @@ class windowAPI:
 			else:
 				textures = [self._textures[tex_id] for tex_id in self._pending_texture_ids if tex_id in self._textures]
 				self._pending_texture_ids.clear()
+			cursor_target = self._pending_cursor_target
+			self._pending_cursor_target = None
 			close_browser = self._close_browser_requested
 			if close_browser:
 				self._close_browser_requested = False
@@ -368,6 +375,7 @@ class windowAPI:
 				"entities": list(self._pending_entities),
 				"textures": textures,
 				"camera": dict(self._pending_camera),
+				"cursor_target": dict(cursor_target) if cursor_target is not None else None,
 				"close_browser": close_browser,
 			}
 
