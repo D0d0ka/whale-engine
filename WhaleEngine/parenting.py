@@ -17,6 +17,10 @@ class ParentIn:
         self.child = child
         self.attrs = {}
         self.entity_type = "Parenting"
+        if not hasattr(self.parent, "parentings"):
+            self.parent.parentings = []
+        if not hasattr(self.child, "parentings"):
+            self.child.parentings = []
         self.parent.parentings.append(self)
         self.child.parentings.append(self)
         for attr, mode in attributes.items():

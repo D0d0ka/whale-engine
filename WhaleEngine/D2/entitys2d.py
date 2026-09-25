@@ -26,7 +26,6 @@ class Entity2D:
             renderer = current_app.renderers[renderer]
         self.renderer = renderer
         self.entity_type = "Entity 2D"
-        self.parentings = []
         renderer.add(self)
         for key, value in kwargs.items():
             setattr(self, key, value)

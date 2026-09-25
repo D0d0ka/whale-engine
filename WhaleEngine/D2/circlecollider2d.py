@@ -18,7 +18,6 @@ class CircleCollider2D:
         self.size = size/2
         self.layers = layers
         self.colliding = False
-        self.parentings = []
         self.ignores = []
         self.entity_type = "Circle Collider"
         self.type = "circle collider"
@@ -61,7 +60,6 @@ class MeshCircleCollider2D:
         self.density = density
         self.layers = layers
         self.colliding = False
-        self.parentings = []
         self.ignores = []
         self.entity_type = "Mesh circle Collider"
         self.enabled = True

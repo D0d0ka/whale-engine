@@ -18,6 +18,18 @@ class Renderer2D:
         pass
     def add(self, entity):
         self.entities.append(entity)
+    def render_last(self, entity):
+        if entity in self.entities:
+            self.entities.remove(entity)
+            self.entities.append(entity)
+    def render_first(self, entity):
+        if entity in self.entities:
+            self.entities.remove(entity)
+            self.entities.insert(0, entity)
+    def set_render_order(self, entity, place):
+        if entity in self.entities:
+            self.entities.remove(entity)
+            self.entities.insert(place, entity)
     def update_entitys(self, dt):
         for i in self.entities:
             if i.do_update and i.enabled:

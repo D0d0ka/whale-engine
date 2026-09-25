@@ -3,11 +3,15 @@ def destroy(entity):
     if entity.entity_type == "Entity 2D":
         if entity in entity.renderer.entities:
             entity.renderer.entities.remove(entity)
-        for i in list(entity.parentings):
-            destroy(i)
+        if hasattr(entity, "parentings"):
+            for i in list(entity.parentings):
+                destroy(i)
     elif entity.entity_type == "Circle Collider":
         if entity.visualize:
             destroy(entity.visualition)
+        if hasattr(entity, "parentings"):
+            for i in list(entity.parentings):
+                destroy(i)
         for i in list(entity.parentings):
             destroy(i)
         if entity in current_app.CircleCollisionSystem2D.circle_colliders:
@@ -19,8 +23,9 @@ def destroy(entity):
         if hasattr(entity, "dots"):
             for dot in entity.dots:
                 destroy(dot)
-        for i in list(entity.parentings):
-            destroy(i)
+        if hasattr(entity, "parentings"):
+            for i in list(entity.parentings):
+                destroy(i)
         if hasattr(current_app, "CircleCollisionSystem2D") and entity in current_app.CircleCollisionSystem2D.mesh_colliders:
             current_app.CircleCollisionSystem2D.mesh_colliders.remove(entity)
         if hasattr(current_app, "BetterCollisionSystem2D") and entity in current_app.BetterCollisionSystem2D.colliders:
@@ -28,9 +33,10 @@ def destroy(entity):
     elif entity.entity_type == "Quad Collider":
         if entity.visualize:
             destroy(entity.visualition)
-        for i in list(entity.parentings):
-            destroy(i)
-        if hasattr(current_app, "BetterCollisionSystem") and entity in current_app.BetterCollisionSystem2D.colliders:
+        if hasattr(entity, "parentings"):
+            for i in list(entity.parentings):
+                destroy(i)
+        if hasattr(current_app, "BetterCollisionSystem2D") and entity in current_app.BetterCollisionSystem2D.colliders:
             current_app.BetterCollisionSystem2D.colliders.remove(entity)
     elif entity.entity_type == "Line 2D":
         for part in entity.parts:

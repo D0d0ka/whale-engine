@@ -16,7 +16,7 @@ class ParticleSystem2d(Plugin):
         for spawner in self.particle_spawners:
             if spawner.active:
                 if spawner.spawn_timer.over:
-                    Particle2d(spawner.particle_type, x=spawner.x, y=spawner.y, renderer=spawner.renderer)
+                    Particle2d(spawner.particle_type, pos=spawner.get_pos(), renderer=spawner.renderer)
                     spawner.spawn_timer.reset()
         removing_particles = []
         for i in self.particles:
@@ -62,9 +62,9 @@ class ParticleType2d:
         self.color_a_speed = color_a_speed
 
 class Particle2d(Entity2D):
-    def __init__(self, particle_type: ParticleType2d, x=0, y=0, *, renderer=0):
+    def __init__(self, particle_type: ParticleType2d, pos=(0, 0), *, renderer=0):
         requirePlugin("ParticleSystem2d", "Particle2d")
-        super().__init__(texture=particle_type.texture, position=(x, y),scale=(particle_type.scale_x.safe_uniform(), particle_type.scale_y.safe_uniform()), color=Color.rgba(particle_type.color_r.safe_uniform(), particle_type.color_g.safe_uniform(), particle_type.color_b.safe_uniform(), particle_type.color_a.safe_uniform()),renderer=renderer)
+        super().__init__(texture=particle_type.texture, position=pos,scale=(particle_type.scale_x.safe_uniform(), particle_type.scale_y.safe_uniform()), color=Color.rgba(particle_type.color_r.safe_uniform(), particle_type.color_g.safe_uniform(), particle_type.color_b.safe_uniform(), particle_type.color_a.safe_uniform()),renderer=renderer)
         self.particle_type = particle_type
         self.lifetime = Timer(particle_type.lifetime.safe_uniform())
         self.x_speed = particle_type.x_speed.safe_uniform()
@@ -81,11 +81,10 @@ class Particle2d(Entity2D):
         current_app.ParticleSystem2d.particles.append(self)
 
 class ParticleSpawner2d:
-    def __init__(self, particle_type: ParticleType2d, x=0, y=0, spawn_rate=1, *, renderer=0):
+    def __init__(self, particle_type: ParticleType2d, pos=(0, 0), spawn_rate=1, *, renderer=0):
         requirePlugin("ParticleSystem2d", "ParticleSpawner2d")
         self.particle_type = particle_type
-        self.x = x
-        self.y = y
+        self.x, self.y = pos
         self.spawn_rate = spawn_rate
         self.spawn_timer = Timer(1/spawn_rate)
         self.active = True
@@ -93,3 +92,7 @@ class ParticleSpawner2d:
         self.entity_type = "Particle Spawner 2D"
         from WhaleEngine.engine import current_app
         current_app.ParticleSystem2d.particle_spawners.append(self)
+    def get_pos(self):
+        return (self.x, self.y)
+    def set_pos(self, pos):
+        self.x, self.y = pos

@@ -25,7 +25,6 @@ class QuadCollider2D:
         self.rotation = rotation
         self.layers = layers
         self.colliding = False
-        self.parentings = []
         self.ignores = []
         self.entity_type = "Quad Collider"
         self.type = "quad collider"
@@ -54,7 +53,6 @@ class MeshCollider2D:
         self.rotation = rotation
         self.layers = layers
         self.colliding = False
-        self.parentings = []
         self.ignores = []
         self.entity_type = "Mesh Better Collider"
         self.type = "mesh collider"

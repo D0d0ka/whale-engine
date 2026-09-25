@@ -30,10 +30,10 @@ test_particle_type = ParticleType2d(
     color_a_speed=Range(-1, 1)
 )
 
-p1 = Particle2d(test_particle_type, x=200, y=200)
-p2 = Particle2d(test_particle_type, x=-200, y=-200)
+p1 = Particle2d(test_particle_type, pos=(200, 200))
+p2 = Particle2d(test_particle_type, pos=(-200, -200))
 
-spawner = ParticleSpawner2d(test_particle_type, x=0, y=0, spawn_rate=100, renderer=renderer)
+spawner = ParticleSpawner2d(test_particle_type, pos=(0, 0), spawn_rate=100, renderer=renderer)
 
 def update(dt):
     FPS_counter(dt)
