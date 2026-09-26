@@ -4,7 +4,7 @@ from WhaleEngine.WindowAPI.OpenGL import windowAPI # or Vulkan / WebGL
 from WhaleEngine.helpers.fpscounter import *
 from WhaleEngine.D2.prefabs.betterrenderer2d import BetterRenderer2D
 
-window = windowAPI(title="Bouncing", target_fps=60)#float("inf"))
+window = windowAPI(title="Bouncing", target_fps=float("inf"))
 window.set_color(Color.cyan)
 app = WhaleEngine(window=window)
 renderer = BetterRenderer2D()
@@ -40,6 +40,7 @@ particle = ParticleType2d(
     lifetime=Range(1, 1),
     scale_x=Range(0.2),
     scale_y=Range(0.2),
+    scale_speed=Range(0.79)
 )
 
 spawner = ParticleSpawner2d(particle, pos=(0, START_HEIGHT), spawn_rate=100000, renderer=renderer)
@@ -53,6 +54,8 @@ camera.x -= 300
 speed_x = START_SPEED_X
 speed_y = START_SPEED_Y
 
+zero_range = Range(-5, 5)
+
 def update(dt):
     global speed_y, speed_x
     FPS_counter(dt)
@@ -60,7 +63,7 @@ def update(dt):
     renderer.render_last(ball)
     renderer.render_last(image)
     speed_x -= AIR_RESISTANCE * dt
-    if speed_x < 0:
+    if zero_range.do_overlap(Range(speed_x)):
         speed_x = 0
     ball.x += speed_x * dt
     ball.rotation -= speed_x * dt

@@ -40,7 +40,7 @@ This repo is heavily example-driven. Many APIs are demonstrated in examples befo
 
 - [AppBase.py](AppBase.py) is the minimal example for app setup.
 - [WhaleEngine/engine.py](WhaleEngine/engine.py) defines `WhaleEngine`, sets `current_app`, tracks `renderers`, `plugins`, and `attrs`, and owns the frame loop and shutdown path.
-- `WhaleEngine.run()` does the main loop: `window.poll()`, `BeforeRender` plugins, `app.update`, each renderer update/render, `AfterRender` plugins, then `window.swap()`.
+- `WhaleEngine.run()` does the main loop: `window.poll()`, `window.clear()`, `BeforeRender` plugins, `app.update`, each renderer (`update`, `update_entitys`, `render`), `AfterRender` plugins, then `window.swap()`.
 - `close_app()` executes `on_app_close`, logs runtime info, and calls `window.terminate()`.
 - Dynamic attributes are common: `app.input`, `app.sound`, `app.renderer`, `app.MouseSystem`, etc.
 
@@ -53,7 +53,7 @@ This repo is heavily example-driven. Many APIs are demonstrated in examples befo
 ### Plugin system
 
 - Plugins inherit from `Plugin` in [WhaleEngine/plugin.py](WhaleEngine/plugin.py).
-- The base plugin constructor registers the plugin by class name into the active app, both in `current_app.plugins[mode]` and `current_app.attrs`.
+- The base plugin constructor registers the plugin by class name into the active app: in `current_app.plugins[mode]`, in `current_app.attrs`, and as a direct attribute via `setattr(current_app, ClassName, self)`.
 - Plugins often become direct attributes on the app, for example `current_app.InputSystem` or `app.input = InputSystem()`.
 - `requirements` and `incompatibilities` are enforced during initialization by [WhaleEngine/require.py](WhaleEngine/require.py).
 - Plugins can run either before rendering or after rendering via `update_before_rendering`.
@@ -64,7 +64,7 @@ This repo is heavily example-driven. Many APIs are demonstrated in examples befo
 - Renderers use `self.entities` and call `entity.update(dt)` for enabled and `do_update` entities.
 - Rendering is done by iterating visible and enabled entities then delegating to backend-specific rendering when available.
 - [WhaleEngine/D2/entitys2d.py](WhaleEngine/D2/entitys2d.py) defines `Entity2D`, `Text2D`, and `Line2D` and expects common fields like `x`, `y`, `rotation`, `scale_x`, `scale_y`, `visible`, `enabled`, `do_update`, and `renderer`.
-- Cameras are part of the draw pipeline and appear via `camera2d()` from the 2D system.
+- Cameras are part of the draw pipeline; each `Renderer2D` creates a `camera2d` instance at `renderer.camera`. The `camera2d` class is not exported from `WhaleEngine.D2` — access it via `renderer.camera`.
 - World coordinates are centered: `(0, 0)` is the screen center, `+x` points right, and `+y` points up.
 
 ### Window API and backend expectations
@@ -93,12 +93,13 @@ These conventions recur in almost every example and are essential for agent beha
 - App setup pattern:
   - `window = windowAPI(title="...", width=..., height=...)`
   - `app = WhaleEngine(window=window)`
-  - `renderer = Renderer2D()` or `BetterRenderer2D()`
+  - `renderer = Renderer2D()` or `BetterRenderer2D()` (`BetterRenderer2D` requires `from WhaleEngine.D2.prefabs.betterrenderer2d import BetterRenderer2D`)
 - Plugin setup pattern:
   - `app.input = InputSystem()`
   - `MouseSystem()`
   - `TimerSystem()`
   - `ParentingSystem()`
+  - `ParentIn(parent, child, attributes)` — attaches a child to a parent; requires `ParentingSystem`; exported from `WhaleEngine`
   - `BetterCollisionSystem2D()`
   - `SoundSystem()`
   - `ParticleSystem2d()`
@@ -115,7 +116,7 @@ These conventions recur in almost every example and are essential for agent beha
   - `textures = LoadTextures()`
   - `shapes = LoadShapes()`
   - `sounds = LoadSounds()`
-  - then reference `textures.whale`, `shapes.square`, `sounds.music`, etc.
+  - then reference `textures.whale`, `shapes.square`, `sounds.music`, `sounds.sound`, etc.
 - Example run pattern:
   - almost every example ends with `app.run()`
 
@@ -236,6 +237,16 @@ These conventions recur in almost every example and are essential for agent beha
 ### [examples/boomassets](examples/boomassets), [examples/flappydodoassets](examples/flappydodoassets), [examples/gunning_assets](examples/gunning_assets)
 
 - These are example-local asset folders that must be kept next to the example scripts to work as designed.
+
+### [examples/bouncing.py](examples/bouncing.py)
+
+- Demonstrates physics simulation (gravity, elasticity, air resistance) with `BetterRenderer2D`, `ParticleSpawner2d`, and `ParentIn`.
+- Good reference for `ParentIn` usage, particle spawner configuration, and the `Range(...)` pattern.
+
+### [examples/DodoMaps.py](examples/DodoMaps.py)
+
+- Stress-test / large-world example: spawns thousands of entities in a grid, demonstrating `BetterRenderer2D` frustum culling.
+- Good reference for large entity counts and the `Color.random()` helper.
 
 ### [examples/examples.md](examples/examples.md)
 
