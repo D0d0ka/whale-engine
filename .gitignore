@@ -17,10 +17,10 @@ counter.txt
 
 # test python file
 test.py
-assets/
 
 # info for developer only
 cheatsheets/
+saves/
 
 # game flappy dodo save file
 flappydodosave.json

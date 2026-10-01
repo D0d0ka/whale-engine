@@ -25,6 +25,7 @@ class QuadCollider2D:
         self.rotation = rotation
         self.layers = layers
         self.colliding = False
+        self.colliding_layers = []
         self.ignores = []
         self.entity_type = "Quad Collider"
         self.type = "quad collider"
@@ -53,6 +54,7 @@ class MeshCollider2D:
         self.rotation = rotation
         self.layers = layers
         self.colliding = False
+        self.colliding_layers = []
         self.ignores = []
         self.entity_type = "Mesh Better Collider"
         self.type = "mesh collider"
@@ -264,18 +266,18 @@ class BetterCollisionSystem2D(Plugin):
             aabb_cache[id(collider)] = self._get_aabb(poly)
         for collider in self.colliders:
             collider.colliding = False
+            collider.colliding_layers = []
         for first in self.colliders:
             if not first.enabled:
                 continue
             first_id = id(first)
             first_polygon = polygon_cache[first_id]
             if "mouse" in first.layers:
-                if len(first.layers) > 1:
-                    raise RuntimeError("Colliders with 'mouse' layer cannot have other layers")
                 mouse_x, mouse_y = self._mouse_world_position()
                 if self._point_in_polygon(mouse_x, mouse_y, first_polygon):
                     first.colliding = True
-                continue
+                    if "mouse" not in first.colliding_layers:
+                        first.colliding_layers.append("mouse")
             first_aabb = aabb_cache[first_id]
             for second in self.colliders:
                 if not second.enabled:
@@ -290,4 +292,7 @@ class BetterCollisionSystem2D(Plugin):
                     continue
                 if self._polygons_intersect(first_polygon, polygon_cache[id(second)]):
                     first.colliding = True
+                    for layer in second.layers:
+                        if layer in first.layers and layer not in first.colliding_layers:
+                            first.colliding_layers.append(layer)
                     break

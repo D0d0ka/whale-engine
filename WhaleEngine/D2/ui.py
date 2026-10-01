@@ -29,7 +29,7 @@ class Button2D(Entity2D):
         if self.collider.colliding:
             mouse = current_app.MouseSystem
             self.color = self.hover_color
-            if mouse.left_pressed() and self.collider.colliding:
+            if mouse.left_pressed() and "mouse" in self.collider.colliding_layers:
                 self.onpress()
                 self.pressed = True
             elif self.pressed and not mouse.left_down:

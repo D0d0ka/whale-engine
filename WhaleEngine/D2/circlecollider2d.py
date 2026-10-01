@@ -18,6 +18,7 @@ class CircleCollider2D:
         self.size = size/2
         self.layers = layers
         self.colliding = False
+        self.colliding_layers = []
         self.ignores = []
         self.entity_type = "Circle Collider"
         self.type = "circle collider"
@@ -60,6 +61,7 @@ class MeshCircleCollider2D:
         self.density = density
         self.layers = layers
         self.colliding = False
+        self.colliding_layers = []
         self.ignores = []
         self.entity_type = "Mesh circle Collider"
         self.enabled = True
@@ -124,8 +126,10 @@ class CircleCollisionSystem2D(Plugin):
         from WhaleEngine.engine import current_app
         for c in self.circle_colliders:
             c.colliding = False
+            c.colliding_layers = []
         for c in self.mesh_colliders:
             c.colliding = False
+            c.colliding_layers = []
         for first in self.circle_colliders:
             if not first.enabled:
                 continue
@@ -135,6 +139,8 @@ class CircleCollisionSystem2D(Plugin):
                 if "mouse" in first.layers:
                     if distance2D(first,current_app.MouseSystem) < first.size:
                         first.colliding = True
+                        if "mouse" not in first.colliding_layers:
+                            first.colliding_layers.append("mouse")
                         break
                 if first == second:
                     continue
@@ -146,7 +152,9 @@ class CircleCollisionSystem2D(Plugin):
                     continue
                 if distance2D(first,second) < first.size + second.size:
                     first.colliding = True
-                    break
+                    for layer in second.layers:
+                        if layer in first.layers and layer not in first.colliding_layers:
+                            first.colliding_layers.append(layer)
         for mesh in self.mesh_colliders:
             if not mesh.enabled:
                 for i in mesh.dots:
@@ -160,4 +168,6 @@ class CircleCollisionSystem2D(Plugin):
                     continue
                 if i.colliding:
                     mesh.colliding = True
-                    break
+                    for layer in i.colliding_layers:
+                        if layer not in mesh.colliding_layers:
+                            mesh.colliding_layers.append(layer)

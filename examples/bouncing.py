@@ -20,7 +20,7 @@ LOSS_MULTIPLIER = 0.75
 START_HEIGHT = 300
 GROUND_Y = -300
 START_SPEED_Y = 100
-START_SPEED_X = 1000
+START_SPEED_X = -1000
 AIR_RESISTANCE = 100
 ELASTICITY = 0
 START_SCALE_Y = 1
@@ -43,7 +43,7 @@ particle = ParticleType2d(
     scale_speed=Range(0.79)
 )
 
-spawner = ParticleSpawner2d(particle, pos=(0, START_HEIGHT), spawn_rate=100000, renderer=renderer)
+spawner = ParticleSpawner2d(particle, pos=(0, START_HEIGHT), spawn_rate=10, renderer=renderer)
 ParentIn(ball, spawner)
 
 ParentIn(camera, ground, {"x": "set"})
@@ -62,7 +62,10 @@ def update(dt):
     window.set_title(f"Bouncing - FPS: {round(get_FPS())}")
     renderer.render_last(ball)
     renderer.render_last(image)
-    speed_x -= AIR_RESISTANCE * dt
+    if speed_x > 0:
+        speed_x -= AIR_RESISTANCE * dt
+    elif speed_x < 0:
+        speed_x += AIR_RESISTANCE * dt
     if zero_range.do_overlap(Range(speed_x)):
         speed_x = 0
     ball.x += speed_x * dt

@@ -18,7 +18,8 @@ QuadCollider2D(1000, 50, position=(0, -122), visualize=True, visualition_color=C
 QuadCollider2D(400, 50, position=(0, 150), visualize=True, visualition_color=Color.green, layers=[0, "ground"])
 
 def update(dt):
-    pass
+    if app.input.key_pressed(Keys.ESCAPE):
+        app.close()
 app.update = update
 
 app.run()
