@@ -10,6 +10,7 @@ app = WhaleEngine(window=window)
 renderer = BetterRenderer2D()
 camera = renderer.camera
 app.input = InputSystem()
+Mouse = MouseSystem()
 shapes = LoadShapes()
 ParentingSystem()
 TimerSystem()
@@ -19,12 +20,13 @@ GRAVITY = 980
 LOSS_MULTIPLIER = 0.75
 START_HEIGHT = 300
 GROUND_Y = -300
-START_SPEED_Y = 100
-START_SPEED_X = -1000
+START_SPEED_Y = 0
+START_SPEED_X = 0
 AIR_RESISTANCE = 100
 ELASTICITY = 0
 START_SCALE_Y = 1
 CAMERA_SPEED = 2000
+CLICK_MULTIPLIER = 2
 
 # changes
 ELASTICITY = 1 - ELASTICITY
@@ -47,7 +49,7 @@ spawner = ParticleSpawner2d(particle, pos=(0, START_HEIGHT), spawn_rate=10, rend
 ParentIn(ball, spawner)
 
 ParentIn(camera, ground, {"x": "set"})
-ParentIn(ball, camera, {"x": "add"})
+#ParentIn(ball, camera, {"x": "add"})
 
 camera.x -= 300
 
@@ -62,6 +64,11 @@ def update(dt):
     window.set_title(f"Bouncing - FPS: {round(get_FPS())}")
     renderer.render_last(ball)
     renderer.render_last(image)
+    if Mouse.left_pressed():
+        speed_x = (camera.x - Mouse.x) * CLICK_MULTIPLIER
+        speed_y = (Mouse.y - camera.y) * CLICK_MULTIPLIER
+        print(f"Mouse clicked at ({Mouse.x}, {Mouse.y})")
+        print(f"Speed set to ({speed_x}, {speed_y})")
     if speed_x > 0:
         speed_x -= AIR_RESISTANCE * dt
     elif speed_x < 0:

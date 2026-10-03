@@ -43,6 +43,7 @@ class WhaleEngine:
         self.on_app_close = None
         self.running = False
         self.exit = self.close = self.close_app
+        self.need_stop = []
         self.start_time = None
         # Get workspace root: go up from WhaleEngine/engine.py -> WhaleEngine -> workspace
         path = Path(__file__).resolve().parent
@@ -91,6 +92,8 @@ class WhaleEngine:
         self.close_app()
     def close_app(self):
         self.running = False
+        for stoppable in self.need_stop:
+            controlledrun(stoppable.stop)
         if self.on_app_close:
             controlledrun(self.on_app_close)
         stoptime = strftime("%Y-%m-%d %H:%M:%S", localtime())

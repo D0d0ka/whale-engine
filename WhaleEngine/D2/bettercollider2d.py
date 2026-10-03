@@ -124,13 +124,17 @@ class BetterCollisionSystem2D(Plugin):
             self.set_up_timer()
         self.threaded = threaded
         self.shapes = LoadShapes()
+        self.stopping = False
         if threaded:
             def _threaded_update():
                 time.sleep(0.1)
+                from WhaleEngine.engine import current_app
+                current_app.need_stop.append(self)
                 logLn("BetterCollisionSystem2D threaded update started.")
-                while True:
+                while not self.stopping:
                     self.update(0, running_in_thread=True)
-            threading.Thread(target=_threaded_update, daemon=True).start()
+            self.thread = threading.Thread(target=_threaded_update, daemon=True)
+            self.thread.start()
     def add_quad(self, collider):
         self.colliders.append(collider)
     def set_up_timer(self):
@@ -296,3 +300,7 @@ class BetterCollisionSystem2D(Plugin):
                         if layer in first.layers and layer not in first.colliding_layers:
                             first.colliding_layers.append(layer)
                     break
+    def stop(self):
+        if hasattr(self, "thread") and self.thread.is_alive():
+            self.stopping = True
+            self.thread.join()
