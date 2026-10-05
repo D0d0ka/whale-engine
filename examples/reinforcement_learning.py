@@ -4,6 +4,8 @@ from WhaleEngine.WindowAPI.OpenGL import windowAPI # or Vulkan / WebGL
 
 from random import randint, random, choice
 
+from math import sqrt
+
 #
 # WORK
 # IN
@@ -19,14 +21,16 @@ ParentingSystem()
 #textures = LoadTextures()
 shapes = LoadShapes()
 
-CHASER_START_OFFSET = 300
+CHASER_START_OFFSET = 160
 CHASER_SPEED = 20  # pixels per second
 CAMERA_SPEED = 300  # pixels per second
-MAX_SPEED = CHASER_SPEED - 1 # pixels per second
+MAX_SPEED = sqrt(CHASER_SPEED**2+CHASER_SPEED**2) - 1 # pixels per second
 MAX_RUNNER_SPEED_CHANGE = 5  # maximum change in runner speed per update
 EPSILON = 0.2
 MODE = ("one place", "random")[0]
 USE_DT = False
+
+print(f"MAX_SPEED: {MAX_SPEED}")
 
 def get_start_offset():
     if randint(0, 1) == 0:
