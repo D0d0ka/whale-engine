@@ -25,10 +25,10 @@ saves/
 # game flappy dodo save file
 flappydodosave.json
 
-# turning to .exe output
+# turning to .exe
 output/
 
-# turning to .dmg output
+# turning to .dmg # haven't tested yet
 build/
 dist/
 *.spec

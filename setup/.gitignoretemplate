@@ -1,12 +1,12 @@
-#WhaleEngine specific
+# WhaleEngine specific
 WhaleEngine/
 documentation/
 
-#WhaleEngine installers
+# WhaleEngine installers
 WEInstaller-MacLin.sh
 WEInstaller-Win.bat
 
-#python
+# python
 .venv/
 __pycache__/
 

@@ -9,6 +9,7 @@ class Renderer2D:
         self.entities = []
         self.camera = camera2d()
         self.renderer_type = "Renderer 2D"
+        self.active = True
         for key, value in kwargs.items():
             setattr(self, key, value)
         logLn("Renderer 2d loaded.")

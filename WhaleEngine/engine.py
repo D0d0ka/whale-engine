@@ -78,15 +78,21 @@ class WhaleEngine:
             self.window.poll()
             self.window.clear()
             for i in self.plugins["BeforeRender"]:
-                controlledrun(self.plugins["BeforeRender"][i].update, dt)
+                plugin = self.plugins["BeforeRender"][i]
+                if plugin.active:
+                    controlledrun(plugin.update, dt)
             if self.update != None:
                 controlledrun(self.update, dt)
             for i in self.renderers:
+                if not i.active:
+                    continue
                 controlledrun(i.update, dt)
                 controlledrun(i.update_entitys, dt)
                 controlledrun(i.render)
             for i in self.plugins["AfterRender"]:
-                controlledrun(self.plugins["AfterRender"][i].update, dt)
+                plugin = self.plugins["AfterRender"][i]
+                if plugin.active:
+                    controlledrun(plugin.update, dt)
             self.window.swap()
             self.last_render = this_update
         self.close_app()

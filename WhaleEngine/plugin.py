@@ -4,6 +4,7 @@ from .require import requirePlugin, incompatibleWithPlugin
 class Plugin:
     def __init__(self, requirements=[], incompatibilities=[], update_before_rendering=True , **kwargs):
         self.name = self.__class__.__name__
+        self.active = True
         from .engine import current_app
         for req in requirements:
             requirePlugin(req, self.name)
